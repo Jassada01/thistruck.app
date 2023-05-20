@@ -3,7 +3,7 @@
 <!--begin::Head-->
 
 <head>
-	<title>Thistruck System</title>
+	<title>This Truck</title>
 	<meta charset="utf-8" />
 	<meta name="description" content="The most advanced Bootstrap Admin Theme on Themeforest trusted by 94,000 beginners and professionals. Multi-demo, Dark Mode, RTL support and complete React, Angular, Vue &amp; Laravel versions. Grab your copy now and get life-time updates for free." />
 	<meta name="keywords" content="Metronic, bootstrap, bootstrap 5, Angular, VueJs, React, Laravel, admin themes, web design, figma, web development, free templates, free admin themes, bootstrap theme, bootstrap template, bootstrap dashboard, bootstrap dak mode, bootstrap button, bootstrap datepicker, bootstrap timepicker, fullcalendar, datatables, flaticon" />
@@ -30,7 +30,7 @@
 		<!--begin::Authentication - Sign-in -->
 		<div class="d-flex flex-column flex-lg-row flex-column-fluid">
 			<!--begin::Aside-->
-			<div class="d-flex flex-column flex-lg-row-auto w-xl-600px positon-xl-relative" style="background-color: #F2C98A">
+			<div class="d-flex flex-column flex-lg-row-auto w-xl-600px positon-xl-relative" style="background-image: url('assets/media/misc/loginBG.png'); background-size: cover;  background-color: #F8F8FF">
 				<!--begin::Wrapper-->
 				<div class="d-flex flex-column position-xl-fixed top-0 bottom-0 w-xl-600px scroll-y">
 					<!--begin::Content-->
@@ -50,7 +50,6 @@
 					</div>
 					<!--end::Content-->
 					<!--begin::Illustration-->
-					<div class="d-flex flex-row-auto bgi-no-repeat bgi-position-x-center bgi-size-contain bgi-position-y-bottom min-h-100px min-h-lg-350px" style='background-image: url(assets/media/illustrations/unitedpalms-1/13.png)'></div>
 					<!--end::Illustration-->
 				</div>
 				<!--end::Wrapper-->
@@ -65,15 +64,15 @@
 						<!--begin::Form-->
 						<!--begin::Alert-->
 						<div class="alert alert-danger" id="error_alert_box" style="display:none">
-								<!--begin::Wrapper-->
-								<div class="d-flex flex-column">
-									<!--begin::Content-->
-									<span> <i class="fas fa-lock text-danger"></i> ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง</span>
-									<!--end::Content-->
-								</div>
-								<!--end::Wrapper-->
+							<!--begin::Wrapper-->
+							<div class="d-flex flex-column">
+								<!--begin::Content-->
+								<span> <i class="fas fa-lock text-danger"></i> ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง</span>
+								<!--end::Content-->
 							</div>
-							<!--begin::Actions-->
+							<!--end::Wrapper-->
+						</div>
+						<!--begin::Actions-->
 						<form class="form w-100" novalidate="novalidate" id="login_form">
 							<!--begin::Heading-->
 							<!--begin::Input group-->
@@ -103,7 +102,7 @@
 								<!--end::Input-->
 							</div>
 							<!--end::Input group-->
-							
+
 							<div class="text-center">
 								<!--begin::Submit button-->
 								<button type="button" id="kt_sign_in_submit" class="btn btn-lg btn-primary w-100 mb-5">
@@ -112,7 +111,7 @@
 								<!--end::Submit button-->
 								<!--end::Google link-->
 							</div>
-							
+
 							<!--end::Alert-->
 							<!--end::Actions-->
 						</form>
@@ -125,7 +124,8 @@
 				<div class="d-flex flex-center flex-wrap fs-6 p-5 pb-0">
 					<!--begin::Links-->
 					<div class="d-flex flex-center fw-bold fs-6">
-						<spane class="text-muted px-2">Copyright© 2022</span>
+						<span class="text-muted px-2">Copyright&copy; <?php echo date('Y'); ?></span>
+
 					</div>
 					<!--end::Links-->
 				</div>
