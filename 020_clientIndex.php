@@ -2,10 +2,11 @@
 <html lang="en">
 <!--begin::Head-->
 <?php
-    include 'system_config.php';
-    $CURRENT_URL = str_replace($SERVERDIRNAME, "", $_SERVER['REQUEST_URI']);
-    include 'check_cookie.php';
+include 'system_config.php';
+$CURRENT_URL = str_replace($SERVERDIRNAME, "", $_SERVER['REQUEST_URI']);
+include 'check_cookie.php';
 ?>
+
 <head>
     <title>ข้อมูลผู้ว่าจ้าง</title>
     <meta charset="utf-8" />
@@ -188,7 +189,7 @@
                 <!--end::Content-->
                 <!--begin::Footer-->
                 <?php
-                    include 'footer.php';
+                include 'footer.php';
                 ?>
                 <!--end::Footer-->
             </div>
@@ -227,7 +228,8 @@
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json"
-                }
+                },
+                "pageLength": 50 // กำหนดให้แสดงแถวต่อหน้าเริ่มต้นที่ 50 แถว
             });
             clientTable.on('draw', function() {
                 $('#clientTable').removeClass('d-none');

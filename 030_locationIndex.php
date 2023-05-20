@@ -655,6 +655,7 @@ include 'check_cookie.php';
                     "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json"
                 },
                 "autoWidth": false,
+                "pageLength": 50 // กำหนดให้แสดงแถวต่อหน้าเริ่มต้นที่ 50 แถว
 
             });
             // Show Table 

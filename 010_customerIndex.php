@@ -221,7 +221,9 @@
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json"
-                }
+                },
+                "pageLength": 50 // กำหนดให้แสดงแถวต่อหน้าเริ่มต้นที่ 50 แถว
+
             });
             customerDatatable.on('draw', function() {
                 $('#customerTable').removeClass('d-none');
