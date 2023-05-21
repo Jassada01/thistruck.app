@@ -710,84 +710,17 @@ include 'check_cookie.php';
                 $('#select_Trip_no').trigger('click').attr('data-kt-menu-dismiss', 'true');
                 var trip_id = $(this).find(':selected').data('trip_id');
                 var job_id = $(this).find(':selected').data('job_id');
+                console.log(trip_no);
+                console.log(trip_id);
+                console.log(job_id);
                 var trip_no = $(this).find(':selected').val();
                 $("#currentTimelineTripID").html(trip_no);
-                loadtripTimeLine(job_id, trip_id);
+                if (typeof trip_id !== "undefined" && trip_id !== "") {
+                    loadtripTimeLine(job_id, trip_id);
+                }
+
             });
 
-
-            function Initialcalendar() {
-                var calendarEl = document.getElementById("kt_docs_fullcalendar_locales");
-
-                // initialize the calendar -- for more info please visit the official site: https://fullcalendar.io/demos
-                var calendar = new FullCalendar.Calendar(calendarEl, {
-                    headerToolbar: {
-                        left: "prev,next today",
-                        center: "title",
-                        right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth"
-                    },
-                    initialDate: "2020-09-12",
-                    locale: "th",
-                    buttonIcons: false, // show the prev/next text
-                    weekNumbers: true,
-                    navLinks: true, // can click day/week names to navigate views
-                    editable: true,
-                    dayMaxEvents: true, // allow "more" link when too many events
-                    events: [{
-                            title: "อัมพร",
-                            start: "2020-09-01 20:30:00"
-                        }, {
-                            title: "ชัย",
-                            start: "2020-09-01"
-                        }, {
-                            title: "สมพงษ์",
-                            start: "2020-09-01"
-                        },
-                        {
-                            title: "Long Event",
-                            start: "2020-09-07",
-                            end: "2020-09-10"
-                        },
-                        {
-                            title: "Conference",
-                            start: "2020-09-11",
-                            end: "2020-09-13"
-                        },
-                        {
-                            title: "Meeting",
-                            start: "2020-09-12T10:30:00",
-                            end: "2020-09-12T12:30:00"
-                        },
-                        {
-                            title: "Lunch",
-                            start: "2020-09-12T12:00:00"
-                        },
-                        {
-                            title: "Meeting",
-                            start: "2020-09-12T14:30:00"
-                        },
-                        {
-                            title: "Happy Hour",
-                            start: "2020-09-12T17:30:00"
-                        },
-                        {
-                            title: "Dinner",
-                            start: "2020-09-12T20:00:00"
-                        },
-                        {
-                            title: "Birthday Party",
-                            start: "2020-09-13T07:00:00"
-                        },
-                        {
-                            title: "Click for Google",
-                            url: "http://google.com/",
-                            start: "2020-09-28"
-                        }
-                    ]
-                });
-
-                calendar.render();
-            }
 
 
             function loadCalendar() {
