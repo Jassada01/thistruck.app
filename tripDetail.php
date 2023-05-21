@@ -1775,27 +1775,28 @@ License: For each use you must have a valid license purchased only from above li
                             }
 
                             // เพิ่ม timeline item ปกติ
+                            // เพิ่ม timeline item ปกติ
                             timelineItems += '<div class="timeline-item">';
                             timelineItems += '<div class="timeline-label fw-bolder text-gray-800 fs-6">' + timestamp_text + '</div>';
                             timelineItems += '<div class="timeline-badge">';
                             if (item.complete_flag !== null) {
                                 if (item.main_order == "1") {
-                                    timelineItems += '<i class="fa fa-genderless text-primary fs-1"></i>';
+                                    timelineItems += '<i class="fas fa-circle text-primary fs-xs"></i>';
                                 } else if (item.main_order == "3") {
                                     if (item.minor_order == "9") {
-                                        timelineItems += '<i class="fa fa-genderless text-success fs-1"></i>';
+                                        timelineItems += '<i class="fas fa-circle text-success fs-xs"></i>';
                                     } else {
                                         timelineItems += '<i class="fa fa-genderless text-warning fs-1"></i>';
                                     }
                                 } else if (item.main_order == "7") {
-                                    timelineItems += '<i class="fa fa-genderless text-success fs-1"></i>';
+                                    timelineItems += '<i class="fas fa-circle text-success fs-xs"></i>';
                                 } else if (item.main_order == "99") {
-                                    timelineItems += '<i class="fa fa-genderless text-danger fs-1"></i>';
+                                    timelineItems += '<i class="far fa-dot-circle text-danger fs-xs"></i>';
                                 } else {
-                                    timelineItems += '<i class="fa fa-genderless text-danger fs-1"></i>';
+                                    timelineItems += '<i class="far fa-circle text-danger fs-xs"></i>';
                                 }
                             } else {
-                                timelineItems += '<i class="fa fa-genderless text-secondary fs-1"></i>';
+                                timelineItems += '<i class="far fa-circle text-secondary fs-xs"></i>';
                             }
 
                             timelineItems += '</div>';
@@ -1810,7 +1811,7 @@ License: For each use you must have a valid license purchased only from above li
                             // แสดงข้อความของ step_desc และ location_name
                             if (item.step_desc && item.complete_flag !== null) {
                                 timelineItems += '<div class="fw-mormal timeline-content ps-3">';
-
+                                //console.log(item);
                                 timelineItems += item.step_desc;
                                 if (item.location_name) {
                                     timelineItems += '<B> (' + item.button_name + ')</B> - <span class="locationclickBTN" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
@@ -1835,7 +1836,7 @@ License: For each use you must have a valid license purchased only from above li
                                 timelineItems += '</div>';
 
                             } else {
-                                timelineItems += '<div class="fw-mormal timeline-content ' + content_color + ' ps-3">' + item.step_desc;
+                                timelineItems += '<div class="fw-mormal timeline-content ' + content_color + ' ps-3 ">' + item.step_desc;
                                 if (item.location_name) {
                                     timelineItems += ' - <span class="locationclickBTN" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
                                 }
@@ -1901,12 +1902,10 @@ License: For each use you must have a valid license purchased only from above li
                                 if (MAIN_STAGE == "รอเริ่มดำเนินการ") {
                                     $('#jobStatusNextLocation').text(data_arr[0].step_desc + "ที่" + data_arr[0].location_name);
 
-                                } 
-                                else if (MAIN_STAGE == "รอดำเนินการเสร็จ") {
+                                } else if (MAIN_STAGE == "รอดำเนินการเสร็จ") {
                                     $('#jobStatusNextLocation').text(data_arr[0].step_desc + "ที่" + data_arr[0].location_name);
 
-                                }
-                                else {
+                                } else {
                                     $('#jobStatusNextLocation').text(data_arr[0].location_name);
                                 }
                             } else {

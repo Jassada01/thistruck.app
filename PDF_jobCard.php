@@ -331,12 +331,12 @@ if ($result->num_rows > 0) {
 		$pdf->Cell(0, 10, $trip_driver_name, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 		// trip_contact_number
-		$pdf->SetXY(103, 102.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetXY(103, 103); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 		$pdf->SetFont('thsarabunb', 'B', 20);
 		$pdf->Cell(0, 10, $trip_contact_number, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 		// trip_truck_licenseNo
-		$pdf->SetXY(168, 102.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetXY(168, 103); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 		$pdf->SetFont('thsarabunb', 'B', 20);
 		$pdf->Cell(0, 10, $trip_truck_licenseNo, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
@@ -406,7 +406,8 @@ if ($result->num_rows > 0) {
 			a.job_characteristic_id,
 			b.location_code, 
 			b.location_name, 
-			a.job_characteristic 
+			a.job_characteristic,
+			a.job_note 
 		From 
 			job_order_detail_trip_list a 
 			Inner Join locations b ON a.location_id = b.location_id 
@@ -425,33 +426,49 @@ if ($result->num_rows > 0) {
 			$trip_detail_location_code = $row2['location_code'];
 			$trip_detail_location_name = $row2['location_name'];
 			$trip_detail_job_characteristic = $row2['job_characteristic'];
+			$trip_detail_job_note = $row2['job_note'];
 
 			if (in_array($trip_detail_job_characteristic_id, ['1000', '1001'])) {
 				// Pickup Process
-				$pdf->SetXY(46, 149); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetXY(46, 147); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 18);
 				$pdf->Cell(0, 10, $trip_detail_location_code, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
-				$pdf->SetXY(46, 154); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetXY(46, 151.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 14);
 				$pdf->Cell(0, 10, $trip_detail_job_characteristic, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+
+				$pdf->SetXY(46, 156); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetFont('thsarabunb', 'B', 11);
+				$pdf->Cell(0, 10, $trip_detail_job_note, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+
 			} else if (in_array($trip_detail_job_characteristic_id, ['1010', '1011'])) {
 				// Return Process
-				$pdf->SetXY(121, 149); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetXY(122, 147); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 18);
 				$pdf->Cell(0, 10, $trip_detail_location_code, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
-				$pdf->SetXY(121, 154); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetXY(122, 151.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 14);
 				$pdf->Cell(0, 10, $trip_detail_job_characteristic, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+
+				$pdf->SetXY(122, 156); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetFont('thsarabunb', 'B', 11);
+				$pdf->Cell(0, 10, $trip_detail_job_note, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+
+
 			} else {
-				$pdf->SetXY(46, 164+($cnt*14)); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetXY(46, 162+($cnt*14)); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 18);
 				$pdf->Cell(0, 10, $trip_detail_location_code, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
-				$pdf->SetXY(46, 169+($cnt*14)); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetXY(46, 166+($cnt*14)); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 14);
 				$pdf->Cell(0, 10, $trip_detail_job_characteristic, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+
+				$pdf->SetXY(46, 170+($cnt*14)); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetFont('thsarabunb', 'B', 11);
+				$pdf->Cell(0, 10, $trip_detail_job_note, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 				
 				$cnt = $cnt + 1;
 			}
