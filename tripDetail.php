@@ -182,6 +182,9 @@ License: For each use you must have a valid license purchased only from above li
                                         <div class="col-sm-9 mt-3 d-flex align-items-center px-3">
                                             <h1><i class="bi bi-file-text fs-3"></i></i> เลขที่เอกสาร</h1>
                                         </div>
+                                        <div class="card-toolbar">
+                                            <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="printJob"><i class="fas fa-file-pdf fs-3"></i>ใบงาน</button>
+                                        </div>
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
@@ -1290,8 +1293,8 @@ License: For each use you must have a valid license purchased only from above li
                         MAIN_job_id = data_arr[0].job_id;
                         MAIN_trip_id = data_arr[0].id;
 
-                        console.log(MAIN_job_id);
-                        console.log(MAIN_trip_id);
+                        //console.log(MAIN_job_id);
+                        //console.log(MAIN_trip_id);
 
 
                         loadJobdata();
@@ -2546,6 +2549,11 @@ License: For each use you must have a valid license purchased only from above li
                         alert("Posting failed.");
                     });
             }
+
+
+            $('#printJob').click(function() {
+                window.open(`PDF_jobCard.php?job_id=${MAIN_job_id}&trip_id=${MAIN_trip_id}`, '_blank');
+            });
 
 
 
