@@ -182,7 +182,7 @@ function getCalendarData()
 		AND b.minor_order = 1
 	WHERE 
 		a.jobStartDateTime >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) 
-		AND a.jobStartDateTime <= DATE_ADD(CURDATE(), INTERVAL 3 MONTH)";
+		AND a.jobStartDateTime <= DATE_ADD(CURDATE(), INTERVAL 3 MONTH) AND (a.complete_flag IS NULL OR a.complete_flag > 0) ";
 
 	$res = $conn->query(trim($sql));
 	mysqli_close($conn);

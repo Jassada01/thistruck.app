@@ -1292,6 +1292,7 @@ License: For each use you must have a valid license purchased only from above li
                         console.log(data_arr);
                         MAIN_job_id = data_arr[0].job_id;
                         MAIN_trip_id = data_arr[0].id;
+                        MAIN_DriverName = data_arr[0].driver_name;
 
                         //console.log(MAIN_job_id);
                         //console.log(MAIN_trip_id);

@@ -686,7 +686,7 @@ include 'check_cookie.php';
                                 <!-- จบ Card -->
                                 <!-- เริ่มต้น Card -->
                                 <div class="row mt-10">
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-6" id="cardTimeline">
                                         <div class="card">
                                             <div class="card-header">
                                                 <div class="col-sm-6 mt-3 d-flex align-items-center px-3">
@@ -719,6 +719,9 @@ include 'check_cookie.php';
                                                         <!--begin::Menu item-->
                                                         <div class="menu-item px-3">
                                                             <a class="menu-link flex-stack px-3" id="checkMapbtn">ตรวจสอบเส้นทาง</a>
+                                                        </div>
+                                                        <div class="menu-item px-3">
+                                                            <a class="menu-link flex-stack px-3" id="changeRoute">เปลี่ยนแปลงเส้นทาง <i class="fas fa-exclamation-circle ms-2 fs-7" data-bs-toggle="tooltip" title="กรณีเปลี่ยนแปลงเส้นทางสถานการเดินทางจะถูกย้อนไปที่รอคนขับยืนยัน"></i></a></a>
                                                         </div>
                                                         <div class="menu-item px-3">
                                                             <a class="menu-link flex-stack px-3" id="attachedFileBtn" data-bs-toggle="modal" data-bs-target="#addAttachedFileModal">แนบไฟล์/รูป
@@ -757,10 +760,44 @@ include 'check_cookie.php';
                                                     </button>
                                                 </div>
                                             </div>
-
                                         </div>
                                     </div>
-
+                                    <div class="col-sm-6 d-none" id="classEditTimeLine">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <div class="col-auto mt-3 d-flex align-items-center px-3">
+                                                    <h1><i class="bi bi-map fs-3"></i> เปลี่ยนแปลงแผนการเดินทาง</h1>
+                                                </div>
+                                            </div>
+                                            <!--begin::Body-->
+                                            <div class="card-body">
+                                                <!--begin::Row-->
+                                                <div class="row row-cols-1 g-10">
+                                                    <div class="col text-center">
+                                                        <span class="badge badge-primary fs-5">
+                                                            เริ่มงาน
+                                                        </span>
+                                                        </BR>
+                                                        <i class="fas fa-arrow-down fa-5x" style="color: #EFEFEF;"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="row row-cols-1 g-10 min-h-100px draggable-zone" id="dragandDropZone">
+                                                </div>
+                                                <div class="row row-cols-1 g-10">
+                                                    <div class="col text-center">
+                                                        <span class="badge badge-success fs-5">
+                                                            จบงาน
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <!--end::Row-->
+                                            </div>
+                                            <!--end: Card Body-->
+                                            <div class="card-footer d-flex justify-content-between">
+                                                ปปป
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="col-sm-6">
                                         <div class="card card-bordered">
                                             <!--begin::Card header-->
@@ -775,7 +812,6 @@ include 'check_cookie.php';
                                                 </ul>
                                             </div>
                                             <!--end::Card header-->
-
                                             <!--begin::Card body-->
                                             <div class="card-body">
                                                 <div class="tab-content" id="myTabContent">
@@ -1128,6 +1164,189 @@ include 'check_cookie.php';
                         <p class=" fs-5 text-end">เวลาทั้งหมด: <span id="totalTime"></span></p>
                         <p class=" fs-2 text-danger text-end"><i>*ระยะทางและเวลาเป็นการคำนวนเบื้องต้นโดยยึดจากระยะทางที่ใกล้ที่สุดในและไม่คำนึงถึงสภาพการจราจร</i><span id="totalTime"></span></p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal เพิ่มสถานที่ -->
+    <div class="modal fade" id="addLocationModal" tabindex="-1" aria-labelledby="addLocationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addLocationModalLabel">เพิ่มสถานที่</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container my-5">
+                        <div class="row">
+                            <div class="col-md-8 offset-md-2">
+                                <form id="locationForm" method="post" class="m-form m-form--fit m-form--label-align-right">
+
+                                    <div class="form-group mt-3 row">
+                                        <label for="location_select" class="col-sm-3 col-form-label">เลือกสถานที่<span class="text-danger">*</span></label>
+                                        <div class="col-sm-8">
+                                            <select type="text" class="form-control m-input" id="location_select" name="location_select" data-dropdown-parent="#addLocationModal"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mt-3 row">
+                                        <label for="job_characteristic" class="col-sm-3 col-form-label">ลักษณะงาน<span class="text-danger">*</span></label>
+                                        <div class="col-sm-8">
+                                            <select type="text" class="form-control m-input" id="job_characteristic" name="job_characteristic" data-dropdown-parent="#addLocationModal">
+                                                <option value="">กรุณาเลือกลักษณะงาน</option>
+                                                <optgroup label="Pick Up">
+                                                    <?php
+                                                    // Connect to database
+                                                    include "function/connectionDb.php";
+                                                    // Query data from master_data where type = 'Job_Type'
+                                                    $sql = "SELECT * FROM master_data WHERE type = 'job_characteristic' AND name LIKE 'Pick Up%'";
+                                                    $result = mysqli_query($conn, $sql);
+
+                                                    // Loop through data and create dropdown options
+                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                                        echo "<option value='" . $row['name'] . "' data-job_characteristic_id='" . $row['id'] . "'>" . $row['name'] . "</option>";
+                                                    }
+                                                    ?>
+                                                </optgroup>
+                                                <optgroup label="Return">
+                                                    <?php
+                                                    // Query data from master_data where type = 'Job_Type'
+                                                    $sql = "SELECT * FROM master_data WHERE type = 'job_characteristic' AND name LIKE 'Return%'";
+                                                    $result = mysqli_query($conn, $sql);
+
+                                                    // Loop through data and create dropdown options
+                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                                        echo "<option value='" . $row['name'] . "'  data-job_characteristic_id='" . $row['id'] . "'>" . $row['name'] . "</option>";
+                                                    }
+                                                    ?>
+                                                </optgroup>
+                                                <optgroup label="Delivery">
+                                                    <?php
+
+
+                                                    // Query data from master_data where type = 'Job_Type'
+                                                    $sql = "SELECT * FROM master_data WHERE type = 'job_characteristic' AND name LIKE 'Delivery%'";
+                                                    $result = mysqli_query($conn, $sql);
+
+                                                    // Loop through data and create dropdown options
+                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                                        echo "<option value='" . $row['name'] . "'  data-job_characteristic_id='" . $row['id'] . "'>" . $row['name'] . "</option>";
+                                                    }
+                                                    ?>
+                                                </optgroup>
+                                                <optgroup label="Loading">
+                                                    <?php
+                                                    // Query data from master_data where type = 'Job_Type'
+                                                    $sql = "SELECT * FROM master_data WHERE type = 'job_characteristic' AND name = 'Loading (รับสินค้า)'";
+                                                    $result = mysqli_query($conn, $sql);
+
+                                                    // Loop through data and create dropdown options
+                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                                        echo "<option value='" . $row['name'] . "' data-job_characteristic_id='" . $row['id'] . "'>" . $row['name'] . "</option>";
+                                                    }
+                                                    ?>
+                                                </optgroup>
+
+                                                <optgroup label="Other">
+                                                    <?php
+                                                    // Query data from master_data where type = 'Job_Type'
+                                                    $sql = "SELECT * FROM master_data WHERE type = 'job_characteristic' AND name LIKE 'Other%'";
+                                                    $result = mysqli_query($conn, $sql);
+
+                                                    // Loop through data and create dropdown options
+                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                                        echo "<option value='" . $row['name'] . "' data-job_characteristic_id='" . $row['id'] . "'>" . $row['name'] . "</option>";
+                                                    }
+
+                                                    // ปิดการเชื่อมต่อฐานข้อมูล
+                                                    $conn->close();
+                                                    ?>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group mt-3 row">
+                                        <label for="job_note" class="col-sm-3 col-form-label">รายละเอียด</label>
+                                        <div class="col-sm-8">
+                                            <textarea class="form-control m-input" id="job_note" name="job_note" rows="3"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="separator border-secondary my-10"></div>
+
+                                    <h2>รายละเอียดสถานที่</h2>
+                                    <div class="form-group mt-3 row">
+                                        <label for="location_code" class="col-sm-3 col-form-label">รหัสสถานที่</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control m-input" id="location_code" name="location_code" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mt-3 row">
+                                        <label for="location_name" class="col-sm-3 col-form-label">ชื่อสถานที่</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control m-input" id="location_name" name="location_name" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-3 row">
+                                        <label for="location_type" class="col-sm-3 col-form-label">ประเภท</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control m-input" id="location_type" name="location_type" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-3 row" id="edit_customer_panel">
+                                        <label for="customer_id" class="col-sm-3 col-form-label">ลูกค้า</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control m-input" id="customer_id" name="customer_id" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mt-3 row">
+                                        <label for="address" class="col-sm-3 col-form-label">ที่อยู่</label>
+                                        <div class="col-sm-8">
+                                            <textarea class="form-control m-input" id="location_address" name="address" rows="3" readonly></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mt-3 row">
+                                        <label for="map_url" class="col-sm-3 col-form-label">URL Google Map</label>
+                                        <div class="col-sm-8">
+                                            <input type="url" class="form-control m-input" id="map_url" name="map_url" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mt-3 row">
+                                        <label for="latitude" class="col-sm-3 col-form-label">ละติจูด</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control m-input" id="latitude" name="latitude" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mt-3 row">
+                                        <label for="longitude" class="col-sm-3 col-form-label">ลองติจูด</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control m-input" id="longitude" name="longitude" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-3 row">
+                                        <label for="note" class="col-sm-3 col-form-label">หมายเหตุ</label>
+                                        <div class="col-sm-8">
+                                            <textarea class="form-control m-input" id="note" name="note" rows="3" readonly></textarea>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary" id="btnAddNewLocation">เพิ่ม</button>
                 </div>
             </div>
         </div>
@@ -2558,7 +2777,7 @@ include 'check_cookie.php';
                     .done(function(data) {
 
                         var data_arr = JSON.parse(data);
-                        console.log(data_arr);
+                        //console.log(data_arr);
 
                         var location = data_arr[0];
 
@@ -2580,6 +2799,358 @@ include 'check_cookie.php';
                     });
             }
 
+            // changeRoute
+            // classEditTimeLine
+            // classTimeLine
+            // เมื่อคลิกที่ปุ่ม "changeRoute"
+            $("#changeRoute").click(function() {
+                // ซ่อนส่วน "cardTimeline" โดยเพิ่มคลาส "d-none"
+                $("#cardTimeline").addClass("d-none");
+
+                // แสดงส่วน "classEditTimeLine" โดยลบคลาส "d-none"
+                $("#classEditTimeLine").removeClass("d-none");
+                loadTripDetailforEdit();
+            });
+
+            // Loca tripplan for exit
+            function loadTripDetailforEdit() {
+                var ajaxData = {};
+                ajaxData['f'] = '14';
+                ajaxData['job_id'] = MAIN_job_id;
+                ajaxData['trip_id'] = MAIN_trip_id;
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        var data_arr = JSON.parse(data);
+                        console.log(data_arr);
+                        MAIN_DATA = data_arr;
+                        //console.log(MAIN_DATA);
+                        createContainer();
+                        generateJobCodeFlg = true;
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+            function getBadgeColor(jobCharacteristic) {
+                if (jobCharacteristic.includes("Delivery")) {
+                    return "badge-primary";
+                } else if (jobCharacteristic.includes("Loading")) {
+                    return "badge-success";
+                } else if (jobCharacteristic.includes("Pick Up")) {
+                    return "badge-info";
+                } else if (jobCharacteristic.includes("Return")) {
+                    return "badge-danger";
+                } else {
+                    return "badge-secondary";
+                }
+            }
+
+            function getcardColor(action) {
+                let color = "";
+                if (action === "ลูกค้า") {
+                    color = "";
+                } else {
+                    color = "";
+                }
+                return color;
+            }
+
+            // btnAddNewLocation
+            $('body').on('click', '#btnAddNewLocation', function() {
+                //console.log(TEMP_MAIN_DATA);
+                if (checkInputsNewLocation()) {
+                    $('#addLocationModal').modal('hide');
+                    if (TEMP_MAIN_DATA.location_type == "ลูกค้า") {
+                        //TEMP_MAIN_DATA['showName'] = TEMP_MAIN_DATA.customer_name + "(" + TEMP_MAIN_DATA.branch + ")" + " - " + TEMP_MAIN_DATA.location_name
+                        TEMP_MAIN_DATA['showName'] = TEMP_MAIN_DATA.location_code + "<BR>" + TEMP_MAIN_DATA.customer_name + (TEMP_MAIN_DATA.branch ? "(" + TEMP_MAIN_DATA.branch + ")" : "") + " - " + TEMP_MAIN_DATA.location_name;
+                    } else {
+                        TEMP_MAIN_DATA['showName'] = TEMP_MAIN_DATA.location_code + "<BR>" + TEMP_MAIN_DATA.location_name;
+
+                    }
+                    TEMP_MAIN_DATA['job_characteristic'] = $("#job_characteristic").val();
+                    TEMP_MAIN_DATA['job_characteristic_id'] = $("#job_characteristic").find(':selected').data("job_characteristic_id");
+                    TEMP_MAIN_DATA['job_note'] = $("#job_note").val();
+                    TEMP_MAIN_DATA['unique_key'] = generateRandomString(10);
+                    TEMP_MAIN_DATA['cardColor'] = getcardColor(TEMP_MAIN_DATA.location_type);
+                    TEMP_MAIN_DATA['job_characteristicShow'] = '<span class="badge ' + getBadgeColor(TEMP_MAIN_DATA.job_characteristic) + '" style="text-transform: uppercase; font-weight: bold; font-size: 1.2rem;" >' + TEMP_MAIN_DATA.job_characteristic + '</span>';
+
+                    if (EditLocation_seq != "") {
+                        MAIN_DATA[EditLocation_seq] = TEMP_MAIN_DATA
+
+                    } else {
+                        MAIN_DATA.push(TEMP_MAIN_DATA);
+                    }
+
+                    //console.log(MAIN_DATA);
+                    createContainer();
+                }
+
+            });
+
+
+
+            function Refresh_DragDrop() {
+                var container = document.querySelector(".draggable-zone");
+                if (!container) {
+                    return;
+                } else {
+                    //console.log(container);
+                }
+
+                if (!swappable) {
+                    swappable = new Sortable(container, {
+                        draggable: ".draggable",
+                        handle: '.draggable .draggable-handle',
+                        forceFallback: true,
+                        fallbackTolerance: 0,
+                        mirror: {
+                            appendTo: "body",
+                            constrainDimensions: true,
+                            xAxis: false,
+                            yAxis: true
+                        },
+                        onUpdate: () => {
+                            updateMainData();
+                        }
+                    });
+                }
+            }
+
+            function removeItemByUniqueKey(arr, uniqueKey) {
+                return arr.filter(item => item.unique_key !== uniqueKey);
+            }
+
+
+
+            function createContainer() {
+                //console.log(MAIN_DATA);
+                let mainContent = MAIN_DATA.map((item, idx) => {
+                    return `
+                    <div class="col draggable" data-idx="${idx}">
+                        <div class="card border-3 border-gray card-bordered card-rounded ${item.cardColor}">
+                            <div class="card-header">
+                            <div class="card-title">
+                                <div>
+                                <a href="#" class="btn btn-icon btn-hover-light-primary draggable-handle">
+                                    <i class="fas fa-bars fs-2x"><span class="path1"></span><span class="path2"></span></i> 
+                                </a>
+                                </div>
+                                <h4 class="card-label">${item.job_characteristicShow}</h4>
+                            </div>
+                                <a class="btn btn-link btn-color-muted btn-active-color-primary mb-2 changeLocation" location_id="${item.location_id}" job_characteristic="${item.job_characteristic}" value="${idx}">เปลี่ยนสถานที่</a>
+                                <a class="btn btn-link btn-color-muted btn-active-color-primary mb-2 delete_item_box" value="${item.unique_key}">x</a>
+                            </div>
+                            <div class="card-body">
+                            <h4>${item.showName}</h4>
+                            ${item.address} 
+                            </div>
+                            <div class="card-footer">
+                            <div class="row">
+                                <div class="col-6 text-right">
+                                    <strong>Note:</strong> ${item.job_note || "-"}
+                                </div>
+                                <div class="col-6 text-left">
+                                    <strong>Map URL:</strong> <a href="#" class="btn btn-sm btnlinkGoogleMap" lat="${item.latitude}" lng="${item.longitude}">
+                                    <i class="bi bi-geo-alt fa-1x"><span class="path1"></span><span class="path2"></span></i> แผนที่</a>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col text-center">
+                            <i class="fas fa-arrow-down fa-5x" style="color: #EFEFEF;"></i>
+                        </div>
+                        </div>
+                        `;
+                });
+
+                $("#dragandDropZone").html(mainContent);
+                // Action After MAIN_DATA Changed  ==========================
+                Refresh_DragDrop();
+                //generateJobCode();
+                if (MAIN_DATA.length >= 2) {
+                    $('#btnGoogleRoute').removeClass('d-none');
+                } else {
+                    $('#btnGoogleRoute').addClass('d-none');
+                }
+            }
+
+            // สร้าง Function เพื่ออัปเดตลำดับข้อมูลใน MAIN_DATA
+            function updateMainData() {
+                const sortedEls = document.querySelectorAll('.draggable');
+                const newMainData = [];
+                sortedEls.forEach((el) => {
+                    const idx = el.dataset.idx;
+                    //console.log(idx);
+                    //console.log(el.dataset.value);
+                    //console.log(MAIN_DATA[idx]);
+                    newMainData.push(MAIN_DATA[idx]);
+                });
+                MAIN_DATA = newMainData;
+                //console.log(MAIN_DATA);
+                createContainer();
+            }
+
+            $('body').on('click', '.delete_item_box', function() {
+                var target = ($(this).attr('value'));
+                MAIN_DATA = removeItemByUniqueKey(MAIN_DATA, target);
+                createContainer();
+                //console.log(MAIN_DATA);
+            });
+
+            // changeLocation
+            $('body').on('click', '.changeLocation', function() {
+                var target = ($(this).attr('value'));
+                var location_id = ($(this).attr('location_id'));
+                var tmpjob_characteristic = ($(this).attr('job_characteristic'));
+
+                //console.log(tmpjob_characteristic);
+                EditLocation_seq = target;
+                EditLocation_ID = location_id;
+                EDITjob_characteristic = tmpjob_characteristic.trim();
+
+                $('#addLocationModal').modal('show');
+            });
+
+
+            function loadLocationForSelect() {
+                var ajaxData = {};
+                ajaxData['f'] = '1';
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/05_jobOrderTemplate/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(retunrdata) {
+                        //console.log(retunrdata);
+                        var data_arr = JSON.parse(retunrdata);
+                        //console.log(data_arr);
+                        var location_select = $('#location_select');
+                        location_select.empty();
+                        location_select.append($('<option>', {
+                            value: "null",
+                            text: "เลือกสถานที่",
+                            disabled: true, // ตั้งค่า disabled เพื่อให้ไม่สามารถเลือ
+                            selected: true, // ตั้งค่า selected เพื่อให้ถูกเลือก
+                        }));
+                        let show_name = "";
+                        $.each(data_arr, function(index, val) {
+                            show_name = val.location_code + " : " + val.location_name;
+
+                            if (val.location_type == "ลูกค้า") {
+                                //show_name = val.location_code + " : " + val.customer_name + "(" + val.branch + ")" + " - " + val.location_name;
+                                show_name = val.location_code + " : " + val.customer_name + (val.branch ? "(" + val.branch + ")" : "") + " - " + val.location_name;
+
+                            }
+                            location_select.append($('<option>', {
+                                value: val.location_id,
+                                text: show_name
+                            }));
+                        });
+                        $('#location_select').select2({
+                            placeholder: 'เลือกสถานที่',
+
+                        });
+
+                        if (EditLocation_ID != "") {
+                            $('#location_select').val(EditLocation_ID).trigger('change');
+                            $("#job_characteristic").val(EDITjob_characteristic);
+                            $("#btnAddNewLocation").html("เปลี่ยน")
+
+                        } else {
+                            $("#btnAddNewLocation").html("เพิ่ม")
+                        }
+
+
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+            $('#addLocationModal').on('show.bs.modal', function() {
+                $('#locationForm').trigger('reset');
+                loadLocationForSelect();
+                TEMP_MAIN_DATA = {};
+            });
+
+            function checkInputsNewLocation() {
+                // ดึงค่าจาก input สถานที่และลักษณะงาน
+                const location_select = $('#location_select').val();
+                const job_characteristic = $('#job_characteristic').val();
+
+                // ตรวจสอบว่าค่า input สถานที่และลักษณะงานถูกกรอกครบหรือไม่
+                if (location_select && job_characteristic) {
+                    return true;
+                } else {
+                    // แสดงข้อความแจ้งเตือนกรณีไม่กรอกครบ
+                    Swal.fire({
+                        title: 'กรุณากรอก สถานที่ และลักษณะงานให้ครบ',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+            }
+
+            $('#addLocationModal').on('hidden.bs.modal', function() {
+                EditLocation_seq = "";
+                EditLocation_ID = "";
+                Editjob_characteristic = "";
+            });
+
+            $('body').on('change', '#location_select', function() {
+                var target = $(this).val()
+                var ajaxData = {};
+                ajaxData['f'] = '2';
+                ajaxData['location_id'] = target;
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/05_jobOrderTemplate/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+
+                        var data_arr = JSON.parse(data);
+                        TEMP_MAIN_DATA = data_arr[0];
+                        let form = $('#locationForm');
+                        form.find('#location_code').val(data_arr[0].location_code);
+                        form.find('#location_name').val(data_arr[0].location_name);
+                        form.find('#customer_id').val(data_arr[0].customer_name);
+                        form.find('#location_address').val(data_arr[0].address);
+                        form.find('#map_url').val(data_arr[0].map_url);
+                        form.find('#latitude').val(data_arr[0].latitude);
+                        form.find('#longitude').val(data_arr[0].longitude);
+                        form.find('#note').val(data_arr[0].note);
+                        form.find('#location_type').val(data_arr[0].location_type);
+
+
+
+                        if (data_arr[0].location_type == "ลูกค้า") {
+                            $('#edit_customer_panel').removeClass('d-none');
+                        } else {
+                            $('#edit_customer_panel').addClass('d-none');
+                        }
+
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            });
 
 
 

@@ -1166,6 +1166,34 @@ function getTripIDfromRandomCode()
 	echo json_encode($data_Array);
 }
 
+// loadTripDetailforEdit
+// F=14
+function loadTripDetailforEdit()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
+	$sql = "SELECT * FROM job_order_detail_trip_list a 
+	Where a.job_id = $job_id AND a.trip_id = $trip_id Order By a.plan_order;";
+
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	echo json_encode($data_Array);
+}
+
 
 
 
@@ -1221,6 +1249,10 @@ switch ($f) {
 		}
 	case 13: {
 			getTripIDfromRandomCode();
+			break;
+		}
+	case 14: {
+			loadTripDetailforEdit();
 			break;
 		}
 }
