@@ -266,13 +266,6 @@ if ($result->num_rows > 0) {
 		$trip_contact_number = $row['contact_number'];
 		$trip_random_code = $row['random_code'];
 
-		if ($row['containerWeight'] == 0) {
-			$trip_containerWeight = '-';
-		}
-
-		if ($row['containerWeight2'] == 0) {
-			$trip_containerWeight2 = '-';
-		}
 
 		mysqli_set_charset($conn, "utf8");
 		// ---------------------------------------------------------
@@ -288,7 +281,7 @@ if ($result->num_rows > 0) {
 
 
 		// Set position x, y for the text
-		$pdf->SetXY(185,37); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetXY(185, 37); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 		$pdf->SetFont('thsarabunb', 'B', 16);
 		$pdf->Cell(0, 10, '1', 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
@@ -303,6 +296,7 @@ if ($result->num_rows > 0) {
 			$thai_date
 		);
 		$pdf->Cell(0, 10, $thai_date, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+
 
 
 		// job_no
@@ -341,68 +335,81 @@ if ($result->num_rows > 0) {
 
 
 		// trip_truckType
-		$pdf->SetXY(164, 75); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
-		$pdf->SetFont('thsarabunb', 'B', 12);
-		$pdf->Cell(0, 10, $trip_truckType, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+		$pdf->SetXY(164, 76); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetFont('thsarabunb', 'B', 16);
+		//$pdf->Cell(0, 10, $trip_truckType, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+		//$pdf->setFillColor(255, 255, 255);
+		$pdf->MultiCell(40, 5, $trip_truckType . "\n", 0, 'J', false, 1, '', '', true);
 
 		// trip_driver_name
-		$pdf->SetXY(36, 102.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
-		$pdf->SetFont('thsarabunb', 'B', 25);
+		$pdf->SetXY(36, 103); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetFont('thsarabunb', 'B', 18);
 		$pdf->Cell(0, 10, $trip_driver_name, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 		// trip_contact_number
-		
-		
-		$pdf->SetXY(92, 103); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
-		$pdf->SetFont('thsarabunb', 'B', 20);
+		$pdf->SetXY(100, 103); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetFont('thsarabunb', 'B', 18);
 		$pdf->Cell(0, 10, $trip_contact_number, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 		// trip_truck_licenseNo
-		$licensefs = 20;
+		$licensefs = 18;
 		if (strlen($trip_truck_licenseNo) > 30) {
-			$licensefs = 16;
+			$licensefs = 14;
 		}
-		$pdf->SetXY(155, 103.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetXY(162, 103.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 		$pdf->SetFont('thsarabunb', 'B', $licensefs);
 		$pdf->Cell(0, 10, $trip_truck_licenseNo, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
+		// trip_container 1 ===========================================================
 		// trip_containerID
-		$pdf->SetXY(45, 115); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetXY(38, 115); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 		$pdf->SetFont('thsarabunb', 'B', 20);
 		$pdf->Cell(0, 10, $trip_containerID, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 		// trip_seal_no
-		$pdf->SetXY(120, 115); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
-		$pdf->SetFont('thsarabunb', 'B', 20);
+		$pdf->SetXY(98, 115); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetFont('thsarabunb', 'B', 18);
 		$pdf->Cell(0, 10, $trip_seal_no, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
-		// trip_containerWeight
-		$pdf->SetXY(172, 115); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
-		$pdf->SetFont('thsarabunb', 'B', 20);
-		$pdf->Cell(0, 10, $trip_containerWeight, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+		// trip_containersize
+		$pdf->SetXY(139, 115); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetFont('thsarabunb', 'B', 18);
+		$pdf->Cell(0, 10, $trip_containersize, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
+		// trip_containerWeight
+		if (($trip_containerWeight != "") and ($trip_containerWeight != 0.00)) {
+			$pdf->SetXY(178, 115); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+			$pdf->SetFont('thsarabunb', 'B', 18);
+			$pdf->Cell(0, 10, number_format($trip_containerWeight)." กก.", 0, 1, 'L', false, '', 0, false, 'T', 'C');
+		}
+
+
+		// trip_container 2 ===========================================================
 		// trip_containerID2
-		$pdf->SetXY(45, 130); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetXY(38, 130); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 		$pdf->SetFont('thsarabunb', 'B', 20);
 		$pdf->Cell(0, 10, $trip_containerID2, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 		// trip_seal_no2
-		$pdf->SetXY(120, 130); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
-		$pdf->SetFont('thsarabunb', 'B', 20);
+		$pdf->SetXY(98, 130); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetFont('thsarabunb', 'B', 18);
 		$pdf->Cell(0, 10, $trip_seal_no2, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
-		// trip_containerWeight2
-		$pdf->SetXY(172, 130); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
-		$pdf->SetFont('thsarabunb', 'B', 20);
-		$pdf->Cell(0, 10, $trip_containerWeight2, 0, 1, 'L', false, '', 0, false, 'T', 'C');
-
-		// trip_containerWeight2
-		$pdf->SetXY(164, 81); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		// trip_containersize
+		$pdf->SetXY(139, 130); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 		$pdf->SetFont('thsarabunb', 'B', 18);
-		$pdf->Cell(0, 10, $trip_containersize, 0, 1, 'L', false, '', 0, false, 'T', 'C');
-
+		$pdf->Cell(0, 10, $trip_containersize2, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 		// trip_containerWeight2
+		if (($trip_containerWeight2 != "") and ($trip_containerWeight2 != 0.00)) {
+			$pdf->SetXY(178, 115); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+			$pdf->SetFont('thsarabunb', 'B', 18);
+			$pdf->Cell(0, 10, number_format($trip_containerWeight2)." กก.", 0, 1, 'L', false, '', 0, false, 'T', 'C');
+		}
+		
+
+
+		// remark
 		$pdf->SetXY(15, 246); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 		$pdf->SetFont('thsarabunb', '', 14);
 		$pdf->Cell(0, 10, $remark, 0, 1, 'L', false, '', 0, false, 'T', 'C');
@@ -419,7 +426,7 @@ if ($result->num_rows > 0) {
 		$currentDateTime = date('d/m/Y H:i:s');
 		$pdf->SetXY(15, 287); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 		$pdf->SetFont('thsarabunb', '', 14);
-		$pdf->Cell(0, 10, "Export Date : ".$currentDateTime, 0, 1, 'R', false, '', 0, false, 'T', 'C');
+		$pdf->Cell(0, 10, "Export Date : " . $currentDateTime, 0, 1, 'R', false, '', 0, false, 'T', 'C');
 
 
 		//$trip_status
@@ -467,9 +474,9 @@ if ($result->num_rows > 0) {
 				$pdf->SetFont('thsarabunb', 'B', 18);
 				$pdf->Cell(0, 10, $trip_detail_location_code, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
-				$pdf->SetXY(46, 151.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetXY(46, 151.7); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 14);
-				$pdf->Cell(0, 10, $trip_detail_job_characteristic, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+				$pdf->Cell(0, 10, str_replace("Pick Up (รับตู้) >> ", "รับ", $trip_detail_job_characteristic), 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 				$pdf->SetXY(46, 156); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 11);
@@ -480,9 +487,9 @@ if ($result->num_rows > 0) {
 				$pdf->SetFont('thsarabunb', 'B', 18);
 				$pdf->Cell(0, 10, $trip_detail_location_code, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
-				$pdf->SetXY(122, 151.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetXY(122, 151.7); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 14);
-				$pdf->Cell(0, 10, $trip_detail_job_characteristic, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+				$pdf->Cell(0, 10, str_replace("Return  (คืนตู้) >> ", "คืน", $trip_detail_job_characteristic), 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 				$pdf->SetXY(122, 156); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 11);

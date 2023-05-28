@@ -355,7 +355,7 @@ include 'check_cookie.php';
                                                                                                 // Loop through data and create dropdown options
                                                                                                 while ($row = mysqli_fetch_assoc($result)) {
                                                                                                     //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
-                                                                                                    echo "<option value='" . $row['driver_id'] . "' driverName='" . $row['driver_name'] . "' driverImg='assets/media/uploadfile/" . $row['image_path'] . "' data-driver_type='" . $row['type'] . "' >" . $row['driver_name'] . "</option>";
+                                                                                                    echo "<option value='" . $row['driver_id'] . "' driverName='" . $row['driver_name'] . "' driverImg='assets/media/uploadfile/" . $row['image_path'] . "' data-driver_type='" . $row['type'] . "' data-line_id='" . $row['line_id'] .  "'>" . $row['driver_name'] . "</option>";
                                                                                                 }
                                                                                                 // Close database connection
                                                                                                 mysqli_close($conn);
@@ -439,7 +439,7 @@ include 'check_cookie.php';
                                                                                             <label class="form-label">น้ำหนักตู้</label>
                                                                                             <div class="input-group">
                                                                                                 <input type="number" class="form-control containerWeight" name="containerWeight" autocomplete="off" />
-                                                                                                <span class="input-group-text" id="basic-addon2">ตัน</span>
+                                                                                                <span class="input-group-text" id="basic-addon2">กก.</span>
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
@@ -479,7 +479,7 @@ include 'check_cookie.php';
                                                                                             <label class="form-label">น้ำหนักตู้</label>
                                                                                             <div class="input-group">
                                                                                                 <input type="number" class="form-control containerWeight2" name="containerWeight2" autocomplete="off" />
-                                                                                                <span class="input-group-text" id="basic-addon2">ตัน</span>
+                                                                                                <span class="input-group-text" id="basic-addon2">กก.</span>
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
@@ -718,10 +718,13 @@ include 'check_cookie.php';
                                                         <!--end::Heading-->
                                                         <!--begin::Menu item-->
                                                         <div class="menu-item px-3">
+                                                            <a class="menu-link flex-stack px-3" id="sednMSGtoDriver">ส่งข้อความถึงคนขับ</a>
+                                                        </div>
+                                                        <div class="menu-item px-3">
                                                             <a class="menu-link flex-stack px-3" id="checkMapbtn">ตรวจสอบเส้นทาง</a>
                                                         </div>
                                                         <div class="menu-item px-3">
-                                                            <a class="menu-link flex-stack px-3" id="changeRoute">เปลี่ยนแปลงเส้นทาง <i class="fas fa-exclamation-circle ms-2 fs-7" data-bs-toggle="tooltip" title="กรณีเปลี่ยนแปลงเส้นทางสถานการเดินทางจะถูกย้อนไปที่รอคนขับยืนยัน"></i></a></a>
+                                                            <a class="menu-link flex-stack px-3" id="changeRoute">เปลี่ยนแผนการเดินรถ <i class="fas fa-exclamation-circle ms-2 fs-7" data-bs-toggle="tooltip" title="สามารถเปลี่ยนแปลงเส้นทางได้เฉพาะยังไม่ได้ยืนยันงานเท่านั้น"></i></a></a>
                                                         </div>
                                                         <div class="menu-item px-3">
                                                             <a class="menu-link flex-stack px-3" id="attachedFileBtn" data-bs-toggle="modal" data-bs-target="#addAttachedFileModal">แนบไฟล์/รูป
@@ -773,6 +776,14 @@ include 'check_cookie.php';
                                             <div class="card-body">
                                                 <!--begin::Row-->
                                                 <div class="row row-cols-1 g-10">
+                                                    <div class="col-sm-12 text-end">
+                                                        <!-- ปุ่มเพิ่มสถานที่ -->
+                                                        <button type="button" class="btn btn-primary  mt-1" data-bs-toggle="modal" data-bs-target="#addLocationModal">
+                                                            <i class="fas fa-plus"></i> เพิ่มสถานที่ในเส้นทาง
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="row row-cols-1 g-10">
                                                     <div class="col text-center">
                                                         <span class="badge badge-primary fs-5">
                                                             เริ่มงาน
@@ -794,7 +805,13 @@ include 'check_cookie.php';
                                             </div>
                                             <!--end: Card Body-->
                                             <div class="card-footer d-flex justify-content-between">
-                                                ปปป
+                                                <button type="button" class="btn btn-secondary" id="cancelCreateNewRoute">
+                                                    ยกเลิก
+                                                </button>
+
+                                                <button type="button" class="btn btn-primary" id="saveNewRoute">
+                                                    <i class="fas fa-save"></i> บันทึกการเปลี่ยนแปลงเส้นทาง
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -1060,7 +1077,7 @@ include 'check_cookie.php';
                             <a class="nav-link active" data-bs-toggle="tab" href="#GGmap">แผนที่</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#Expen">ค่าใช้จ่ายที่เกี่ยวข้อง</a>
+                            <a class="nav-link" data-bs-toggle="tab" href="#Expen">ข้อมูลสถานที่ค่าใช้จ่าย</a>
                         </li>
                     </ul>
                     <div class="tab-content" id="myTabContent">
@@ -1080,7 +1097,6 @@ include 'check_cookie.php';
                         </div>
                         <div class="tab-pane fade" id="Expen" role="tabpanel">
                             <div id="locationDetailPanel" class="container">
-                                <h1 class="mt-4">ข้อมูลสถานที่</h1>
 
                                 <div class="row mt-4">
                                     <div class="col-md-6">
@@ -1175,7 +1191,7 @@ include 'check_cookie.php';
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addLocationModalLabel">เพิ่มสถานที่</h5>
+                    <h5 class="modal-title" id="addLocationModalLabel">เลือกสถานที่</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -1265,6 +1281,7 @@ include 'check_cookie.php';
                                                     ?>
                                                 </optgroup>
                                             </select>
+                                            <label class="col-sm-6 col-form-label d-none" id="job_characteristic_Panel"></label>
                                         </div>
                                     </div>
 
@@ -1546,6 +1563,10 @@ include 'check_cookie.php';
             const urlParams = new URLSearchParams(window.location.search);
             const MAIN_job_id = urlParams.get('job_id');
             const MAIN_trip_id = urlParams.get('trip_id');
+            let MAIN_trip_no = "";
+            let MAIN_job_no = "";
+            let updatePlan_no = "";
+            let MAIN_TRIP_RANDOMCODE = "";
             //var LOAD_PROCESS_COUNT = 0;
 
             //alert(MAIN_job_id);
@@ -1561,6 +1582,10 @@ include 'check_cookie.php';
             let MAIN_CONFIRM_BTN = "";
             let MAIN_STAGE = "";
             let tempGooglrMapRoute = [];
+            let EditLocation_seq = "";
+            let EditLocation_ID = "";
+            let Editjob_characteristic = "";
+            let changeActionMode = 0;
 
 
             // Set Initial Select 2
@@ -1728,7 +1753,7 @@ include 'check_cookie.php';
                         document.querySelectorAll('#jobHeaderForm input').forEach(input => {
                             input.disabled = true;
                         });
-
+                        console.log(data_arr);
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
 
@@ -1746,7 +1771,7 @@ include 'check_cookie.php';
                         $('#main_book_no').val(jobHeaderForm.main_book_no);
                         $('#main_no').val(jobHeaderForm.main_book_no);
                         $('#job_no').val(jobHeaderForm.job_no);
-
+                        MAIN_job_no = jobHeaderForm.job_no;
                         //console.log(jobHeaderForm.job_date);
                         //$('#job_date').val(jobHeaderForm.job_date);
                         job_date_picker.setDate(jobHeaderForm.job_date);
@@ -1786,7 +1811,8 @@ include 'check_cookie.php';
                         $("#jobOrderbreadcrumb").text(jobHeaderForm.job_no);
                         $("#tripbreadcrumb").text(data_arr.JobDetailTrip[0].tripNo);
                         $('#tripNo').val(data_arr.JobDetailTrip[0].tripNo);
-
+                        MAIN_trip_no = data_arr.JobDetailTrip[0].tripNo;
+                        MAIN_TRIP_RANDOMCODE = data_arr.JobDetailTrip[0].random_code;
                         MAIN_TRIP_STATUS = data_arr.JobDetailTrip[0].status;
                         // Set job status text and apply styles
                         var jobStatusText = $('#jobStatusText');
@@ -1883,6 +1909,7 @@ include 'check_cookie.php';
                         }
 
 
+                        loadtripTimeLine();
                         $('#loading-spinner').hide();
                     })
                     .fail(function() {
@@ -2093,9 +2120,13 @@ include 'check_cookie.php';
                                 timelineItems += '<div class="fw-mormal timeline-content ' + content_color + ' ps-3 ">' + item.step_desc;
                                 if (item.location_name) {
                                     timelineItems += ' - <span class="locationclickBTN" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
+                                    if (MAIN_TRIP_STATUS != "รอเจ้าหน้าที่ยืนยัน") {
+                                        timelineItems += '    <span class="badge badge-circle badge-light locationChangeBtn" data-plan_order="' + item.plan_order + '" data-location_id="' + item.location_id + '" data-job_characteristic="' + item.step_desc + '" ><i class="fas fa-sync-alt"></i></span>';
+                                    }
                                 }
                                 timelineItems += '</div>';
                             }
+
 
                             timelineItems += '</div>';
                         }
@@ -2134,7 +2165,7 @@ include 'check_cookie.php';
                         if (data != "[]") {
                             //console.log(data);
                             var data_arr = JSON.parse(data);
-                            console.log(data_arr);
+                            //console.log(data_arr);
                             if (data_arr[0].stage != "รอเจ้าหน้าที่ยืนยัน") {
 
                                 // ดึงข้อมูล step_desc และ button_name จาก Object
@@ -2720,6 +2751,7 @@ include 'check_cookie.php';
                     })
                     .done(function(retunrdata) {
                         var data_arr = JSON.parse(retunrdata);
+                        //console.log(data_arr);
 
                         var formattedData = data_arr.map(function(item, index) {
                             var name = (index + 1) + ". " + item.location_code + " [" + item.job_characteristic + "]";
@@ -2784,14 +2816,25 @@ include 'check_cookie.php';
                         $("#locationCode").text(location.location_code);
                         $("#address").text(location.address);
                         $("#locationType").text(location.location_type);
-                        $("#shortHaulFee").text(location.short_haul_fee ? location.short_haul_fee + " บาท" : "-");
-                        $("#longHaulFee").text(location.long_haul_fee ? location.long_haul_fee + " บาท" : "-");
-                        $("#shortHaulReturnFee").text(location.short_haul_return_fee ? location.short_haul_return_fee + " บาท" : "-");
-                        $("#longHaulReturnFee").text(location.long_haul_return_fee ? location.long_haul_return_fee + " บาท" : "-");
-                        $("#yardFee").text(location.yard_fee ? location.yard_fee + " บาท" : "-");
+                        $("#shortHaulFee").text(location.short_haul_fee && parseFloat(location.short_haul_fee) !== 0 ? location.short_haul_fee + " บาท" : "-");
+                        $("#longHaulFee").text(location.long_haul_fee && parseFloat(location.long_haul_fee) !== 0 ? location.long_haul_fee + " บาท" : "-");
+                        $("#shortHaulReturnFee").text(location.short_haul_return_fee && parseFloat(location.short_haul_return_fee) !== 0 ? location.short_haul_return_fee + " บาท" : "-");
+                        $("#longHaulReturnFee").text(location.long_haul_return_fee && parseFloat(location.long_haul_return_fee) !== 0 ? location.long_haul_return_fee + " บาท" : "-");
+                        $("#yardFee").text(location.yard_fee && parseFloat(location.yard_fee) !== 0 ? location.yard_fee + " บาท" : "-");
+
                         $("#openingHours").text(location.opening_hours ? location.opening_hours + " น." : "-");
                         $("#contactNumber").text(location.contact_number);
-                        $("#note").text(location.note ? location.note : "-");
+
+                        var urlPattern = /(https?:\/\/[^\s]+)/g;
+                        var url = location.note.match(urlPattern);
+                        if (url) {
+                            // If a URL is found, create a link that opens in a new tab
+                            var link = '<a href="' + url[0] + '" target="_blank">' + url[0] + '</a>';
+
+                            // Replace the URL in the data with the new link
+                            location.note = location.note.replace(urlPattern, link);
+                        }
+                        $("#note").html(location.note ? location.note : "-");
                     })
                     .fail(function() {
                         // just in case posting your form failed
@@ -2804,12 +2847,24 @@ include 'check_cookie.php';
             // classTimeLine
             // เมื่อคลิกที่ปุ่ม "changeRoute"
             $("#changeRoute").click(function() {
-                // ซ่อนส่วน "cardTimeline" โดยเพิ่มคลาส "d-none"
-                $("#cardTimeline").addClass("d-none");
+                if (MAIN_TRIP_STATUS == "รอเจ้าหน้าที่ยืนยัน") {
+                    // saveDatabtn
+                    $('#saveDatabtn').prop('disabled', true);
+                    // ซ่อนส่วน "cardTimeline" โดยเพิ่มคลาส "d-none"
+                    $("#cardTimeline").addClass("d-none");
 
-                // แสดงส่วน "classEditTimeLine" โดยลบคลาส "d-none"
-                $("#classEditTimeLine").removeClass("d-none");
-                loadTripDetailforEdit();
+                    // แสดงส่วน "classEditTimeLine" โดยลบคลาส "d-none"
+                    $("#classEditTimeLine").removeClass("d-none");
+                    loadTripDetailforEdit();
+                } else {
+                    Swal.fire({
+                        title: 'ไม่สามารถเปลี่ยนแผนการเดินรถได้',
+                        text: 'แต่คุณยังสามารถเปลี่ยนสถานที่ได้โดยคลิกที่สถานที่ เลือกเปลี่ยนสถานที่',
+                        icon: 'warning',
+                        confirmButtonText: 'ตกลง'
+                    })
+
+                }
             });
 
             // Loca tripplan for exit
@@ -2827,7 +2882,7 @@ include 'check_cookie.php';
                     })
                     .done(function(data) {
                         var data_arr = JSON.parse(data);
-                        console.log(data_arr);
+                        //console.log(data_arr);
                         MAIN_DATA = data_arr;
                         //console.log(MAIN_DATA);
                         createContainer();
@@ -2866,7 +2921,8 @@ include 'check_cookie.php';
             // btnAddNewLocation
             $('body').on('click', '#btnAddNewLocation', function() {
                 //console.log(TEMP_MAIN_DATA);
-                if (checkInputsNewLocation()) {
+                if (changeActionMode == 1) {
+
                     $('#addLocationModal').modal('hide');
                     if (TEMP_MAIN_DATA.location_type == "ลูกค้า") {
                         //TEMP_MAIN_DATA['showName'] = TEMP_MAIN_DATA.customer_name + "(" + TEMP_MAIN_DATA.branch + ")" + " - " + TEMP_MAIN_DATA.location_name
@@ -2875,23 +2931,75 @@ include 'check_cookie.php';
                         TEMP_MAIN_DATA['showName'] = TEMP_MAIN_DATA.location_code + "<BR>" + TEMP_MAIN_DATA.location_name;
 
                     }
-                    TEMP_MAIN_DATA['job_characteristic'] = $("#job_characteristic").val();
-                    TEMP_MAIN_DATA['job_characteristic_id'] = $("#job_characteristic").find(':selected').data("job_characteristic_id");
+                    //TEMP_MAIN_DATA['job_characteristic'] = $("#job_characteristic").val();
+                    //TEMP_MAIN_DATA['job_characteristic_id'] = $("#job_characteristic").find(':selected').data("job_characteristic_id");
                     TEMP_MAIN_DATA['job_note'] = $("#job_note").val();
                     TEMP_MAIN_DATA['unique_key'] = generateRandomString(10);
-                    TEMP_MAIN_DATA['cardColor'] = getcardColor(TEMP_MAIN_DATA.location_type);
-                    TEMP_MAIN_DATA['job_characteristicShow'] = '<span class="badge ' + getBadgeColor(TEMP_MAIN_DATA.job_characteristic) + '" style="text-transform: uppercase; font-weight: bold; font-size: 1.2rem;" >' + TEMP_MAIN_DATA.job_characteristic + '</span>';
+                    //TEMP_MAIN_DATA['cardColor'] = getcardColor(TEMP_MAIN_DATA.location_type);
+                    //TEMP_MAIN_DATA['job_characteristicShow'] = '<span class="badge ' + getBadgeColor(TEMP_MAIN_DATA.job_characteristic) + '" style="text-transform: uppercase; font-weight: bold; font-size: 1.2rem;" >' + TEMP_MAIN_DATA.job_characteristic + '</span>';
 
-                    if (EditLocation_seq != "") {
-                        MAIN_DATA[EditLocation_seq] = TEMP_MAIN_DATA
+                    //console.log(TEMP_MAIN_DATA);
+                    var ajaxData = TEMP_MAIN_DATA;
+                    ajaxData['f'] = '16';
+                    ajaxData['job_id'] = MAIN_job_id;
+                    ajaxData['job_no'] = MAIN_job_no;
+                    ajaxData['trip_id'] = MAIN_trip_id;
+                    ajaxData['tripNo'] = MAIN_trip_no;
+                    ajaxData['plan_order'] = EditLocation_seq;
+                    //console.log(ajaxData);
+                    $.ajax({
+                            type: 'POST',
+                            dataType: "text",
+                            url: 'function/10_workOrder/mainFunction.php',
+                            data: (ajaxData)
+                        })
+                        .done(function(data) {
+                            //console.log(data);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'บันทึกข้อมูลสำเร็จ',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                                //null
+                            });
 
-                    } else {
-                        MAIN_DATA.push(TEMP_MAIN_DATA);
+                        })
+                        .fail(function() {
+                            // just in case posting your form failed
+                            alert("Posting failed.");
+                        });
+
+                } else {
+                    if (checkInputsNewLocation()) {
+                        $('#addLocationModal').modal('hide');
+                        if (TEMP_MAIN_DATA.location_type == "ลูกค้า") {
+                            //TEMP_MAIN_DATA['showName'] = TEMP_MAIN_DATA.customer_name + "(" + TEMP_MAIN_DATA.branch + ")" + " - " + TEMP_MAIN_DATA.location_name
+                            TEMP_MAIN_DATA['showName'] = TEMP_MAIN_DATA.location_code + "<BR>" + TEMP_MAIN_DATA.customer_name + (TEMP_MAIN_DATA.branch ? "(" + TEMP_MAIN_DATA.branch + ")" : "") + " - " + TEMP_MAIN_DATA.location_name;
+                        } else {
+                            TEMP_MAIN_DATA['showName'] = TEMP_MAIN_DATA.location_code + "<BR>" + TEMP_MAIN_DATA.location_name;
+
+                        }
+                        TEMP_MAIN_DATA['job_characteristic'] = $("#job_characteristic").val();
+                        TEMP_MAIN_DATA['job_characteristic_id'] = $("#job_characteristic").find(':selected').data("job_characteristic_id");
+                        TEMP_MAIN_DATA['job_note'] = $("#job_note").val();
+                        TEMP_MAIN_DATA['unique_key'] = generateRandomString(10);
+                        TEMP_MAIN_DATA['cardColor'] = getcardColor(TEMP_MAIN_DATA.location_type);
+                        TEMP_MAIN_DATA['job_characteristicShow'] = '<span class="badge ' + getBadgeColor(TEMP_MAIN_DATA.job_characteristic) + '" style="text-transform: uppercase; font-weight: bold; font-size: 1.2rem;" >' + TEMP_MAIN_DATA.job_characteristic + '</span>';
+
+                        if (EditLocation_seq != "") {
+                            MAIN_DATA[EditLocation_seq] = TEMP_MAIN_DATA
+
+                        } else {
+                            MAIN_DATA.push(TEMP_MAIN_DATA);
+                        }
+
+                        //console.log(MAIN_DATA);
+                        createContainer();
                     }
-
-                    //console.log(MAIN_DATA);
-                    createContainer();
                 }
+
 
             });
 
@@ -3069,6 +3177,16 @@ include 'check_cookie.php';
                             $("#btnAddNewLocation").html("เพิ่ม")
                         }
 
+                        if (changeActionMode == 1) {
+                            $("#job_characteristic_Panel").html(EDITjob_characteristic);
+                            $("#job_characteristic_Panel").removeClass("d-none");
+                            $("#job_characteristic").addClass("d-none");
+                        } else {
+                            $("#job_characteristic").removeClass("d-none");
+                            $("#job_characteristic_Panel").addClass("d-none");
+                        }
+
+
 
 
                     })
@@ -3107,6 +3225,7 @@ include 'check_cookie.php';
                 EditLocation_seq = "";
                 EditLocation_ID = "";
                 Editjob_characteristic = "";
+                changeActionMode = 0;
             });
 
             $('body').on('change', '#location_select', function() {
@@ -3135,9 +3254,6 @@ include 'check_cookie.php';
                         form.find('#longitude').val(data_arr[0].longitude);
                         form.find('#note').val(data_arr[0].note);
                         form.find('#location_type').val(data_arr[0].location_type);
-
-
-
                         if (data_arr[0].location_type == "ลูกค้า") {
                             $('#edit_customer_panel').removeClass('d-none');
                         } else {
@@ -3153,16 +3269,132 @@ include 'check_cookie.php';
             });
 
 
+            // 
+            // 
 
+            $("#cancelCreateNewRoute").click(function() {
+                // ซ่อนส่วน "cardTimeline" โดยเพิ่มคลาส "d-none"
+                $("#classEditTimeLine").addClass("d-none");
 
+                // แสดงส่วน "classEditTimeLine" โดยลบคลาส "d-none"
+                $("#cardTimeline").removeClass("d-none");
+                $('#saveDatabtn').prop('disabled', false);
+                //loadTripDetailforEdit();
+            });
 
+            // saveNewRoute
+            $("#saveNewRoute").click(function() {
+                var ajaxData = {
+                    jobDetailPlan: MAIN_DATA.map((item, index) => ({
+                        ...item,
+                        plan_order: index
+                    }))
+                };
+                ajaxData['f'] = '15';
+                ajaxData['job_id'] = MAIN_job_id;
+                ajaxData['job_no'] = MAIN_job_no;
+                ajaxData['trip_id'] = MAIN_trip_id;
+                ajaxData['tripNo'] = MAIN_trip_no;
+
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData),
+                        beforeSend: function() {
+                            // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                            $('#loading-spinner').show();
+                        },
+                    })
+                    .done(function(data) {
+                        //console.log(data);
+                        $('#loading-spinner').hide();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'บันทึกข้อมูลสำเร็จ',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                            //null
+                        });
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            });
+
+            //locationChangeBtn
+            $('body').on('click', '.locationChangeBtn', function() {
+                var target = $(this).data('plan_order');
+                var tmpjob_characteristic = $(this).data('job_characteristic');
+                var location_id = $(this).data('location_id');
+
+                //console.log(tmpjob_characteristic);
+                EditLocation_seq = target;
+                EditLocation_ID = location_id;
+                EDITjob_characteristic = tmpjob_characteristic.trim();
+
+                changeActionMode = 1;
+                $('#addLocationModal').modal('show');
+            });
+
+            //sednMSGtoDriver
+            //var driver_type = $(this).find(':selected').data('driver_type');
+            $('body').on('click', '#sednMSGtoDriver', function() {
+                var line_id_target = $(".truckDriver").find(':selected').data('line_id');
+                if (line_id_target.trim() == "") {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ไม่พบข้อมูล Line',
+                        text: 'ยังไม่ได้บันทึกข้อมูล System Line ID ของพนักงานขับรถเข้าสู่ระบบ',
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'ข้อความที่ต้องการส่ง',
+                        input: 'text',
+                        inputPlaceholder: 'กรอกข้อความของคุณที่นี่',
+                        showCancelButton: true,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            let Message = result.value;
+                            var ajaxData = {};
+                            ajaxData['f'] = '8';
+                            ajaxData['line_id'] = line_id_target;
+                            ajaxData['message'] = "ข้อความจากเจ้าหน้าที่ : " + Message;
+                            ajaxData['link'] = "tripDetail.php?r="+MAIN_TRIP_RANDOMCODE; //MAIN_TRIP_RANDOMCODE
+                            $.ajax({
+                                    type: 'POST',
+                                    dataType: "text",
+                                    url: 'function/00_systemManagement/mainFunction.php',
+                                    data: (ajaxData)
+                                })
+                                .done(function(data) {
+                                    //console.log(data);
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'ส่งข้อความแล้ว',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    });
+                                })
+                                .fail(function() {
+                                    // just in case posting your form failed
+                                    alert("Posting failed.");
+                                });
+
+                        }
+                    });
+
+                }
+            });
 
 
 
             // Load Data from Initail page load =======
             //loadJobTemplateDatafromJobTemplateID();
             loadJobdata();
-            loadtripTimeLine();
             get_status_and_button();
             loadAttachedData();
 

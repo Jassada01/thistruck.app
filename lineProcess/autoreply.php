@@ -23,6 +23,10 @@ foreach ($events['events'] as $event) {
                 // ทำการตอบกลับด้วยค่าของ userID
                 replyTextMessage($replyToken, $userId);
             }
+            else
+            {
+                replyTextMessage($replyToken, "นี่เป็นช่องทางสำหรับการส่งข้อมูลแจ้งเตือนเท่านั้น ถ้าคุณมีคำถามหรือต้องการข้อมูลเพิ่มเติม, กรุณาติดต่อเราที่หมายเลข 063-914-4536 นะคะ");
+            }
         }
     }
 }

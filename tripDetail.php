@@ -592,7 +592,7 @@ License: For each use you must have a valid license purchased only from above li
                                                                                             <label class="form-label">น้ำหนักตู้</label>
                                                                                             <div class="input-group">
                                                                                                 <input type="number" class="form-control containerWeight" name="containerWeight" autocomplete="off" />
-                                                                                                <span class="input-group-text" id="basic-addon2">ตัน</span>
+                                                                                                <span class="input-group-text" id="basic-addon2"></span>
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
@@ -632,7 +632,7 @@ License: For each use you must have a valid license purchased only from above li
                                                                                             <label class="form-label">น้ำหนักตู้</label>
                                                                                             <div class="input-group">
                                                                                                 <input type="number" class="form-control containerWeight2" name="containerWeight2" autocomplete="off" />
-                                                                                                <span class="input-group-text" id="basic-addon2">ตัน</span>
+                                                                                                <span class="input-group-text" id="basic-addon2"></span>
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
@@ -950,7 +950,7 @@ License: For each use you must have a valid license purchased only from above li
                             <a class="nav-link active" data-bs-toggle="tab" href="#GGmap">แผนที่</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#Expen">ค่าใช้จ่ายที่เกี่ยวข้อง</a>
+                            <a class="nav-link" data-bs-toggle="tab" href="#Expen">ข้อมูลสถานที่ค่าใช้จ่าย</a>
                         </li>
                     </ul>
                     <div class="tab-content" id="myTabContent">
@@ -970,7 +970,6 @@ License: For each use you must have a valid license purchased only from above li
                         </div>
                         <div class="tab-pane fade" id="Expen" role="tabpanel">
                             <div id="locationDetailPanel" class="container">
-                                <h1 class="mt-4">ข้อมูลสถานที่</h1>
 
                                 <div class="row mt-4">
                                     <div class="col-md-6">
@@ -2536,14 +2535,23 @@ License: For each use you must have a valid license purchased only from above li
                         $("#locationCode").text(location.location_code);
                         $("#address").text(location.address);
                         $("#locationType").text(location.location_type);
-                        $("#shortHaulFee").text(location.short_haul_fee ? location.short_haul_fee + " บาท" : "-");
-                        $("#longHaulFee").text(location.long_haul_fee ? location.long_haul_fee + " บาท" : "-");
-                        $("#shortHaulReturnFee").text(location.short_haul_return_fee ? location.short_haul_return_fee + " บาท" : "-");
-                        $("#longHaulReturnFee").text(location.long_haul_return_fee ? location.long_haul_return_fee + " บาท" : "-");
-                        $("#yardFee").text(location.yard_fee ? location.yard_fee + " บาท" : "-");
+                        $("#shortHaulFee").text(location.short_haul_fee && parseFloat(location.short_haul_fee) !== 0 ? location.short_haul_fee + " บาท" : "-");
+                        $("#longHaulFee").text(location.long_haul_fee && parseFloat(location.long_haul_fee) !== 0 ? location.long_haul_fee + " บาท" : "-");
+                        $("#shortHaulReturnFee").text(location.short_haul_return_fee && parseFloat(location.short_haul_return_fee) !== 0 ? location.short_haul_return_fee + " บาท" : "-");
+                        $("#longHaulReturnFee").text(location.long_haul_return_fee && parseFloat(location.long_haul_return_fee) !== 0 ? location.long_haul_return_fee + " บาท" : "-");
+                        $("#yardFee").text(location.yard_fee && parseFloat(location.yard_fee) !== 0 ? location.yard_fee + " บาท" : "-");
                         $("#openingHours").text(location.opening_hours ? location.opening_hours + " น." : "-");
                         $("#contactNumber").text(location.contact_number);
-                        $("#note").text(location.note ? location.note : "-");
+                        var urlPattern = /(https?:\/\/[^\s]+)/g;
+                        var url = location.note.match(urlPattern);
+                        if (url) {
+                            // If a URL is found, create a link that opens in a new tab
+                            var link = '<a href="' + url[0] + '" target="_blank">' + url[0] + '</a>';
+
+                            // Replace the URL in the data with the new link
+                            location.note = location.note.replace(urlPattern, link);
+                        }
+                        $("#note").html(location.note ? location.note : "-");
                     })
                     .fail(function() {
                         // just in case posting your form failed

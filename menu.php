@@ -127,7 +127,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion me-lg-1">
+                        <div data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion me-lg-1 <?php if ($MAIN_USER_DATA->position_name != "ผู้ดูแลระบบ") echo "d-none"; ?>">
                             <span class="menu-link py-3">
                                 <span class="menu-title">จัดการระบบ</span>
                                 <span class="menu-arrow d-lg-none"></span>

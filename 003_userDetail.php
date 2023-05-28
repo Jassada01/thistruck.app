@@ -226,9 +226,12 @@ include 'check_cookie.php';
                                                     </div>
                                                 </div>
                                                 <div class="mb-3 row">
-                                                    <label for="line_id" class="col-sm-3 col-form-label text-end-pc">Line ID</label>
+                                                    <label for="line_id" class="col-sm-3 col-form-label text-end-pc"><a href="addLineManual.php" target="_blank">System Line ID</a></label>
                                                     <div class="col-sm-4">
                                                         <input type="text" class="form-control" id="line_id" name="line_id" autocomplete="off">
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <button type="button" class="btn  btn-light-danger" id="TestSendLineBTN">ทดสอบ</button>
                                                     </div>
                                                 </div>
                                                 <div class="mb-3 row d-none">
@@ -634,7 +637,7 @@ include 'check_cookie.php';
                 ajaxData['password'] = CryptoJS.MD5($("#newPassword").val()).toString()
                 //console.log(ajaxData);
 
-                
+
                 // ส่งข้อมูลไปบันทึก
                 $.ajax({
                     type: 'POST',
@@ -660,8 +663,36 @@ include 'check_cookie.php';
                         });
                     }
                 });
-                
 
+
+            });
+
+            $('body').on('click', '#TestSendLineBTN', function() {
+                var target = $("#line_id").val();
+                if (target.trim() != "") {
+                    var ajaxData = {};
+                    ajaxData['f'] = '7';
+                    ajaxData['line_id'] = target;
+                    $.ajax({
+                            type: 'POST',
+                            dataType: "text",
+                            url: 'function/00_systemManagement/mainFunction.php',
+                            data: (ajaxData)
+                        })
+                        .done(function(data) {
+                            console.log(data);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ส่งข้อความแล้ว',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        })
+                        .fail(function() {
+                            // just in case posting your form failed
+                            alert("Posting failed.");
+                        });
+                }
             });
 
 

@@ -325,6 +325,101 @@ function testSendLine()
 }
 
 
+// F=8
+function sendLineMSG()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// Line_Token
+	$sql = "SELECT * FROM master_data WHERE type = 'system_value' AND name = 'Line Token'";
+	$result = $conn->query($sql);
+	$row = $result->fetch_assoc();
+	$Line_Token = $row['value'];
+
+	// Server Name 
+	$sql = "SELECT * FROM master_data WHERE type = 'server_name'";
+	$result = $conn->query($sql);
+	$row = $result->fetch_assoc();
+	$server_name = $row['value'];
+	
+	
+	mysqli_close($conn);
+
+
+	$accessToken = $Line_Token;
+	$userId = $line_id; // เปลี่ยนเป็น User ID ของผู้รับข้อความ
+	$link = $server_name.$link;
+
+
+	$data = [
+		'to' => $userId,
+		'messages' => [
+			[
+				'type' => 'flex',
+				'altText' => 'ข้อความจากเจ้าหน้าที่',
+				'contents' => [
+					'type' => 'bubble',
+					'body' => [
+						'type' => 'box',
+						'layout' => 'vertical',
+						'contents' => [
+							[
+								'type' => 'text',
+								'text' => $message,
+								'wrap' => true
+							],
+							[
+								'type' => 'separator',
+								'margin' => 'xl'
+							],
+							[
+								'type' => 'button',
+								'style' => 'primary',
+								'action' => [
+									'type' => 'uri',
+									'label' => 'ดูรายละเอียด',
+									'uri' => $link
+								]
+							]
+						]
+					]
+				]
+			]
+		]
+	];
+
+	$url = 'https://api.line.me/v2/bot/message/push';
+
+	$headers = [
+		'Content-Type: application/json',
+		'Authorization: Bearer ' . $accessToken
+	];
+
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$result = curl_exec($ch);
+	curl_close($ch);
+	if ($result === false) {
+		echo 'เกิดข้อผิดพลาดในการส่งข้อความ: ' . curl_error($ch);
+	} else {
+		echo 'ส่งข้อความและลิงก์ Line Message API สำเร็จ!';
+	}
+
+
+}
+
+
 //============================ MAIN =========================================================
 switch ($f) {
 	case 1: {
@@ -353,6 +448,10 @@ switch ($f) {
 		}
 	case 7: {
 			testSendLine();
+			break;
+		}
+	case 8: {
+			sendLineMSG();
 			break;
 		}
 }

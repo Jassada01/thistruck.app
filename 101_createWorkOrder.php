@@ -549,7 +549,7 @@ include 'check_cookie.php';
                                                                         <label class="form-label">น้ำหนักตู้</label>
                                                                         <div class="input-group">
                                                                             <input type="number" class="form-control containerWeight" name="containerWeight" autocomplete="off" />
-                                                                            <span class="input-group-text" id="basic-addon2">ตัน</span>
+                                                                            <span class="input-group-text" id="basic-addon2">กก.</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -589,7 +589,7 @@ include 'check_cookie.php';
                                                                         <label class="form-label">น้ำหนักตู้</label>
                                                                         <div class="input-group">
                                                                             <input type="number" class="form-control containerWeight2" name="containerWeight2" autocomplete="off" />
-                                                                            <span class="input-group-text" id="basic-addon2">ตัน</span>
+                                                                            <span class="input-group-text" id="basic-addon2">กก.</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>

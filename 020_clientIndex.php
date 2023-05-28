@@ -165,7 +165,7 @@ include 'check_cookie.php';
                                                         echo "<td>" . $row['ContactPerson'] . "</td>";
                                                         echo "<td>" . $row['Phone'] . "</td>";
                                                         echo "<td>" . $row['Email'] . "</td>";
-                                                        echo "<td><a href=\"022_clientDetail.php?client_id=" . $row['ClientID'] . "\"><button type=\"button\" class=\"btn btn-sm btn-secondary\">ดูรายละเอียด</button></a></td>";
+                                                        echo "<td><a href=\"022_clientDetail.php?client_id=" . $row['ClientID'] . "\"><button type=\"button\" class=\"btn btn-sm btn-secondary\">รายละเอียด</button></a></td>";
                                                         echo "</tr>";
                                                     }
 

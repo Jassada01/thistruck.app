@@ -231,7 +231,7 @@ include 'check_cookie.php';
                                         </div>
                                         <!--end::Header-->
                                         <!--begin::Body-->
-                                        <div class="card-body py-3">
+                                        <div class="card-body py-3" style="max-height: 400px; overflow-y: auto;">
                                             <!--begin::Table container-->
                                             <div class="table-responsive">
                                                 <!--begin::Table-->
@@ -710,9 +710,9 @@ include 'check_cookie.php';
                 $('#select_Trip_no').trigger('click').attr('data-kt-menu-dismiss', 'true');
                 var trip_id = $(this).find(':selected').data('trip_id');
                 var job_id = $(this).find(':selected').data('job_id');
-                console.log(trip_no);
-                console.log(trip_id);
-                console.log(job_id);
+                //console.log(trip_no);
+                //console.log(trip_id);
+                //console.log(job_id);
                 var trip_no = $(this).find(':selected').val();
                 $("#currentTimelineTripID").html(trip_no);
                 if (typeof trip_id !== "undefined" && trip_id !== "") {

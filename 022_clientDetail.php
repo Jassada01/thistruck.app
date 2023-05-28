@@ -136,7 +136,7 @@ include 'check_cookie.php';
                                             <div class="mb-3 row">
                                                 <label for="ClientCode" class="col-sm-3 col-form-label text-end-pc">รหัสผู้ว่าจ้าง<span class="text-danger">*</span></label>
                                                 <div class="col-sm-2">
-                                                    <input type="text" class="form-control required" id="ClientCode" name="ClientCode" required >
+                                                    <input type="text" class="form-control required" id="ClientCode" name="ClientCode" required>
                                                 </div>
                                                 <div class="col-sm-2">
                                                     <label for="ClientCode" class="col-form-label"><i><span class="text-danger d-none">ไม่สามารถแก้ไขได้</span></i></label>
@@ -194,9 +194,12 @@ include 'check_cookie.php';
                                                 </div>
                                             </div>
                                             <div class="form-group mt-3 row">
-                                                <label for="Line_token" class="col-sm-3 col-form-label text-end-pc">Line Token</label>
+                                                <label for="Line_token" class="col-sm-3 col-form-label text-end-pc"><a href="addLineManual.php" target="_blank">System Line ID</a></label>
                                                 <div class="col-sm-6">
                                                     <input type="text" class="form-control m-input" id="Line_token" name="Line_token" autocomplete="off">
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <button type="button" class="btn  btn-light-danger" id="TestSendLineBTN">ทดสอบ</button>
                                                 </div>
                                             </div>
                                             <div class="form-group mt-3 row">
@@ -1023,13 +1026,42 @@ include 'check_cookie.php';
                 $('#ImageShow').attr('src', target);
                 $('#showImageModal').modal('show');
             });
-            loadAttachedData();
+
+            $('body').on('click', '#TestSendLineBTN', function() {
+                var target = $("#Line_token").val();
+                if (target.trim() != "") {
+                    var ajaxData = {};
+                    ajaxData['f'] = '7';
+                    ajaxData['line_id'] = target;
+                    $.ajax({
+                            type: 'POST',
+                            dataType: "text",
+                            url: 'function/00_systemManagement/mainFunction.php',
+                            data: (ajaxData)
+                        })
+                        .done(function(data) {
+                            console.log(data);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ส่งข้อความแล้ว',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        })
+                        .fail(function() {
+                            // just in case posting your form failed
+                            alert("Posting failed.");
+                        });
+                }
+            });
 
             // END Process ===========================================
 
             // Run from Start --------------
             loadCliantDatafromClientID();
             loadRelateCustomerbyClientID();
+            
+            loadAttachedData();
 
 
         });

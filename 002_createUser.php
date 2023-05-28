@@ -223,7 +223,7 @@ include 'check_cookie.php';
                                                     </div>
                                                 </div>
                                                 <div class="mb-3 row">
-                                                    <label for="line_id" class="col-sm-3 col-form-label text-end-pc">Line ID</label>
+                                                    <label for="line_id" class="col-sm-3 col-form-label text-end-pc"><a href="addLineManual.php" target="_blank">System Line ID</a></label>
                                                     <div class="col-sm-4">
                                                         <input type="text" class="form-control" id="line_id" name="line_id" autocomplete="off">
                                                     </div>
@@ -446,7 +446,7 @@ include 'check_cookie.php';
                 ajaxData['f'] = 1;
                 //console.log(ajaxData);
 
-                
+
                 // ส่งข้อมูลไปบันทึก
                 $.ajax({
                     type: 'POST',
@@ -472,7 +472,7 @@ include 'check_cookie.php';
                         });
                     }
                 });
-                
+
             });
 
         });

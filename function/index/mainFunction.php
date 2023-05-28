@@ -137,8 +137,7 @@ function getJobProgress()
 				a.complete_flag IS NULL 
 			Order BY 
 				a.id 
-			LIMIT 
-				5";
+			";
 
 	$res = $conn->query(trim($sql));
 	mysqli_close($conn);

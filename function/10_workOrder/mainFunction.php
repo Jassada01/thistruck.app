@@ -1195,6 +1195,205 @@ function loadTripDetailforEdit()
 }
 
 
+// F=15
+function updateTripRoute()
+{
+
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	$jobDetailPlan = $_POST['jobDetailPlan'];
+	$job_id = $_POST['job_id'];
+	$job_no = $_POST['job_no'];
+	$trip_id = $_POST['trip_id'];
+	$tripNo = $_POST['tripNo'];
+
+
+	// Delete From job_order_detail_trip_list
+	$sql = "DELETE FROM job_order_detail_trip_list WHERE job_id = $job_id AND trip_id = $trip_id";
+	// ทำการ Delete ข้อมูล 
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+
+	// Delete From job_order_detail_trip_action_log
+	$sql = "DELETE FROM job_order_detail_trip_action_log WHERE job_id = $job_id AND trip_id = $trip_id";
+	// ทำการ Delete ข้อมูล 
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+
+
+	// สร้าง SQL Query เพื่อ Insert ข้อมูลลงในตาราง job_order_detail_trip_list
+	$sql = "INSERT INTO job_order_detail_trip_list (job_id, job_no, trip_id, trip_no, location_id, plan_order, branch, showName, job_characteristic, job_characteristic_id, job_note, unique_key, cardColor, job_characteristicShow, create_datetime, location_code, location_name, customer_id, address, map_url, latitude, longitude, location_type, active, customer_name)
+			VALUES ";
+
+	// Loop ข้อมูลจาก Object และเพิ่มค่าลงใน SQL Query
+	foreach ($jobDetailPlan as $plan) {
+		$sql .= "('" . $job_id . "', '" . $job_no . "', '" . $trip_id . "', '" . $tripNo . "', '" . $plan['location_id'] . "', '" . $plan['plan_order'] . "', '" . $plan['branch'] . "', '" . $plan['showName'] . "', '" . $plan['job_characteristic'] . "', '" . $plan['job_characteristic_id'] . "', '" . $plan['job_note'] . "', '" . $plan['unique_key'] . "', '" . $plan['cardColor'] . "', '" . $plan['job_characteristicShow'] . "', '" . $plan['create_datetime'] . "', '" . $plan['location_code'] . "', '" . $plan['location_name'] . "', '" . $plan['customer_id'] . "', '" . $plan['address'] . "', '" . $plan['map_url'] . "', '" . $plan['latitude'] . "', '" . $plan['longitude'] . "', '" . $plan['location_type'] . "', '" . $plan['active'] . "', '" . $plan['customer_name'] . "'),";
+	}
+
+	// ตัด comma ที่ไม่จำเป็นทิ้ง
+	$sql = rtrim($sql, ",");
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	// Create Trip Action ========================================================================
+	// Step 1 Start Process ================
+	$sql = "INSERT INTO job_order_detail_trip_action_log
+					(job_id,
+					job_no,
+					trip_id,
+					trip_no,
+					main_order,
+					minor_order,
+					step_desc,
+					stage,
+					button_name,
+					progress)
+		SELECT a.job_id,
+			a.job_no,
+			a.id,
+			a.tripno,
+			b.main_order,
+			b.minor_order,
+			b.step_desc,
+			b.stage,
+			b.button_name,
+			b.progress
+		FROM   job_order_detail_trip_info a
+			INNER JOIN job_action_template b
+					ON b.id = 0
+						AND b.main_order = 1
+		WHERE  a.id = $trip_id
+		ORDER  BY b.minor_order; ";
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	// Step 2 Action  Process ================
+	$sql = "INSERT INTO job_order_detail_trip_action_log (
+		job_id, job_no, trip_id, trip_no, trip_list_id, main_order, minor_order, plan_order, step_desc, stage, button_name, progress
+				)
+				SELECT
+					a.job_id,
+					a.job_no,
+					a.trip_id,
+					a.trip_no,
+					a.id as trip_list_id,
+					b.main_order,
+					b.minor_order,
+					a.plan_order,
+					b.step_desc,
+					b.stage,
+					b.button_name,
+					b.progress
+				FROM
+					job_order_detail_trip_list a
+					INNER JOIN job_action_template b ON a.job_characteristic_id = b.id
+				WHERE
+					a.trip_id = $trip_id
+				ORDER BY
+					a.plan_order,
+					b.main_order,
+					b.minor_order;";
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	// Step 3 Fotter  Process ================
+	$sql = "INSERT INTO job_order_detail_trip_action_log
+					(job_id,
+					job_no,
+					trip_id,
+					trip_no,
+					main_order,
+					minor_order,
+					step_desc,
+					stage,
+					button_name,
+					progress)
+			SELECT a.job_id,
+			a.job_no,
+			a.id,
+			a.tripno,
+			b.main_order,
+			b.minor_order,
+			b.step_desc,
+			b.stage,
+			b.button_name,
+			b.progress
+			FROM   job_order_detail_trip_info a
+			INNER JOIN job_action_template b
+					ON b.id = 0
+						AND b.main_order = 7
+			WHERE  a.id = $trip_id
+			ORDER  BY b.minor_order; ";
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+
+	mysqli_close($conn);
+}
+
+// F=16
+function updateTripRoute_onlyLocation()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+
+
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL UPDATE
+	$sql = "UPDATE job_order_detail_trip_list SET 
+		location_id = '$location_id',
+		branch = '$branch',
+		showName = '$showName',
+		job_note = '$job_note',
+		unique_key = '$unique_key',
+		location_code = '$location_code',
+		location_name = '$location_name',
+		customer_id = '$customer_id',
+		address = '$address',
+		map_url = '$map_url',
+		latitude = '$latitude',
+		longitude = '$longitude',
+		location_type = '$location_type',
+		active = '$active',
+		customer_name = '$customer_name'
+		WHERE job_id = '$job_id' AND trip_id = '$trip_id' AND plan_order = '$plan_order'";
+
+
+	echo $sql;
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+	mysqli_close($conn);
+}
 
 
 //============================ MAIN =========================================================
@@ -1253,6 +1452,14 @@ switch ($f) {
 		}
 	case 14: {
 			loadTripDetailforEdit();
+			break;
+		}
+	case 15: {
+			updateTripRoute();
+			break;
+		}
+	case 16: {
+			updateTripRoute_onlyLocation();
 			break;
 		}
 }

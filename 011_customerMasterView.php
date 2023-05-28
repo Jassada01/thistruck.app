@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-    include 'system_config.php';
-    $CURRENT_URL = str_replace($SERVERDIRNAME, "", $_SERVER['REQUEST_URI']);
-    include 'check_cookie.php';
+include 'system_config.php';
+$CURRENT_URL = str_replace($SERVERDIRNAME, "", $_SERVER['REQUEST_URI']);
+include 'check_cookie.php';
 ?>
 <!--begin::Head-->
 
@@ -198,9 +198,12 @@
                                                 </div>
                                             </div>
                                             <div class="form-group mt-3 row">
-                                                <label for="line_token" class="col-sm-3 col-form-label text-end-pc">Line Token</label>
+                                                <label for="line_token" class="col-sm-3 col-form-label text-end-pc"><a href="addLineManual.php" target="_blank">System Line ID</a></label>
                                                 <div class="col-sm-6">
                                                     <input type="text" class="form-control m-input" id="line_token" name="line_token" autocomplete="off">
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <button type="button" class="btn  btn-light-danger" id="TestSendLineBTN">ทดสอบ</button>
                                                 </div>
                                             </div>
                                             <div class="form-group mt-3 row">
@@ -958,6 +961,34 @@
                             });
                     }
                 })
+            });
+
+            $('body').on('click', '#TestSendLineBTN', function() {
+                var target = $("#line_token").val();
+                if (target.trim() != "") {
+                    var ajaxData = {};
+                    ajaxData['f'] = '7';
+                    ajaxData['line_id'] = target;
+                    $.ajax({
+                            type: 'POST',
+                            dataType: "text",
+                            url: 'function/00_systemManagement/mainFunction.php',
+                            data: (ajaxData)
+                        })
+                        .done(function(data) {
+                            console.log(data);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ส่งข้อความแล้ว',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        })
+                        .fail(function() {
+                            // just in case posting your form failed
+                            alert("Posting failed.");
+                        });
+                }
             });
 
 

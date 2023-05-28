@@ -79,10 +79,17 @@ include 'check_cookie.php';
                 $fn = basename($_SERVER['PHP_SELF']);
                 include 'menu.php';
                 $checkword = " checked";
-                $inactive = isset($_GET['inactive']) && $_GET['inactive'] == 'true';
+                $inactive = isset($_GET['inactive']) && $_GET['inactive'] == 'false';
                 if ($inactive) {
                     $checkword = "";
                 }
+
+                $queryString = "all";
+                if (isset($_GET['typeFilter']))
+                {
+                    $queryString = $_GET['typeFilter'];
+                }
+
                 ?>
 
                 <!--end::Header-->
@@ -147,9 +154,79 @@ include 'check_cookie.php';
                                             <h1><i class="bi bi-geo-alt-fill fs-3"></i> รายการสถานที่</h1>
                                         </div>
                                         <div class="card-toolbar">
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" id="active" name="active" value="1" <?php echo $checkword; ?>>
-                                                <label class="form-check-label" for="active">เฉพาะรายการที่ยังใช้งาน</label>
+                                            <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary" id="cancelJob" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
+                                                <span class="svg-icon svg-icon-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
+                                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                            <rect x="5" y="5" width="5" height="5" rx="1" fill="#000000" />
+                                                            <rect x="14" y="5" width="5" height="5" rx="1" fill="#000000" opacity="0.3" />
+                                                            <rect x="5" y="14" width="5" height="5" rx="1" fill="#000000" opacity="0.3" />
+                                                            <rect x="14" y="14" width="5" height="5" rx="1" fill="#000000" opacity="0.3" />
+                                                        </g>
+                                                    </svg>
+                                                </span>
+                                                <!--end::Svg Icon-->
+                                            </button>
+                                            <!--begin::Menu 3-->
+                                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-bold w-350px py-3" data-kt-menu="true" id="kt_menu_615c3caa96379">
+                                                <!--begin::Header-->
+                                                <div class="px-7 py-5">
+                                                    <div class="fs-5 text-dark fw-bolder">Filter Options</div>
+                                                </div>
+                                                <!--end::Header-->
+                                                <!--begin::Menu separator-->
+                                                <div class="separator border-gray-200"></div>
+                                                <!--end::Menu separator-->
+                                                <!--begin::Form-->
+                                                <div class="px-7 py-5">
+                                                    <!--begin::Input group-->
+                                                    <div class="mb-10">
+                                                        <!--begin::Label-->
+                                                        <label class="form-label fw-bold">ประเภทของสถานที่:</label>
+                                                        <!--end::Label-->
+                                                        <!--begin::Input-->
+                                                        <div>
+                                                            <select class="form-select form-select-solid" data-kt-select2="true" data-placeholder="Select option" id="selectFilter" data-dropdown-parent="#kt_menu_615c3caa96379" data-allow-clear="false">
+                                                                <option value='all'>ทั้งหมด</option>
+                                                                <?php
+                                                                // Connect to database
+                                                                include "function/connectionDb.php";
+
+                                                                // Query data from master_data where type = 'Job_Type'
+                                                                $sql = "SELECT * FROM master_data WHERE type = 'location_type'";
+                                                                $result = mysqli_query($conn, $sql);
+
+                                                                // Loop through data and create dropdown options
+                                                                while ($row = mysqli_fetch_assoc($result)) {
+                                                                    echo "<option value='" . $row['name'] ."'" ;
+                                                                    if ($queryString == $row['name'])
+                                                                    {
+                                                                        echo " selected='selected' ";
+                                                                    }
+                                                                    echo " >" . $row['name']."</option>";
+                                                                }
+
+                                                                // Close database connection
+                                                                mysqli_close($conn);
+                                                                ?>
+                                                            </select>
+                                                        </div>
+                                                        <!--end::Input-->
+                                                    </div>
+                                                    <!--end::Input group-->
+                                                    <!--begin::Input group-->
+                                                    <div class="mb-10">
+                                                        <!--begin::Switch-->
+                                                        <div class="form-check form-switch form-switch-sm form-check-custom form-check-solid">
+                                                            <input type="checkbox" class="form-check-input" id="active" name="active" value="1" <?php echo $checkword; ?>>
+                                                            <label class="form-check-label" for="active">เฉพาะรายการที่ยังใช้งาน</label>
+                                                        </div>
+                                                        <!--end::Switch-->
+                                                    </div>
+                                                    <!--end::Input group-->
+                                                </div>
+                                                <!--end::Form-->
                                             </div>
                                         </div>
                                     </div>
@@ -172,13 +249,26 @@ include 'check_cookie.php';
 
                                                     // ส่วนของการเชื่อมต่อฐานข้อมูล
                                                     include "function/connectionDb.php";
+                                                    
+                                                    
 
+                                                    if ($queryString == "all")
+                                                    {
+                                                        $whereString = " a.location_type like '%%' ";
+                                                    }
+                                                    else
+                                                    {
+                                                        $whereString = " a.location_type like '%$queryString%' ";
+                                                    }
+
+                                                    
                                                     // ส่วนของการดึงข้อมูลจากฐานข้อมูล
                                                     if ($inactive) {
-                                                        $sql = "Select a.*, b.customer_name From locations a Left join customers b ON a.customer_id = b.customer_id";
+                                                        $sql = "Select a.*, b.customer_name From locations a Left join customers b ON a.customer_id = b.customer_id WHERE ".$whereString;
                                                     } else {
-                                                        $sql = "Select a.*, b.customer_name From locations a Left join customers b ON a.customer_id = b.customer_id Where a.active = 1";
+                                                        $sql = "Select a.*, b.customer_name From locations a Left join customers b ON a.customer_id = b.customer_id Where a.active = 1 AND ".$whereString;
                                                     }
+                                                    
                                                     $result = mysqli_query($conn, $sql);
 
                                                     // ส่วนของการแสดงข้อมูลผู้ว่าจ้างในตาราง
@@ -222,7 +312,7 @@ include 'check_cookie.php';
                                                         echo "<td class='text-center'><button class='btn btn-sm btn-secondary btnlinkGoogleMap  border-0' lat='" . $row['latitude'] . "' lng='" . $row['longitude'] . "'>แผนที่</button></td>";
                                                         echo '<td class="text-center">';
                                                         echo '<div class="btn-group">';
-                                                        echo '<button type="button" class="btn btn-sm btn-secondary btnLocationView" data-bs-toggle="modal" data-bs-target="#EditLocationModal" value="' . $row['location_id'] . '"><i class="fa fa-eye"></i></button>';
+                                                        echo '<button type="button" class="btn btn-sm btn-secondary btnLocationView" data-bs-toggle="modal" data-bs-target="#EditLocationModal" value="' . $row['location_id'] . '">รายละเอียด</button>';
                                                         if ($row['active'] == "1") {
                                                             echo '<button type="button" class="btn btn-sm btn-light btnLocationDelete"   value="' . $row['location_id'] . '"><i class="fa fa-trash"></i></button>';
                                                         }
@@ -665,11 +755,24 @@ include 'check_cookie.php';
 
             // ตรวจสอบการเปลี่ยนแปลงค่าของ checkbox
             $('#active').change(function() {
-                if ($(this).is(":checked")) { // ถ้าถูกติ๊ก
-                    window.location.href = '030_locationIndex.php'; // รีโหลดหน้าเว็บพร้อมกับส่งพารามิเตอร์ ?inactive=true
-                } else { // ถ้าไม่ถูกติ๊ก
-                    window.location.href = '030_locationIndex.php?inactive=true'; // รีโหลดหน้าเว็บพร้อมกับส่งพารามิเตอร์ ?inactive=true
-                }
+                var checkActive = $('#active').is(":checked");
+                var optionFilter = $("#selectFilter").val();
+                // Build the URL with your parameters
+                var newUrl = "030_locationIndex.php?inactive=" + checkActive + "&typeFilter=" + optionFilter;
+
+                // Redirect to the new URL
+                window.location.href = newUrl;
+            });
+
+            //selectFilter
+            $('#selectFilter').change(function() {
+                var checkActive = $('#active').is(":checked");
+                var optionFilter = $("#selectFilter").val();
+                // Build the URL with your parameters
+                var newUrl = "030_locationIndex.php?inactive=" + checkActive + "&typeFilter=" + optionFilter;
+
+                // Redirect to the new URL
+                window.location.href = newUrl;
             });
 
 
@@ -857,7 +960,7 @@ include 'check_cookie.php';
                 if (data['location_type'] != "ลูกค้า") {
                     data['customer_id'] = ""
                 }
-                console.log(data)
+                //console.log(data)
 
                 data['f'] = '3';
                 $.ajax({
@@ -1018,7 +1121,7 @@ include 'check_cookie.php';
                     data['customer_id'] = ""
                 }
                 data['f'] = '6';
-                console.log(data)
+                //console.log(data)
                 $.ajax({
                         type: 'POST',
                         dataType: "text",
