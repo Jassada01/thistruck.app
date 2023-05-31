@@ -430,14 +430,14 @@ include 'check_cookie.php';
                                     <div class="form-group mt-3 row">
                                         <label for="latitude" class="col-sm-3 col-form-label text-end-pc">ละติจูด</label>
                                         <div class="col-sm-4">
-                                            <input type="number" class="form-control m-input" id="latitude" name="latitude">
+                                            <input type="text" class="form-control m-input" id="latitude" name="latitude">
                                         </div>
                                     </div>
 
                                     <div class="form-group mt-3 row">
                                         <label for="longitude" class="col-sm-3 col-form-label text-end-pc">ลองติจูด</label>
                                         <div class="col-sm-4">
-                                            <input type="number" class="form-control m-input" id="longitude" name="longitude">
+                                            <input type="text" class="form-control m-input" id="longitude" name="longitude">
                                         </div>
                                     </div>
                                     <div class="form-group mt-3 row">

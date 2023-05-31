@@ -151,6 +151,12 @@ include 'check_cookie.php';
         .dotted-line {
             border-bottom: 2px dotted black;
         }
+
+        .timeline-item-custom {
+            border-top: 1px solid #CCC;
+            border-top-style: dashed;
+            padding-top: 10px;
+        }
     </style>
 
 </head>
@@ -693,7 +699,11 @@ include 'check_cookie.php';
                                                     <h1><i class="bi bi-map fs-3"></i> รายละเอียด Trip</h1>
                                                 </div>
 
+
                                                 <div class="card-toolbar">
+                                                    <button type="button" class="btn btn-sm  btn-color-success btn-active-light-success" data-bs-toggle="modal" data-bs-target="#addAttachedFileModal">
+                                                        แนบไฟล์/รูปภาพ
+                                                    </button>
                                                     <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary" id="cancelJob" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                                         <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
                                                         <span class="svg-icon svg-icon-2">
@@ -1587,6 +1597,13 @@ include 'check_cookie.php';
             let Editjob_characteristic = "";
             let changeActionMode = 0;
 
+            // Change Status BTN =======================
+            let STC_Title = "";
+            let STC_Text = "";
+            let STC_btn = "";
+
+            let initialWordforAttached = "";
+
 
             // Set Initial Select 2
             //ClientID
@@ -1974,7 +1991,8 @@ include 'check_cookie.php';
                 ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
                 ajaxData['MAIN_trip_id'] = MAIN_trip_id;
                 ajaxData['driver_name'] = $('.truckDriver').find(":selected").text();;
-                // data.driver_name = $(this).find('.truckDriver').find(":selected").text();
+                ajaxData['truck_licenseNo'] = $('.truckinJob').find(":selected").text();;
+                // data.driver_name = $(this).find('.truckDriver').find(":selected").text(); truckinJob
                 //console.log(ajaxData);
 
                 $.ajax({
@@ -2055,9 +2073,20 @@ include 'check_cookie.php';
                                     timelineItems += '</div>';
                                 }
                             }
+                            bg_class = "";
+                            if (item.main_order == "3") {
+                                if (item.minor_order == "1") {
+                                    item.step_desc = "<span class='fw-bolder fs-3'>" + item.step_desc + "</span>";
+                                    bg_class = "timeline-item-custom";
+
+                                } else {
+                                    item.step_desc = "<span class=''>" + item.step_desc + "</span>";
+                                }
+
+                            }
 
                             // เพิ่ม timeline item ปกติ
-                            timelineItems += '<div class="timeline-item">';
+                            timelineItems += '<div class="timeline-item ' + bg_class + ' ">';
                             timelineItems += '<div class="timeline-label fw-bolder text-gray-800 fs-6">' + timestamp_text + '</div>';
                             timelineItems += '<div class="timeline-badge">';
                             if (item.complete_flag !== null) {
@@ -2093,9 +2122,29 @@ include 'check_cookie.php';
                             if (item.step_desc && item.complete_flag !== null) {
                                 timelineItems += '<div class="fw-mormal timeline-content ps-3">';
                                 //console.log(item);
-                                timelineItems += item.step_desc;
+
                                 if (item.location_name) {
-                                    timelineItems += '<B> (' + item.button_name + ')</B> - <span class="locationclickBTN" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
+                                    switch (item.minor_order) {
+                                        case "1":
+                                            //timelineItems += item.step_desc;
+                                            timelineItems += '<span class="text-danger fw-bolder">ถึงที่ </span>' + item.step_desc + ' ที่ <span class="locationclickBTN fw-bolder fs-3" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
+                                            break;
+                                        case "3":
+                                            timelineItems += '<span class="text-danger fw-bolder">เริ่ม </span>' + item.step_desc;
+                                            break;
+                                        case "7":
+                                            timelineItems += '<span class="text-danger fw-bolder">เสร็จแล้ว </span>' + item.step_desc;
+                                            break;
+                                        case "9":
+                                            timelineItems += '<span class="text-danger fw-bolder">ออกจากที่ </span>' + item.step_desc;
+                                            break;
+                                        default:
+                                            // code block
+                                    }
+                                    //timelineItems += item.step_desc;
+                                    //timelineItems += '<B> (' + item.button_name + ')</B> - <span class="locationclickBTN" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
+                                } else {
+                                    timelineItems += item.step_desc;
                                 }
                                 if (item.main_order == '99') {
                                     var attachedFiles = item.attached_file;
@@ -2119,7 +2168,7 @@ include 'check_cookie.php';
                             } else {
                                 timelineItems += '<div class="fw-mormal timeline-content ' + content_color + ' ps-3 ">' + item.step_desc;
                                 if (item.location_name) {
-                                    timelineItems += ' - <span class="locationclickBTN" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
+                                    timelineItems += ' - <span class="locationclickBTN fw-bolder fs-3" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
                                     if (MAIN_TRIP_STATUS != "รอเจ้าหน้าที่ยืนยัน") {
                                         timelineItems += '    <span class="badge badge-circle badge-light locationChangeBtn" data-plan_order="' + item.plan_order + '" data-location_id="' + item.location_id + '" data-job_characteristic="' + item.step_desc + '" ><i class="fas fa-sync-alt"></i></span>';
                                     }
@@ -2165,7 +2214,7 @@ include 'check_cookie.php';
                         if (data != "[]") {
                             //console.log(data);
                             var data_arr = JSON.parse(data);
-                            //console.log(data_arr);
+                            console.log(data_arr);
                             if (data_arr[0].stage != "รอเจ้าหน้าที่ยืนยัน") {
 
                                 // ดึงข้อมูล step_desc และ button_name จาก Object
@@ -2211,6 +2260,39 @@ include 'check_cookie.php';
                             $('#jobStatusNext').hide();
                             $('#status_update').hide();
                         }
+
+                        initialWordforAttached = "";
+                        // Change Status BTN
+                        if (data_arr[0].main_order == "3") {
+                            initialWordforAttached = data_arr[0].stage + " " + data_arr[0].location_name;
+                            switch (data_arr[0].minor_order) {
+                                case "1":
+                                    STC_Title = "ถึงที่หมาย";
+                                    STC_Text = data_arr[0].location_name;
+                                    STC_btn = "ยืนยัน" + MAIN_CONFIRM_BTN;
+                                    break;
+                                case "3":
+                                    STC_Title = "เริ่มดำเนินการ" + data_arr[0].step_desc;
+                                    STC_Text = data_arr[0].location_name;
+                                    STC_btn = "ยืนยัน" + MAIN_CONFIRM_BTN;
+                                    break;
+                                case "7":
+                                    STC_Title = data_arr[0].step_desc + "เสร็จ";
+                                    STC_Text = data_arr[0].location_name;
+                                    STC_btn = "ยืนยัน" + MAIN_CONFIRM_BTN;
+                                    break;
+                                case "9":
+                                    STC_Title = "ออกจาก";
+                                    STC_Text = data_arr[0].location_name;
+                                    STC_btn = "ยืนยัน" + MAIN_CONFIRM_BTN;
+                                    break;
+                                default:
+                            }
+                        } else {
+                            STC_Title = MAIN_STAGE;
+                            STC_Text = "";
+                            STC_btn = "ยืนยัน";
+                        }
                     })
                     .fail(function() {
                         // just in case posting your form failed
@@ -2218,15 +2300,20 @@ include 'check_cookie.php';
                     });
             }
 
+            $('#addAttachedFileModal').on('show.bs.modal', function() {
+                $("#newFileDesc").val(initialWordforAttached);
+            });
+
             // status_update
             $('#status_update').on('click', function() {
                 Swal.fire({
-                    title: MAIN_STAGE,
+                    title: STC_Title,
+                    text: STC_Text,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: MAIN_CONFIRM_BTN,
+                    confirmButtonText: STC_btn,
                     cancelButtonText: 'ยกเลิก'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -3363,7 +3450,7 @@ include 'check_cookie.php';
                             ajaxData['f'] = '8';
                             ajaxData['line_id'] = line_id_target;
                             ajaxData['message'] = "ข้อความจากเจ้าหน้าที่ : " + Message;
-                            ajaxData['link'] = "tripDetail.php?r="+MAIN_TRIP_RANDOMCODE; //MAIN_TRIP_RANDOMCODE
+                            ajaxData['link'] = "tripDetail.php?r=" + MAIN_TRIP_RANDOMCODE; //MAIN_TRIP_RANDOMCODE
                             $.ajax({
                                     type: 'POST',
                                     dataType: "text",

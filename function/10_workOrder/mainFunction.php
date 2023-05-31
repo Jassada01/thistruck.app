@@ -593,6 +593,7 @@ function updateTripInfo()
 	$MAIN_JOB_ID = $_POST['MAIN_JOB_ID'];
 	$MAIN_trip_id = $_POST['MAIN_trip_id'];
 	$driver_name = $_POST['driver_name'];
+	$truck_licenseNo = $_POST['truck_licenseNo'];
 
 	// กำหนดตัวแปรสำหรับใช้ในการ update
 	//$job_id = $driverListForm['MAIN_JOB_ID'];
@@ -609,6 +610,7 @@ function updateTripInfo()
 	$containersize2 = $driverListForm['containersize2'];
 	$sealNo2 = $driverListForm['sealNo2'];
 	$containerWeight2 = $driverListForm['containerWeight2'];
+	$truck_id = $driverListForm['truckinJob'];
 
 	// เชื่อมต่อฐานข้อมูล MySQL
 	include "../connectionDb.php";
@@ -617,6 +619,8 @@ function updateTripInfo()
 	$sql = "UPDATE job_order_detail_trip_info SET 
 		driver_id = $truckDriver, 
 		driver_name = '$driver_name', 
+		truck_licenseNo = '$truck_licenseNo', 
+		truck_id = '$truck_id', 
 		truckType = '$truckType', 
 		jobStartDateTime = '$jobStartDateTime', 
 		subcontrackCheckbox = $subcontrackCheckbox, 
@@ -788,6 +792,7 @@ function confirmJob()
 
 	// คำสั่ง SQL สำหรับหา job_order_detail_trip_info.id ที่มี job_id = MAIN_JOB_ID
 	//$sql = "SELECT id FROM job_order_detail_trip_info WHERE job_id = $MAIN_JOB_ID AND status = 'รอเจ้าหน้าที่ยืนยัน' and complete_flag IS NULL";
+	/*
 	$sql = "SELECT 
 			a.id, 
 			a.driver_name, 
@@ -806,6 +811,86 @@ function confirmJob()
 			a.job_id = $MAIN_JOB_ID
 			AND a.status = 'รอเจ้าหน้าที่ยืนยัน' 
 			and a.complete_flag IS NULL";
+	*/
+
+
+	// สร้างคำสั่ง SQL สำหรับดึงข้อมูล refDoc_Data
+	$sql = "SELECT customer_job_no, booking, customer_po_no, bill_of_lading, customer_invoice_no, agent, goods, quantity
+	FROM job_order_header where id = $MAIN_JOB_ID";
+
+	$result = $conn->query($sql);
+
+	$refDoc_Data = ""; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
+	$agent = "";
+	if ($result->num_rows > 0) {
+		// วนลูปผลลัพธ์ที่ได้จากฐานข้อมูล
+		while ($row = $result->fetch_assoc()) {
+			// ตรวจสอบและเก็บข้อมูลที่ไม่ใช่ Null
+			$customerJobNo = $row['customer_job_no'];
+			if (!empty($customerJobNo)) {
+				$refDoc_Data .= "Job NO ของลูกค้า: " . $customerJobNo . "\n";
+			}
+
+			$booking = $row['booking'];
+			if (!empty($booking)) {
+				$refDoc_Data .= "Booking (บุ๊กกิ้ง): " . $booking . "\n";
+			}
+
+			$customerPoNo = $row['customer_po_no'];
+			if (!empty($customerPoNo)) {
+				$refDoc_Data .= "PO No.: " . $customerPoNo . "\n";
+			}
+
+			$billOfLading = $row['bill_of_lading'];
+			if (!empty($billOfLading)) {
+				$refDoc_Data .= "B/L(ใบขน): " . $billOfLading . "\n";
+			}
+
+			$customerInvoiceNo = $row['customer_invoice_no'];
+			if (!empty($customerInvoiceNo)) {
+				$refDoc_Data .= "Invoice No.: " . $customerInvoiceNo . "\n";
+			}
+
+			$agent = $row['agent'];
+			if (!empty($agent)) {
+				$refDoc_Data .= "Agent(เอเย่นต์): " . $agent . "\n";
+			}
+
+			$goods = $row['goods'];
+			if (!empty($goods)) {
+				$refDoc_Data .= "ชื่อสินค้า: " . $goods . "\n";
+			}
+
+			$quantity = $row['quantity'];
+			if (!empty($quantity)) {
+				$refDoc_Data .= "QTY/No. of Package: " . $quantity . "\n";
+			}
+		}
+	}
+
+	$sql = "SELECT 
+			a.id, 
+			a.job_id,
+			a.driver_name, 
+			c.job_name, 
+			a.job_no, 
+			a.tripNo, 
+			a.status, 
+			a.random_code, 
+			b.line_id,
+			a.jobStartDateTime,
+			a.containersize,
+			d.insInvAdd1, d.insInvAdd2, d.insInvAdd3,
+			c.remark
+		FROM 
+			job_order_detail_trip_info a 
+			Inner Join job_order_header c ON a.job_id = c.id
+			LEFT Join truck_driver_info b ON a.driver_id = b.driver_id 
+			inner Join job_order_detail_trip_cost d ON a.id = d.trip_id AND a.job_id = d.job_id
+		WHERE 
+			a.job_id = $MAIN_JOB_ID
+			AND a.status = 'รอเจ้าหน้าที่ยืนยัน' 
+			and a.complete_flag IS NULL;";
 
 	// ส่งคำสั่ง SQL ไปยังฐานข้อมูล
 	$result = $conn->query($sql);
@@ -824,6 +909,11 @@ function confirmJob()
 			$random_code = $row['random_code'];
 			$jobStartDateTime = $row['jobStartDateTime'];
 			$User_line_id = $row['line_id'];
+			$containersize = $row['containersize'];
+			$insInvAdd1 = $row['insInvAdd1'];
+			$insInvAdd2 = $row['insInvAdd2'];
+			$insInvAdd3 = $row['insInvAdd3'];
+			$hdRemark = $row['remark'];
 			$progress = "";
 
 
@@ -855,12 +945,28 @@ function confirmJob()
 					}
 
 					// แสดงผลลัพธ์ในรูปแบบ JSON
-					echo json_encode($row2);
+					//echo json_encode($row2);
 				}
 			} else {
 				echo "0 results";
 			}
 
+
+
+			$sql = "SELECT a.job_characteristic_id, a.job_characteristic, a.location_code, a.map_url, b.attr1 AS JSC 
+			FROM job_order_detail_trip_list a Inner JOIN master_data b ON a.job_characteristic_id = b.id AND b.type = 'job_characteristic' 
+			WHERE a.trip_id = $id Order By a.plan_order;";
+			$result3 = $conn->query($sql);
+			$jobActionLog = "";
+			while ($row3 = $result3->fetch_assoc()) {
+				$job_characteristic_id = $row3['job_characteristic_id'];
+				$job_characteristic = $row3['job_characteristic'];
+				$location_code = $row3['location_code'];
+				$map_url = $row3['map_url'];
+				$JSC = $row3['JSC'];
+
+				$jobActionLog = $jobActionLog."\n".$JSC." : ".$location_code;
+			}
 
 			// Send Line Notification =======================================================
 			if (trim($User_line_id != "")) {
@@ -889,12 +995,25 @@ function confirmJob()
 				$formattedDate = $thai_date . ' เวลา ' . $formattedTime . ' น.';
 
 				$message = "มีงานใหม่เข้า
+เริ่มงาน : $formattedDate
 คนขับ : $driver_name
 Job ID : $job_no
 Trip ID : $tripNo
 ชื่องาน : $job_name
 สถานะ : $progress
-เริ่มงาน : $formattedDate";
+เลขที่อ้างอิง :
+$refDoc_Data
+ขนาด : $containersize
+=========================
+$jobActionLog 
+========================
+ที่อยู่ออกใบเสร็จ
+$insInvAdd1
+$insInvAdd2
+$insInvAdd3
+
+$hdRemark
+";
 
 				$link = $SERVER_NAME . 'tripDetail.php?r=' . $random_code;
 				SendNoticeJobConfirm($User_line_id, $Line_Token, $message, $link);

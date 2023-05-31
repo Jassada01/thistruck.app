@@ -157,6 +157,12 @@ License: For each use you must have a valid license purchased only from above li
             margin: 0 5px;
             /* กำหนดระยะห่างระหว่างปุ่ม */
         }
+
+        .timeline-item-custom {
+            border-top: 1px solid #CCC;
+            border-top-style: dashed;
+            padding-top: 10px;
+        }
     </style>
 </head>
 <!--end::Head-->
@@ -193,665 +199,715 @@ License: For each use you must have a valid license purchased only from above li
                                                     <div class="col-sm-12 text-end-pc">
                                                         <label class=" fs-1">สถานะปัจจุบัน: </label> <label id="jobStatusText" class=" fs-1"></label>
                                                     </div>
-                                                </div>
-                                                <form id="jobHeaderMainForm">
-                                                    <div class="row d-none">
-                                                        <label for="main_book_no" class="col-3 col-form-label text-end-pc">เล่มที่</label>
-                                                        <div class="col-3">
-                                                            <input type="text" class="form-control" id="main_book_no" name="main_book_no" placeholder="เลขอัตโนมัติ" disabled>
-                                                        </div>
-                                                        <label for="main_no" class="col-sm-3 col-form-label text-end-pc">เลขที่</label>
-                                                        <div class="col-3">
-                                                            <input type="text" class="form-control" id="main_no" name="main_no" placeholder="เลขอัตโนมัติ" disabled>
-                                                        </div>
-                                                    </div>
-                                                    <div class=" row">
-                                                        <label for="job_no" class="col-sm-1 col-form-label text-end-pc">Job No.</label>
-                                                        <div class="col-sm-3">
-                                                            <input type="text" class="form-control" id="job_no" name="job_no" placeholder="เลขอัตโนมัติ" disabled>
-                                                        </div>
-                                                        <label for="tripNo" class="col-sm-1 col-form-label text-end-pc">Trip No.</label>
-                                                        <div class="col-sm-3">
-                                                            <input type="text" class="form-control" id="tripNo" name="tripNo" placeholder="เลขอัตโนมัติ" disabled>
-                                                        </div>
-                                                        <label for="job_date" class="col-sm-1 col-form-label text-end-pc  d-none">วันที่</label>
-                                                        <div class="col-sm-3  d-none">
-                                                            <input type="date" class="form-control" id="job_date" name="job_date" disabled>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
+                                                    <div class="separator border-primary my-5"></div>
 
+                                                    <div class="d-flex justify-content-between">
+                                                        <div class="col-8">
+                                                            <div class="row">
+                                                                <label id="jobStatusNext" class="fs-3"></label>
+                                                            </div>
+                                                            <div class="row">
+                                                                <label id="jobStatusNextLocation" class="fs-6 text-gray-500"></label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-4 text-end">
+                                                            <button type="button" class="btn btn-primary" id="status_update">
+                                                                Loading...
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            
+                                            <form id="jobHeaderMainForm">
+                                                <div class="row d-none">
+                                                    <label for="main_book_no" class="col-3 col-form-label text-end-pc">เล่มที่</label>
+                                                    <div class="col-3">
+                                                        <input type="text" class="form-control" id="main_book_no" name="main_book_no" placeholder="เลขอัตโนมัติ" disabled>
+                                                    </div>
+                                                    <label for="main_no" class="col-sm-3 col-form-label text-end-pc">เลขที่</label>
+                                                    <div class="col-3">
+                                                        <input type="text" class="form-control" id="main_no" name="main_no" placeholder="เลขอัตโนมัติ" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class=" row">
+                                                    <label for="job_no" class="col-sm-1 col-form-label text-end-pc">Job No.</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" class="form-control" id="job_no" name="job_no" placeholder="เลขอัตโนมัติ" disabled>
+                                                    </div>
+                                                    <label for="tripNo" class="col-sm-1 col-form-label text-end-pc">Trip No.</label>
+                                                    <div class="col-sm-3">
+                                                        <input type="text" class="form-control" id="tripNo" name="tripNo" placeholder="เลขอัตโนมัติ" disabled>
+                                                    </div>
+                                                    <label for="job_date" class="col-sm-1 col-form-label text-end-pc  d-none">วันที่</label>
+                                                    <div class="col-sm-3  d-none">
+                                                        <input type="date" class="form-control" id="job_date" name="job_date" disabled>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <div class="row  mt-3 mh-5">
+                                                <div class="col-md-4">
+                                                    <h5>ชื่องาน</h5>
+                                                    <p id="HD_job_name"></p>
+
+                                                    <h5>ประเภทงาน</h5>
+                                                    <p id="HD_job_type"></p>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <h5>ลูกค้า </h5>
+                                                    <p id="HD_customer_name"></p>
+
+                                                    <h5>ผู้ว่าจ้าง</h5>
+                                                    <p id="HD_client_name"></p>
+
+                                                </div>
+                                            </div>
+                                            <div class="row  mt-3 mh-5">
+                                                <div class="col-md-6">
+                                                    <h5 class="d-none">Job NO ของลูกค้า</h5>
+                                                    <p id="HD_customerJobNo"></p>
+
+                                                    <h5 class="d-none">Booking (บุ๊กกิ้ง)</h5>
+                                                    <p id="HD_booking"></p>
+
+                                                    <h5 class="d-none">PO No.</h5>
+                                                    <p id="HD_poNo"></p>
+
+                                                    <h5 class="d-none">B/L(ใบขน)</h5>
+                                                    <p id="HD_bl"></p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h5 class="d-none">Invoice No.</h5>
+                                                    <p id="HD_invoiceNo"></p>
+
+                                                    <h5 class="d-none">Agent(เอเย่นต์)</h5>
+                                                    <p id="HD_agent"></p>
+
+                                                    <h5 class="d-none">ชื่อสินค้า</h5>
+                                                    <p id="HD_goods"></p>
+
+                                                    <h5 class="d-none">QTY/No. of Package</h5>
+                                                    <p id="HD_quantity"></p>
+                                                </div>
+                                            </div>
                                         </div>
+
                                     </div>
                                 </div>
-                                <!-- เริ่มต้น Card -->
-                                <div class="row mt-2">
-                                    <div class="col-sm-6">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <div class="col-sm-6 mt-3 d-flex align-items-center px-3">
-                                                    <h1><i class="bi bi-map fs-3"></i> รายละเอียด Trip</h1>
-                                                </div>
-
-                                                <div class="card-toolbar">
-                                                    <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary" id="cancelJob" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                                                        <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
-                                                        <span class="svg-icon svg-icon-2">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
-                                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                                                    <rect x="5" y="5" width="5" height="5" rx="1" fill="#000000" />
-                                                                    <rect x="14" y="5" width="5" height="5" rx="1" fill="#000000" opacity="0.3" />
-                                                                    <rect x="5" y="14" width="5" height="5" rx="1" fill="#000000" opacity="0.3" />
-                                                                    <rect x="14" y="14" width="5" height="5" rx="1" fill="#000000" opacity="0.3" />
-                                                                </g>
-                                                            </svg>
-                                                        </span>
-                                                        <!--end::Svg Icon-->
-                                                    </button>
-                                                    <!--begin::Menu 3-->
-                                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-bold w-200px py-3" data-kt-menu="true">
-                                                        <!--begin::Heading-->
-                                                        <div class="menu-item px-3">
-                                                            <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">
-                                                                Option</div>
-                                                        </div>
-                                                        <!--end::Heading-->
-                                                        <!--begin::Menu item-->
-                                                        <div class="menu-item px-3">
-                                                            <a class="menu-link flex-stack px-3" id="checkMapbtn">ตรวจสอบเส้นทาง</a>
-                                                        </div>
-                                                        <div class="menu-item px-3">
-                                                            <a class="menu-link flex-stack px-3" id="attachedFileBtn" data-bs-toggle="modal" data-bs-target="#addAttachedFileModal">แนบไฟล์/รูป
-                                                            </a>
-                                                        </div>
-                                                        <!--end::Menu item-->
-                                                    </div>
-                                                </div>
-
-
+                            </div>
+                            <!-- เริ่มต้น Card -->
+                            <div class="row mt-2">
+                                <div class="col-sm-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <div class="col-sm-6 mt-3 d-flex align-items-center px-3">
+                                                <h1><i class="bi bi-map fs-3"></i> รายละเอียด Trip</h1>
                                             </div>
-                                            <!--begin::Body-->
-                                            <div class="card-body pt-5">
-                                                <div class="d-flex justify-content-between">
-                                                    <div class="col-8">
-                                                        <div class="row">
-                                                            <label id="jobStatusNext" class="fs-3"></label>
-                                                        </div>
-                                                        <div class="row">
-                                                            <label id="jobStatusNextLocation" class="fs-6 text-gray-500"></label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-4 text-end">
 
-                                                        <button type="button" class="btn btn-primary" id="status_update">
-                                                            Action
-                                                        </button>
+                                            <div class="card-toolbar">
+                                                <button type="button" class="btn btn-sm  btn-color-success btn-active-light-success" data-bs-toggle="modal" data-bs-target="#addAttachedFileModal">
+                                                    แนบไฟล์/รูปภาพ
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary" id="cancelJob" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                    <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
+                                                    <span class="svg-icon svg-icon-2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
+                                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                                <rect x="5" y="5" width="5" height="5" rx="1" fill="#000000" />
+                                                                <rect x="14" y="5" width="5" height="5" rx="1" fill="#000000" opacity="0.3" />
+                                                                <rect x="5" y="14" width="5" height="5" rx="1" fill="#000000" opacity="0.3" />
+                                                                <rect x="14" y="14" width="5" height="5" rx="1" fill="#000000" opacity="0.3" />
+                                                            </g>
+                                                        </svg>
+                                                    </span>
+                                                    <!--end::Svg Icon-->
+                                                </button>
+                                                <!--begin::Menu 3-->
+                                                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-bold w-200px py-3" data-kt-menu="true">
+                                                    <!--begin::Heading-->
+                                                    <div class="menu-item px-3">
+                                                        <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">
+                                                            Option</div>
                                                     </div>
-                                                </div>
-                                                <div class="separator border-primary my-10"></div>
-                                                <div class="timeline-label">
+                                                    <!--end::Heading-->
+                                                    <!--begin::Menu item-->
+                                                    <div class="menu-item px-3">
+                                                        <a class="menu-link flex-stack px-3" id="checkMapbtn">ตรวจสอบเส้นทาง</a>
+                                                    </div>
+                                                    <div class="menu-item px-3">
+                                                        <a class="menu-link flex-stack px-3" id="attachedFileBtn" data-bs-toggle="modal" data-bs-target="#addAttachedFileModal">แนบไฟล์/รูป
+                                                        </a>
+                                                    </div>
+                                                    <!--end::Menu item-->
                                                 </div>
                                             </div>
-                                            <!--end: Card Body-->
-
 
 
                                         </div>
-                                    </div>
-
-                                    <div class="col-sm-6 mt-5">
-                                        <div class="card card-bordered">
-                                            <!--begin::Card header-->
-                                            <div class="card-header">
-                                                <ul class="nav nav-tabs nav-line-tabs nav-stretch fs-6 border-0">
-                                                    <li class="nav-item">
-                                                        <a class="nav-link active" data-bs-toggle="tab" href="#relateCostTab">ค่าใช้จ่ายที่เกี่ยวข้อง</a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" data-bs-toggle="tab" href="#issueInvoiceAddressTab">ที่อยู่ออกใบเสร็จ</a>
-                                                    </li>
-                                                </ul>
+                                        <!--begin::Body-->
+                                        <div class="card-body pt-5">
+                                            <div class="timeline-label">
                                             </div>
-                                            <!--end::Card header-->
+                                        </div>
+                                        <!--end: Card Body-->
 
-                                            <!--begin::Card body-->
-                                            <div class="card-body">
-                                                <div class="tab-content" id="myTabContent">
-                                                    <div class="tab-pane fade show active" id="relateCostTab" role="tabpanel">
-                                                        <!--begin::Row-->
-                                                        <div class="row row-cols-1 g-10">
-                                                            <form id="jobDetailCostForm">
-                                                                <div class="row mb-3">
-                                                                    <label for="hire_price" class="col-sm-5 col-form-label  text-end-pc">ราคาจ้าง</label>
-                                                                    <div class="col-sm-7">
-                                                                        <input type="number" step="0.01" class="form-control" id="hire_price" name="hire_price" required>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="overtime_fee" class="col-sm-5 col-form-label  text-end-pc">ค่าล่วงเวลา</label>
-                                                                    <div class="col-sm-7">
-                                                                        <input type="number" step="0.01" class="form-control" id="overtime_fee" name="overtime_fee" required>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="port_charge" class="col-sm-5 col-form-label  text-end-pc">ค่าผ่านท่า</label>
-                                                                    <div class="col-sm-7">
-                                                                        <input type="number" step="0.01" class="form-control" id="port_charge" name="port_charge" required>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="yard_charge" class="col-sm-5 col-form-label  text-end-pc">ค่าผ่านลาน</label>
-                                                                    <div class="col-sm-7">
-                                                                        <input type="number" step="0.01" class="form-control" id="yard_charge" name="yard_charge" required>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="container_return" class="col-sm-5 col-form-label  text-end-pc">ค่าคืน/รับตู้</label>
-                                                                    <div class="col-sm-7">
-                                                                        <input type="number" step="0.01" class="form-control" id="container_return" name="container_return" required>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="container_cleaning_repair" class="col-sm-5 col-form-label  text-end-pc">ค่าซ่อม/ล้างตู้</label>
-                                                                    <div class="col-sm-7">
-                                                                        <input type="number" step="0.01" class="form-control" id="container_cleaning_repair" name="container_cleaning_repair" required>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="container_drop_lift" class="col-sm-5 col-form-label  text-end-pc">ค่ายก/วางตู้</label>
-                                                                    <div class="col-sm-7">
-                                                                        <input type="number" step="0.01" class="form-control" id="container_drop_lift" name="container_drop_lift" required>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="other_charge" class="col-sm-5 col-form-label  text-end-pc">ค่าใช้จ่ายอื่นๆ</label>
-                                                                    <div class="col-sm-7">
-                                                                        <input type="number" step="0.01" class="form-control" id="other_charge" name="other_charge" required>
-                                                                    </div>
 
+
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 mt-5">
+                                    <div class="card card-bordered">
+                                        <!--begin::Card header-->
+                                        <div class="card-header">
+                                            <ul class="nav nav-tabs nav-line-tabs nav-stretch fs-6 border-0">
+                                                <li class="nav-item">
+                                                    <a class="nav-link active" data-bs-toggle="tab" href="#relateCostTab">ค่าใช้จ่ายที่เกี่ยวข้อง</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" data-bs-toggle="tab" href="#issueInvoiceAddressTab">ที่อยู่ออกใบเสร็จ</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <!--end::Card header-->
+
+                                        <!--begin::Card body-->
+                                        <div class="card-body">
+                                            <div class="tab-content" id="myTabContent">
+                                                <div class="tab-pane fade show active" id="relateCostTab" role="tabpanel">
+                                                    <!--begin::Row-->
+                                                    <div class="row row-cols-1 g-10">
+                                                        <form id="jobDetailCostForm">
+                                                            <div class="row mb-3">
+                                                                <label for="hire_price" class="col-sm-5 col-form-label  text-end-pc">ราคาจ้าง</label>
+                                                                <div class="col-sm-7">
+                                                                    <input type="number" step="0.01" class="form-control" id="hire_price" name="hire_price" required>
                                                                 </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="deduction_note" class="col-sm-5 col-form-label  text-end-pc">ใบหัก ณ ที่จ่ายกระทำแทน</label>
-                                                                    <div class="col-sm-7">
-                                                                        <input type="number" step="0.01" class="form-control" id="deduction_note" name="deduction_note" required>
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="overtime_fee" class="col-sm-5 col-form-label  text-end-pc">ค่าล่วงเวลา</label>
+                                                                <div class="col-sm-7">
+                                                                    <input type="number" step="0.01" class="form-control" id="overtime_fee" name="overtime_fee" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="port_charge" class="col-sm-5 col-form-label  text-end-pc">ค่าผ่านท่า</label>
+                                                                <div class="col-sm-7">
+                                                                    <input type="number" step="0.01" class="form-control" id="port_charge" name="port_charge" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="yard_charge" class="col-sm-5 col-form-label  text-end-pc">ค่าผ่านลาน</label>
+                                                                <div class="col-sm-7">
+                                                                    <input type="number" step="0.01" class="form-control" id="yard_charge" name="yard_charge" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="container_return" class="col-sm-5 col-form-label  text-end-pc">ค่าคืน/รับตู้</label>
+                                                                <div class="col-sm-7">
+                                                                    <input type="number" step="0.01" class="form-control" id="container_return" name="container_return" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="container_cleaning_repair" class="col-sm-5 col-form-label  text-end-pc">ค่าซ่อม/ล้างตู้</label>
+                                                                <div class="col-sm-7">
+                                                                    <input type="number" step="0.01" class="form-control" id="container_cleaning_repair" name="container_cleaning_repair" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="container_drop_lift" class="col-sm-5 col-form-label  text-end-pc">ค่ายก/วางตู้</label>
+                                                                <div class="col-sm-7">
+                                                                    <input type="number" step="0.01" class="form-control" id="container_drop_lift" name="container_drop_lift" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="other_charge" class="col-sm-5 col-form-label  text-end-pc">ค่าใช้จ่ายอื่นๆ</label>
+                                                                <div class="col-sm-7">
+                                                                    <input type="number" step="0.01" class="form-control" id="other_charge" name="other_charge" required>
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="deduction_note" class="col-sm-5 col-form-label  text-end-pc">ใบหัก ณ ที่จ่ายกระทำแทน</label>
+                                                                <div class="col-sm-7">
+                                                                    <input type="number" step="0.01" class="form-control" id="deduction_note" name="deduction_note" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3 d-none">
+                                                                <label for="total_expenses" class="col-sm-5 col-form-label  text-end-pc">รวมค่าใช้จ่าย</label>
+                                                                <div class="col-sm-7">
+                                                                    <input type="number" step="0.01" class="form-control" id="total_expenses" name="total_expenses" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="totalCostPanel" class="col-sm-5 col-form-label text-end-pc">รวมค่าใช้จ่าย</label>
+                                                                <div class="col-sm-7  d-flex align-items-center">
+                                                                    <span class="text-success  fw-bolder fs-1 mb-1" id="totalCostPanel">- บาท</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="wage_travel_cost" class="col-sm-5 col-form-label  text-end-pc">ค่าเดินทาง/ค่าเที่ยว</label>
+                                                                <div class="col-sm-7">
+                                                                    <input type="number" step="0.01" class="form-control" id="wage_travel_cost" name="wage_travel_cost" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="vehicle_expenses" class="col-sm-5 col-form-label  text-end-pc">ค่าใช้จ่ายรถ</label>
+                                                                <div class="col-sm-7">
+                                                                    <input type="number" step="0.01" class="form-control" id="vehicle_expenses" name="vehicle_expenses" required>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <!--end::Row-->
+                                                </div>
+                                                <div class="tab-pane fade" id="issueInvoiceAddressTab" role="tabpanel">
+                                                    <!--begin::Row-->
+                                                    <div class="row row-cols-1 g-10">
+                                                        <form id="jobDetailinvAddForm">
+                                                            <div class="row mb-3">
+                                                                <label for="insInvAdd1" class="col-sm-3 col-form-label  text-end-pc">ที่อยู่ออกใบเสร็จ 1</label>
+                                                                <div class="col-sm-9">
+                                                                    <textarea class="form-control " id="insInvAdd1" name="insInvAdd1" rows="5" disabled></textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="insInvAdd2" class="col-sm-3 col-form-label  text-end-pc">ที่อยู่ออกใบเสร็จ 2</label>
+                                                                <div class="col-sm-9">
+                                                                    <textarea class="form-control " id="insInvAdd2" name="insInvAdd2" rows="5" disabled></textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mb-3">
+                                                                <label for="insInvAdd3" class="col-sm-3 col-form-label  text-end-pc">ที่อยู่ออกใบเสร็จ 3</label>
+                                                                <div class="col-sm-9">
+                                                                    <textarea class="form-control " id="insInvAdd3" name="insInvAdd3" rows="5" disabled></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--end::Card body-->
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- จบ Card -->
+
+
+                            <!-- เริ่มต้น Card -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-bs-toggle="tab" href="#panel_1"><i class="bi bi-truck fs-3"></i>&nbsp&nbsp&nbspรถบรรทุก</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#panel_2"><i class="bi bi-card-checklist fs-3"></i></i>&nbsp&nbsp&nbspรายละเอียดใบงาน</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#panel_3"><i class="fas fa-file fs-3"></i></i>&nbsp&nbsp&nbspไฟล์</a>
+                                        </li>
+                                    </ul>
+
+                                    <div class="tab-content" id="myTabContent">
+                                        <div class="tab-pane fade show active" id="panel_1" role="tabpanel">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <!--begin::Repeater-->
+                                                    <div id="DriverList">
+                                                        <!--begin::Form group-->
+                                                        <div class="form-group">
+                                                            <div data-repeater-list="DriverList">
+                                                                <div data-repeater-item>
+                                                                    <div class="row">
+                                                                        <div class="col-12">
+                                                                            <h3 class="triptNo"></h3>
+                                                                        </div>
+                                                                    </div>
+                                                                    <form id="DriverListForm">
+                                                                        <div class="form-group row mb-2">
+                                                                            <div class="col-md-3">
+                                                                                <div class="row">
+                                                                                    <div class="col-12">
+                                                                                        <label class="form-label">รถ</label>
+                                                                                        <select class="form-control mb-2 mb-md-2 truckinJob" id="truckinJob" name="truckinJob" disabled>
+                                                                                            <?php
+                                                                                            // Connect to database
+                                                                                            include "function/connectionDb.php";
+
+                                                                                            // Query data from master_data where type = 'Job_Type'
+                                                                                            $sql = "SELECT a.truck_id, a.truck_type, a.truck_number, a.province, b.driver_name , b.driver_id, b.image_path, b.type as driver_type FROM truck_info a left join truck_driver_info b ON a.main_driver_id = b.driver_id WHERE a.active = 1";
+                                                                                            $result = mysqli_query($conn, $sql);
+
+                                                                                            // Loop through data and create dropdown options
+                                                                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                                                                //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                                                                echo "<option value='" . $row['truck_id'] . "' driverName='" . $row['driver_name'] . "' driverImg='assets/media/uploadfile/" . $row['image_path'] . "' license='" . $row['truck_number'] . "' province='" . $row['province'] . "' driver_id='" . $row['driver_id'] . "' data-driver_id='" . $row['driver_id'] . "' data-truck_type='" . $row['truck_type'] . "'  data-driver_type='" . $row['driver_type'] . "'>" . $row['truck_number'] . " - " . $row['province'] . "</option>";
+                                                                                            }
+                                                                                            // Close database connection
+                                                                                            mysqli_close($conn);
+                                                                                            ?>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="col-12">
+                                                                                        <select class="form-control mb-2 mb-md-0 truckDriver" id="truckDriver" name="truckDriver" disabled>
+                                                                                            <?php
+                                                                                            // Connect to database
+                                                                                            include "function/connectionDb.php";
+
+                                                                                            // Query data from master_data where type = 'Job_Type'
+                                                                                            $sql = "SELECT * From truck_driver_info WHERE active = 1";
+                                                                                            $result = mysqli_query($conn, $sql);
+
+                                                                                            // Loop through data and create dropdown options
+                                                                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                                                                //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                                                                echo "<option value='" . $row['driver_id'] . "' driverName='" . $row['driver_name'] . "' driverImg='assets/media/uploadfile/" . $row['image_path'] . "' data-driver_type='" . $row['type'] . "' >" . $row['driver_name'] . "</option>";
+                                                                                            }
+                                                                                            // Close database connection
+                                                                                            mysqli_close($conn);
+                                                                                            ?>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-9">
+                                                                                <div class="row">
+                                                                                    <div class="col-md-4">
+                                                                                        <label class="form-label">ประเภทรถ</label>
+                                                                                        <select class="form-control mb-2 mb-md-0 truckType" name="truckType" id="truckType" disabled>
+                                                                                            <option></option>
+                                                                                            <?php
+                                                                                            // Connect to database
+                                                                                            include "function/connectionDb.php";
+
+                                                                                            // Query data from master_data where type = 'Job_Type'
+                                                                                            $sql = "SELECT * FROM master_data where type = 'Truck_typeInJob' order by id;";
+                                                                                            $result = mysqli_query($conn, $sql);
+
+                                                                                            // Loop through data and create dropdown options
+                                                                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                                                                //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                                                                echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
+                                                                                            }
+
+                                                                                            // Close database connection
+                                                                                            mysqli_close($conn);
+                                                                                            ?>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="col-md-4">
+                                                                                        <label class="form-label">เข้า</label>
+                                                                                        <input type="date" class="form-control jobStartDateTime" name="jobStartDateTime" id="jobStartDateTime" autocomplete="off" disabled>
+                                                                                    </div>
+
+                                                                                    <div class="col-md-2  text-end">
+                                                                                        <div class="form-check form-check-custom form-check-solid mt-2 mt-md-10">
+                                                                                            <input class="form-check-input subcontrackCheckbox" type="checkbox" value="" name="subcontrackCheckbox" disabled />
+                                                                                            <label class="form-check-label" for="subcontrackCheckbox">
+                                                                                                รถร่วม
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row my-5">
+                                                                                    <div class="col-md-3">
+                                                                                        <label class="form-label">หมายเลขตู้ 1</label>
+                                                                                        <input class="form-control mb-2 mb-md-0 containerID" name="containerID" />
+                                                                                    </div>
+                                                                                    <div class="col-md-3">
+                                                                                        <label class="form-label">ขนาดตู้(Type)</label>
+                                                                                        <select class="form-control mb-2 mb-md-0 containersize" name="containersize">
+                                                                                            <option></option>
+                                                                                            <?php
+                                                                                            // Connect to database
+                                                                                            include "function/connectionDb.php";
+
+                                                                                            // Query data from master_data where type = 'Job_Type'
+                                                                                            $sql = "SELECT * FROM master_data where type = 'container_size' order by id;";
+                                                                                            $result = mysqli_query($conn, $sql);
+
+                                                                                            // Loop through data and create dropdown options
+                                                                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                                                                //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                                                                echo "<option value='" . $row['value'] . "'>" . $row['name'] . "</option>";
+                                                                                            }
+
+                                                                                            // Close database connection
+                                                                                            mysqli_close($conn);
+                                                                                            ?>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="col-md-3">
+                                                                                        <label class="form-label">หมายเลขซีล</label>
+                                                                                        <input class="form-control mb-2 mb-md-0 sealNo" name="sealNo" />
+                                                                                    </div>
+                                                                                    <div class="col-md-3">
+                                                                                        <label class="form-label">น้ำหนักตู้</label>
+                                                                                        <div class="input-group">
+                                                                                            <input type="number" class="form-control containerWeight" name="containerWeight" autocomplete="off" />
+                                                                                            <span class="input-group-text" id="basic-addon2"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row my-5">
+                                                                                    <div class="col-md-3">
+                                                                                        <label class="form-label">หมายเลขตู้ 2</label>
+                                                                                        <input class="form-control mb-2 mb-md-0 containerID2" name="containerID2" />
+                                                                                    </div>
+                                                                                    <div class="col-md-3">
+                                                                                        <label class="form-label">ขนาดตู้(Type)</label>
+                                                                                        <select class="form-control mb-2 mb-md-0 containersize2" name="containersize2">
+                                                                                            <option></option>
+                                                                                            <?php
+                                                                                            // Connect to database
+                                                                                            include "function/connectionDb.php";
+
+                                                                                            // Query data from master_data where type = 'Job_Type'
+                                                                                            $sql = "SELECT * FROM master_data where type = 'container_size' order by id;";
+                                                                                            $result = mysqli_query($conn, $sql);
+
+                                                                                            // Loop through data and create dropdown options
+                                                                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                                                                //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                                                                echo "<option value='" . $row['value'] . "'>" . $row['name'] . "</option>";
+                                                                                            }
+
+                                                                                            // Close database connection
+                                                                                            mysqli_close($conn);
+                                                                                            ?>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="col-md-3">
+                                                                                        <label class="form-label">หมายเลขซีล</label>
+                                                                                        <input class="form-control mb-2 mb-md-0 sealNo2" name="sealNo2" />
+                                                                                    </div>
+                                                                                    <div class="col-md-3">
+                                                                                        <label class="form-label">น้ำหนักตู้</label>
+                                                                                        <div class="input-group">
+                                                                                            <input type="number" class="form-control containerWeight2" name="containerWeight2" autocomplete="off" />
+                                                                                            <span class="input-group-text" id="basic-addon2"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!--end::Form group-->
+
+                                                    </div>
+                                                    <!--end::Repeater-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="panel_2" role="tabpanel">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="container">
+                                                            <form id="jobHeaderForm">
+                                                                <div class="mb-3 row">
+                                                                    <label for="job_name" class="col-sm-3 col-form-label text-end-pc">ชื่องาน<span class="text-danger">*</span></label>
+                                                                    <div class="col-sm-5">
+                                                                        <select class="form-control" id="job_name" name="job_name" disabled>
+                                                                            <option value="">กรุณาเลือกชื่องาน</option>
+                                                                            <?php
+                                                                            // Connect to database
+                                                                            include "function/connectionDb.php";
+
+                                                                            // Query data from master_data where type = 'Job_Type'
+                                                                            $sql = "SELECT * FROM job_order_template_header WHERE active = 1";
+                                                                            $result = mysqli_query($conn, $sql);
+
+                                                                            // Loop through data and create dropdown options
+                                                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                                                echo "<option value='" . $row['job_name']  . "' selectID='" . $row['id'] . "'>" . $row['job_name'] . "</option>";
+                                                                            }
+
+                                                                            // Close database connection
+                                                                            mysqli_close($conn);
+                                                                            ?>
+                                                                        </select>
                                                                     </div>
                                                                 </div>
-                                                                <div class="row mb-3 d-none">
-                                                                    <label for="total_expenses" class="col-sm-5 col-form-label  text-end-pc">รวมค่าใช้จ่าย</label>
-                                                                    <div class="col-sm-7">
-                                                                        <input type="number" step="0.01" class="form-control" id="total_expenses" name="total_expenses" required>
+                                                                <div class="mb-3 row">
+                                                                    <label for="ClientID" class="col-sm-3 col-form-label text-end-pc"> ผู้ว่าจ้าง <span class="text-danger">*</span></label>
+                                                                    <div class="col-sm-5">
+
+                                                                        <select class="form-control" id="ClientID" name="ClientID" disabled>
+                                                                            <option value="">กรุณาเลือกผู้ว่าจ้าง</option>
+                                                                            <?php
+                                                                            // Connect to database
+                                                                            include "function/connectionDb.php";
+
+                                                                            // Query data from master_data where type = 'Job_Type'
+                                                                            $sql = "SELECT * FROM client_info WHERE Active = 1";
+                                                                            $result = mysqli_query($conn, $sql);
+
+                                                                            // Loop through data and create dropdown options
+                                                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                                                echo "<option value='" . $row['ClientID'] . "' ClientCode='" . $row['ClientCode'] . "'>" . $row['ClientName'] . "</option>";
+                                                                            }
+
+                                                                            // Close database connection
+                                                                            mysqli_close($conn);
+                                                                            ?>
+                                                                        </select>
                                                                     </div>
                                                                 </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="totalCostPanel" class="col-sm-5 col-form-label text-end-pc">รวมค่าใช้จ่าย</label>
-                                                                    <div class="col-sm-7  d-flex align-items-center">
-                                                                        <span class="text-success  fw-bolder fs-1 mb-1" id="totalCostPanel">- บาท</span>
+                                                                <div class="mb-3 row">
+                                                                    <label for="customerID" class="col-sm-3 col-form-label text-end-pc"> ลูกค้า <span class="text-danger">*</span></label>
+                                                                    <div class="col-sm-5">
+
+                                                                        <select class="form-control" id="customerID" name="customerID" disabled>
+                                                                            <option value="">กรุณาเลือกลูกค้า</option>
+                                                                            <?php
+                                                                            // Connect to database
+                                                                            include "function/connectionDb.php";
+
+                                                                            // Query data from master_data where type = 'Job_Type'
+                                                                            $sql = "SELECT * FROM customers WHERE active = 1";
+                                                                            $result = mysqli_query($conn, $sql);
+
+                                                                            // Loop through data and create dropdown options
+                                                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                                                echo "<option value='" . $row['customer_id'] . "'>" . $row['customer_name'] . "(" . $row['branch'] . ")</option>";
+                                                                            }
+
+                                                                            // Close database connection
+                                                                            mysqli_close($conn);
+                                                                            ?>
+                                                                        </select>
                                                                     </div>
                                                                 </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="wage_travel_cost" class="col-sm-5 col-form-label  text-end-pc">ค่าเดินทาง/ค่าเที่ยว</label>
-                                                                    <div class="col-sm-7">
-                                                                        <input type="number" step="0.01" class="form-control" id="wage_travel_cost" name="wage_travel_cost" required>
+                                                                <div class="mb-3 row">
+                                                                    <label for="job_type" class="col-sm-3 col-form-label text-end-pc">ประเภทงาน<span class="text-danger">*</span></label>
+                                                                    <div class="col-sm-3">
+                                                                        <select class="form-control required" id="job_type" name="job_type" disabled>
+                                                                            <option value="">กรุณาเลือกประเภทงาน</option>
+                                                                            <?php
+                                                                            // Connect to database
+                                                                            include "function/connectionDb.php";
+
+                                                                            // Query data from master_data where type = 'Job_Type'
+                                                                            $sql = "SELECT * FROM master_data WHERE type = 'Job_Type'";
+                                                                            $result = mysqli_query($conn, $sql);
+
+                                                                            // Loop through data and create dropdown options
+                                                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                                                echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
+                                                                            }
+
+                                                                            // Close database connection
+                                                                            mysqli_close($conn);
+                                                                            ?>
+                                                                        </select>
                                                                     </div>
                                                                 </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="vehicle_expenses" class="col-sm-5 col-form-label  text-end-pc">ค่าใช้จ่ายรถ</label>
-                                                                    <div class="col-sm-7">
-                                                                        <input type="number" step="0.01" class="form-control" id="vehicle_expenses" name="vehicle_expenses" required>
+
+
+                                                                <div class="separator border-secondary my-5"></div>
+
+                                                                <div class="mb-3 row">
+                                                                    <label class="col-sm-5 col-form-label">
+                                                                        <h3>ข้อมูลเอกสารลูกค้า</h3>
+                                                                    </label>
+                                                                </div>
+                                                                <div class="mb-3 row">
+                                                                    <label for="customer_job_no" class="col-sm-3 col-form-label text-end-pc">Job NO ของลูกค้า</label>
+                                                                    <div class="col-sm-3">
+                                                                        <input type="text" class="form-control" id="customer_job_no" name="customer_job_no">
+                                                                    </div>
+                                                                    <label for="booking" class="col-sm-3 col-form-label text-end-pc">Booking (บุ๊กกิ้ง)</label>
+                                                                    <div class="col-sm-3">
+                                                                        <input type="text" class="form-control" id="booking" name="booking">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mb-3 row">
+                                                                    <label for="customer_po_no" class="col-sm-3 col-form-label text-end-pc">PO No.</label>
+                                                                    <div class="col-sm-3">
+                                                                        <input type="text" class="form-control" id="customer_po_no" name="customer_po_no">
+                                                                    </div>
+                                                                    <label for="bill_of_lading" class="col-sm-3 col-form-label text-end-pc">B/L(ใบขน)</label>
+                                                                    <div class="col-sm-3">
+                                                                        <input type="text" class="form-control" id="bill_of_lading" name="bill_of_lading">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mb-3 row">
+                                                                    <label for="customer_invoice_no" class="col-sm-3 col-form-label text-end-pc">Invoice No.</label>
+                                                                    <div class="col-sm-3">
+                                                                        <input type="text" class="form-control" id="customer_invoice_no" name="customer_invoice_no">
+                                                                    </div>
+                                                                    <label for="agent" class="col-sm-3 col-form-label text-end-pc">Agent(เอเย่นต์)</label>
+                                                                    <div class="col-sm-3">
+                                                                        <input type="text" class="form-control" id="agent" name="agent">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mb-3 row">
+                                                                    <label for="goods" class="col-sm-3 col-form-label text-end-pc">ชื่อสินค้า</label>
+                                                                    <div class="col-sm-3">
+                                                                        <input type="text" class="form-control" id="goods" name="goods">
+                                                                    </div>
+                                                                    <label for="quantity" class="col-sm-3 col-form-label text-end-pc">QTY/No. of Package</label>
+                                                                    <div class="col-sm-3">
+                                                                        <input type="text" class="form-control" id="quantity" name="quantity">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mb-3 row">
+                                                                    <label for="remark" class="col-sm-3 col-form-label text-end-pc">หมายเหตุ</label>
+                                                                    <div class="col-sm-6">
+                                                                        <textarea class="form-control" id="remark" name="remark" disabled></textarea>
                                                                     </div>
                                                                 </div>
                                                             </form>
                                                         </div>
-                                                        <!--end::Row-->
-                                                    </div>
-                                                    <div class="tab-pane fade" id="issueInvoiceAddressTab" role="tabpanel">
-                                                        <!--begin::Row-->
-                                                        <div class="row row-cols-1 g-10">
-                                                            <form id="jobDetailinvAddForm">
-                                                                <div class="row mb-3">
-                                                                    <label for="insInvAdd1" class="col-sm-3 col-form-label  text-end-pc">ที่อยู่ออกใบเสร็จ 1</label>
-                                                                    <div class="col-sm-9">
-                                                                        <textarea class="form-control " id="insInvAdd1" name="insInvAdd1" rows="5" disabled></textarea>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="insInvAdd2" class="col-sm-3 col-form-label  text-end-pc">ที่อยู่ออกใบเสร็จ 2</label>
-                                                                    <div class="col-sm-9">
-                                                                        <textarea class="form-control " id="insInvAdd2" name="insInvAdd2" rows="5" disabled></textarea>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row mb-3">
-                                                                    <label for="insInvAdd3" class="col-sm-3 col-form-label  text-end-pc">ที่อยู่ออกใบเสร็จ 3</label>
-                                                                    <div class="col-sm-9">
-                                                                        <textarea class="form-control " id="insInvAdd3" name="insInvAdd3" rows="5" disabled></textarea>
-                                                                    </div>
-                                                                </div>
-                                                            </form>
-                                                        </div>
+
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!--end::Card body-->
                                         </div>
-                                    </div>
-
-                                </div>
-                                <!-- จบ Card -->
-
-
-                                <!-- เริ่มต้น Card -->
-                                <div class="card">
-                                    <div class="card-body">
-                                        <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
-                                            <li class="nav-item">
-                                                <a class="nav-link active" data-bs-toggle="tab" href="#panel_1"><i class="bi bi-truck fs-3"></i>&nbsp&nbsp&nbspรถบรรทุก</a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a class="nav-link" data-bs-toggle="tab" href="#panel_2"><i class="bi bi-card-checklist fs-3"></i></i>&nbsp&nbsp&nbspรายละเอียดใบงาน</a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a class="nav-link" data-bs-toggle="tab" href="#panel_3"><i class="fas fa-file fs-3"></i></i>&nbsp&nbsp&nbspไฟล์</a>
-                                            </li>
-                                        </ul>
-
-                                        <div class="tab-content" id="myTabContent">
-                                            <div class="tab-pane fade show active" id="panel_1" role="tabpanel">
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <!--begin::Repeater-->
-                                                        <div id="DriverList">
-                                                            <!--begin::Form group-->
-                                                            <div class="form-group">
-                                                                <div data-repeater-list="DriverList">
-                                                                    <div data-repeater-item>
-                                                                        <div class="row">
-                                                                            <div class="col-12">
-                                                                                <h3 class="triptNo"></h3>
-                                                                            </div>
-                                                                        </div>
-                                                                        <form id="DriverListForm">
-                                                                            <div class="form-group row mb-2">
-                                                                                <div class="col-md-3">
-                                                                                    <div class="row">
-                                                                                        <div class="col-12">
-                                                                                            <label class="form-label">รถ</label>
-                                                                                            <select class="form-control mb-2 mb-md-2 truckinJob" id="truckinJob" name="truckinJob" disabled>
-                                                                                                <?php
-                                                                                                // Connect to database
-                                                                                                include "function/connectionDb.php";
-
-                                                                                                // Query data from master_data where type = 'Job_Type'
-                                                                                                $sql = "SELECT a.truck_id, a.truck_type, a.truck_number, a.province, b.driver_name , b.driver_id, b.image_path, b.type as driver_type FROM truck_info a left join truck_driver_info b ON a.main_driver_id = b.driver_id WHERE a.active = 1";
-                                                                                                $result = mysqli_query($conn, $sql);
-
-                                                                                                // Loop through data and create dropdown options
-                                                                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                                                                    //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
-                                                                                                    echo "<option value='" . $row['truck_id'] . "' driverName='" . $row['driver_name'] . "' driverImg='assets/media/uploadfile/" . $row['image_path'] . "' license='" . $row['truck_number'] . "' province='" . $row['province'] . "' driver_id='" . $row['driver_id'] . "' data-driver_id='" . $row['driver_id'] . "' data-truck_type='" . $row['truck_type'] . "'  data-driver_type='" . $row['driver_type'] . "'>" . $row['truck_number'] . " - " . $row['province'] . "</option>";
-                                                                                                }
-                                                                                                // Close database connection
-                                                                                                mysqli_close($conn);
-                                                                                                ?>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                        <div class="col-12">
-                                                                                            <select class="form-control mb-2 mb-md-0 truckDriver" id="truckDriver" name="truckDriver" disabled>
-                                                                                                <?php
-                                                                                                // Connect to database
-                                                                                                include "function/connectionDb.php";
-
-                                                                                                // Query data from master_data where type = 'Job_Type'
-                                                                                                $sql = "SELECT * From truck_driver_info WHERE active = 1";
-                                                                                                $result = mysqli_query($conn, $sql);
-
-                                                                                                // Loop through data and create dropdown options
-                                                                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                                                                    //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
-                                                                                                    echo "<option value='" . $row['driver_id'] . "' driverName='" . $row['driver_name'] . "' driverImg='assets/media/uploadfile/" . $row['image_path'] . "' data-driver_type='" . $row['type'] . "' >" . $row['driver_name'] . "</option>";
-                                                                                                }
-                                                                                                // Close database connection
-                                                                                                mysqli_close($conn);
-                                                                                                ?>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-md-9">
-                                                                                    <div class="row">
-                                                                                        <div class="col-md-4">
-                                                                                            <label class="form-label">ประเภทรถ</label>
-                                                                                            <select class="form-control mb-2 mb-md-0 truckType" name="truckType" id="truckType" disabled>
-                                                                                                <option></option>
-                                                                                                <?php
-                                                                                                // Connect to database
-                                                                                                include "function/connectionDb.php";
-
-                                                                                                // Query data from master_data where type = 'Job_Type'
-                                                                                                $sql = "SELECT * FROM master_data where type = 'Truck_typeInJob' order by id;";
-                                                                                                $result = mysqli_query($conn, $sql);
-
-                                                                                                // Loop through data and create dropdown options
-                                                                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                                                                    //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
-                                                                                                    echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
-                                                                                                }
-
-                                                                                                // Close database connection
-                                                                                                mysqli_close($conn);
-                                                                                                ?>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                        <div class="col-md-4">
-                                                                                            <label class="form-label">เข้า</label>
-                                                                                            <input type="date" class="form-control jobStartDateTime" name="jobStartDateTime" id="jobStartDateTime" autocomplete="off" disabled>
-                                                                                        </div>
-
-                                                                                        <div class="col-md-2  text-end">
-                                                                                            <div class="form-check form-check-custom form-check-solid mt-2 mt-md-10">
-                                                                                                <input class="form-check-input subcontrackCheckbox" type="checkbox" value="" name="subcontrackCheckbox" disabled />
-                                                                                                <label class="form-check-label" for="subcontrackCheckbox">
-                                                                                                    รถร่วม
-                                                                                                </label>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="row my-5">
-                                                                                        <div class="col-md-3">
-                                                                                            <label class="form-label">หมายเลขตู้ 1</label>
-                                                                                            <input class="form-control mb-2 mb-md-0 containerID" name="containerID" />
-                                                                                        </div>
-                                                                                        <div class="col-md-3">
-                                                                                            <label class="form-label">ขนาดตู้(Type)</label>
-                                                                                            <select class="form-control mb-2 mb-md-0 containersize" name="containersize">
-                                                                                                <option></option>
-                                                                                                <?php
-                                                                                                // Connect to database
-                                                                                                include "function/connectionDb.php";
-
-                                                                                                // Query data from master_data where type = 'Job_Type'
-                                                                                                $sql = "SELECT * FROM master_data where type = 'container_size' order by id;";
-                                                                                                $result = mysqli_query($conn, $sql);
-
-                                                                                                // Loop through data and create dropdown options
-                                                                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                                                                    //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
-                                                                                                    echo "<option value='" . $row['value'] . "'>" . $row['name'] . "</option>";
-                                                                                                }
-
-                                                                                                // Close database connection
-                                                                                                mysqli_close($conn);
-                                                                                                ?>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                        <div class="col-md-3">
-                                                                                            <label class="form-label">หมายเลขซีล</label>
-                                                                                            <input class="form-control mb-2 mb-md-0 sealNo" name="sealNo" />
-                                                                                        </div>
-                                                                                        <div class="col-md-3">
-                                                                                            <label class="form-label">น้ำหนักตู้</label>
-                                                                                            <div class="input-group">
-                                                                                                <input type="number" class="form-control containerWeight" name="containerWeight" autocomplete="off" />
-                                                                                                <span class="input-group-text" id="basic-addon2"></span>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="row my-5">
-                                                                                        <div class="col-md-3">
-                                                                                            <label class="form-label">หมายเลขตู้ 2</label>
-                                                                                            <input class="form-control mb-2 mb-md-0 containerID2" name="containerID2" />
-                                                                                        </div>
-                                                                                        <div class="col-md-3">
-                                                                                            <label class="form-label">ขนาดตู้(Type)</label>
-                                                                                            <select class="form-control mb-2 mb-md-0 containersize2" name="containersize2">
-                                                                                                <option></option>
-                                                                                                <?php
-                                                                                                // Connect to database
-                                                                                                include "function/connectionDb.php";
-
-                                                                                                // Query data from master_data where type = 'Job_Type'
-                                                                                                $sql = "SELECT * FROM master_data where type = 'container_size' order by id;";
-                                                                                                $result = mysqli_query($conn, $sql);
-
-                                                                                                // Loop through data and create dropdown options
-                                                                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                                                                    //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
-                                                                                                    echo "<option value='" . $row['value'] . "'>" . $row['name'] . "</option>";
-                                                                                                }
-
-                                                                                                // Close database connection
-                                                                                                mysqli_close($conn);
-                                                                                                ?>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                        <div class="col-md-3">
-                                                                                            <label class="form-label">หมายเลขซีล</label>
-                                                                                            <input class="form-control mb-2 mb-md-0 sealNo2" name="sealNo2" />
-                                                                                        </div>
-                                                                                        <div class="col-md-3">
-                                                                                            <label class="form-label">น้ำหนักตู้</label>
-                                                                                            <div class="input-group">
-                                                                                                <input type="number" class="form-control containerWeight2" name="containerWeight2" autocomplete="off" />
-                                                                                                <span class="input-group-text" id="basic-addon2"></span>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <!--end::Form group-->
-
-                                                        </div>
-                                                        <!--end::Repeater-->
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="tab-pane fade" id="panel_2" role="tabpanel">
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <div class="row">
-                                                            <div class="container">
-                                                                <form id="jobHeaderForm">
-                                                                    <div class="mb-3 row">
-                                                                        <label for="job_name" class="col-sm-3 col-form-label text-end-pc">ชื่องาน<span class="text-danger">*</span></label>
-                                                                        <div class="col-sm-5">
-                                                                            <select class="form-control" id="job_name" name="job_name" disabled>
-                                                                                <option value="">กรุณาเลือกชื่องาน</option>
-                                                                                <?php
-                                                                                // Connect to database
-                                                                                include "function/connectionDb.php";
-
-                                                                                // Query data from master_data where type = 'Job_Type'
-                                                                                $sql = "SELECT * FROM job_order_template_header WHERE active = 1";
-                                                                                $result = mysqli_query($conn, $sql);
-
-                                                                                // Loop through data and create dropdown options
-                                                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                                                    echo "<option value='" . $row['job_name']  . "' selectID='" . $row['id'] . "'>" . $row['job_name'] . "</option>";
-                                                                                }
-
-                                                                                // Close database connection
-                                                                                mysqli_close($conn);
-                                                                                ?>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="mb-3 row">
-                                                                        <label for="ClientID" class="col-sm-3 col-form-label text-end-pc"> ผู้ว่าจ้าง <span class="text-danger">*</span></label>
-                                                                        <div class="col-sm-5">
-
-                                                                            <select class="form-control" id="ClientID" name="ClientID" disabled>
-                                                                                <option value="">กรุณาเลือกผู้ว่าจ้าง</option>
-                                                                                <?php
-                                                                                // Connect to database
-                                                                                include "function/connectionDb.php";
-
-                                                                                // Query data from master_data where type = 'Job_Type'
-                                                                                $sql = "SELECT * FROM client_info WHERE Active = 1";
-                                                                                $result = mysqli_query($conn, $sql);
-
-                                                                                // Loop through data and create dropdown options
-                                                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                                                    echo "<option value='" . $row['ClientID'] . "' ClientCode='" . $row['ClientCode'] . "'>" . $row['ClientName'] . "</option>";
-                                                                                }
-
-                                                                                // Close database connection
-                                                                                mysqli_close($conn);
-                                                                                ?>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="mb-3 row">
-                                                                        <label for="customerID" class="col-sm-3 col-form-label text-end-pc"> ลูกค้า <span class="text-danger">*</span></label>
-                                                                        <div class="col-sm-5">
-
-                                                                            <select class="form-control" id="customerID" name="customerID" disabled>
-                                                                                <option value="">กรุณาเลือกลูกค้า</option>
-                                                                                <?php
-                                                                                // Connect to database
-                                                                                include "function/connectionDb.php";
-
-                                                                                // Query data from master_data where type = 'Job_Type'
-                                                                                $sql = "SELECT * FROM customers WHERE active = 1";
-                                                                                $result = mysqli_query($conn, $sql);
-
-                                                                                // Loop through data and create dropdown options
-                                                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                                                    echo "<option value='" . $row['customer_id'] . "'>" . $row['customer_name'] . "(" . $row['branch'] . ")</option>";
-                                                                                }
-
-                                                                                // Close database connection
-                                                                                mysqli_close($conn);
-                                                                                ?>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="mb-3 row">
-                                                                        <label for="job_type" class="col-sm-3 col-form-label text-end-pc">ประเภทงาน<span class="text-danger">*</span></label>
-                                                                        <div class="col-sm-3">
-                                                                            <select class="form-control required" id="job_type" name="job_type" disabled>
-                                                                                <option value="">กรุณาเลือกประเภทงาน</option>
-                                                                                <?php
-                                                                                // Connect to database
-                                                                                include "function/connectionDb.php";
-
-                                                                                // Query data from master_data where type = 'Job_Type'
-                                                                                $sql = "SELECT * FROM master_data WHERE type = 'Job_Type'";
-                                                                                $result = mysqli_query($conn, $sql);
-
-                                                                                // Loop through data and create dropdown options
-                                                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                                                    echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
-                                                                                }
-
-                                                                                // Close database connection
-                                                                                mysqli_close($conn);
-                                                                                ?>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-
-
-                                                                    <div class="separator border-secondary my-5"></div>
-
-                                                                    <div class="mb-3 row">
-                                                                        <label class="col-sm-5 col-form-label">
-                                                                            <h3>ข้อมูลเอกสารลูกค้า</h3>
-                                                                        </label>
-                                                                    </div>
-                                                                    <div class="mb-3 row">
-                                                                        <label for="customer_job_no" class="col-sm-3 col-form-label text-end-pc">Job NO ของลูกค้า</label>
-                                                                        <div class="col-sm-3">
-                                                                            <input type="text" class="form-control" id="customer_job_no" name="customer_job_no">
-                                                                        </div>
-                                                                        <label for="booking" class="col-sm-3 col-form-label text-end-pc">Booking (บุ๊กกิ้ง)</label>
-                                                                        <div class="col-sm-3">
-                                                                            <input type="text" class="form-control" id="booking" name="booking">
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="mb-3 row">
-                                                                        <label for="customer_po_no" class="col-sm-3 col-form-label text-end-pc">PO No.</label>
-                                                                        <div class="col-sm-3">
-                                                                            <input type="text" class="form-control" id="customer_po_no" name="customer_po_no">
-                                                                        </div>
-                                                                        <label for="bill_of_lading" class="col-sm-3 col-form-label text-end-pc">B/L(ใบขน)</label>
-                                                                        <div class="col-sm-3">
-                                                                            <input type="text" class="form-control" id="bill_of_lading" name="bill_of_lading">
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="mb-3 row">
-                                                                        <label for="customer_invoice_no" class="col-sm-3 col-form-label text-end-pc">Invoice No.</label>
-                                                                        <div class="col-sm-3">
-                                                                            <input type="text" class="form-control" id="customer_invoice_no" name="customer_invoice_no">
-                                                                        </div>
-                                                                        <label for="agent" class="col-sm-3 col-form-label text-end-pc">Agent(เอเย่นต์)</label>
-                                                                        <div class="col-sm-3">
-                                                                            <input type="text" class="form-control" id="agent" name="agent">
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="mb-3 row">
-                                                                        <label for="goods" class="col-sm-3 col-form-label text-end-pc">ชื่อสินค้า</label>
-                                                                        <div class="col-sm-3">
-                                                                            <input type="text" class="form-control" id="goods" name="goods">
-                                                                        </div>
-                                                                        <label for="quantity" class="col-sm-3 col-form-label text-end-pc">QTY/No. of Package</label>
-                                                                        <div class="col-sm-3">
-                                                                            <input type="text" class="form-control" id="quantity" name="quantity">
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="mb-3 row">
-                                                                        <label for="remark" class="col-sm-3 col-form-label text-end-pc">หมายเหตุ</label>
-                                                                        <div class="col-sm-6">
-                                                                            <textarea class="form-control" id="remark" name="remark" disabled></textarea>
-                                                                        </div>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="tab-pane fade" id="panel_3" role="tabpanel">
-                                                <div class="table-responsive mt-3">
-                                                    <table class="table table-striped table-rounded w-100">
-                                                        <thead class="bg-success text-white">
-                                                            <tr>
-                                                                <th class="font-weight-bold text-center">ประเภทเอกสาร</th>
-                                                                <th class="font-weight-bold text-center">ไฟล์</th>
-                                                                <th class="font-weight-bold text-center">วันเวลา</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="AttachedFileList">
-                                                            <!-- แสดงรายการไฟล์ที่ Upload -->
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                        <div class="tab-pane fade" id="panel_3" role="tabpanel">
+                                            <div class="table-responsive mt-3">
+                                                <table class="table table-striped table-rounded w-100">
+                                                    <thead class="bg-success text-white">
+                                                        <tr>
+                                                            <th class="font-weight-bold text-center">ประเภทเอกสาร</th>
+                                                            <th class="font-weight-bold text-center">ไฟล์</th>
+                                                            <th class="font-weight-bold text-center">วันเวลา</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="AttachedFileList">
+                                                        <!-- แสดงรายการไฟล์ที่ Upload -->
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <!-- จบ Card -->
+                            <!-- จบ Card -->
 
 
 
-                                <div class="row  mt-3">
-                                    <div class=" col-sm-6 mt-3">
-                                    </div>
-                                    <div class="col-sm-6 mt-3 text-end">
-                                        <button type="button" class="btn btn-secondary" style="margin-right: 10px;" onclick="location.reload();">
-                                            <i class="fas fa-undo"></i> Reset
-                                        </button>
-                                        <button type="button" class="btn btn-primary" id="saveDatabtn">
-                                            <i class="fas fa-save"></i> บันทึกข้อมูล
-                                        </button>
+                            <div class="row  mt-3">
+                                <div class=" col-sm-6 mt-3">
+                                </div>
+                                <div class="col-sm-6 mt-3 text-end">
+                                    <button type="button" class="btn btn-secondary" style="margin-right: 10px;" onclick="location.reload();">
+                                        <i class="fas fa-undo"></i> Reset
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="saveDatabtn">
+                                        <i class="fas fa-save"></i> บันทึกข้อมูล
+                                    </button>
 
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -859,6 +915,7 @@ License: For each use you must have a valid license purchased only from above li
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
 
@@ -883,7 +940,7 @@ License: For each use you must have a valid license purchased only from above li
                     </div>
                     <div class="row mt-3" id="rowSelectFile">
                         <div class="col-md-6 mt-3">
-                            <input type="text" class="form-control" id="newFileDesc" name="newFileDesc" placeholder="ประเภทไฟล์" autocomplete="off">
+                            <input type="text" class="form-control" id="newFileDesc" name="newFileDesc" placeholder="ประเภทไฟล์" autocomplete="off" data-allow-clear="true">
                         </div>
                         <div class="col-md-6 mt-3">
                             <div class="input-group">
@@ -1273,13 +1330,20 @@ License: For each use you must have a valid license purchased only from above li
             let MAIN_STAGE = "";
             let tempGooglrMapRoute = [];
 
+            // Change Status BTN =======================
+            let STC_Title = "";
+            let STC_Text = "";
+            let STC_btn = "";
+
+            let initialWordforAttached = "";
+
 
 
             function GetInitialData() {
                 var ajaxData = {};
                 ajaxData['f'] = '13';
                 ajaxData['randomCode'] = randomCode; // Convert the object to a JSON string
-                console.log(ajaxData);
+                //console.log(ajaxData);
                 $.ajax({
                         type: 'POST',
                         dataType: "text",
@@ -1288,7 +1352,7 @@ License: For each use you must have a valid license purchased only from above li
                     })
                     .done(function(retunrdata) {
                         var data_arr = JSON.parse(retunrdata);
-                        console.log(data_arr);
+                        //console.log(data_arr);
                         MAIN_job_id = data_arr[0].job_id;
                         MAIN_trip_id = data_arr[0].id;
                         MAIN_DriverName = data_arr[0].driver_name;
@@ -1476,7 +1540,7 @@ License: For each use you must have a valid license purchased only from above li
                         document.querySelectorAll('#jobHeaderForm input').forEach(input => {
                             input.disabled = true;
                         });
-
+                        //console.log(data_arr);
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
 
@@ -1509,6 +1573,55 @@ License: For each use you must have a valid license purchased only from above li
                         $("#goods").val(jobHeaderForm.goods);
                         $("#quantity").val(jobHeaderForm.quantity);
                         $("#remark").val(jobHeaderForm.remark);
+
+
+
+                        var jobData = data_arr.jobHeader[0];
+
+                        if (jobData.customer_job_no !== "") {
+                            $("#HD_customerJobNo").text(jobData.customer_job_no);
+                            $("#HD_customerJobNo").prev("h5").removeClass("d-none");
+                        }
+
+                        if (jobData.booking !== "") {
+                            $("#HD_booking").text(jobData.booking);
+                            $("#HD_booking").prev("h5").removeClass("d-none");
+                        }
+
+                        if (jobData.customer_po_no !== "") {
+                            $("#HD_poNo").text(jobData.customer_po_no);
+                            $("#HD_poNo").prev("h5").removeClass("d-none");
+                        }
+
+                        if (jobData.bill_of_lading !== "") {
+                            $("#HD_bl").text(jobData.bill_of_lading);
+                            $("#HD_bl").prev("h5").removeClass("d-none");
+                        }
+
+                        if (jobData.customer_invoice_no !== "") {
+                            $("#HD_invoiceNo").text(jobData.customer_invoice_no);
+                            $("#HD_invoiceNo").prev("h5").removeClass("d-none");
+                        }
+
+                        if (jobData.agent !== "") {
+                            $("#HD_agent").text(jobData.agent);
+                            $("#HD_agent").prev("h5").removeClass("d-none");
+                        }
+
+                        if (jobData.goods !== "") {
+                            $("#HD_goods").text(jobData.goods);
+                            $("#HD_goods").prev("h5").removeClass("d-none");
+                        }
+
+                        if (jobData.quantity !== "") {
+                            $("#HD_quantity").text(jobData.quantity);
+                            $("#HD_quantity").prev("h5").removeClass("d-none");
+                        }
+
+                        $("#HD_client_name").text(jobData.client_name);
+                        $("#HD_customer_name").text(jobData.customer_name);
+                        $("#HD_job_name").text(jobData.job_name);
+                        $("#HD_job_type").text(jobData.job_type);
 
 
                         // กำหนดค่าใน element ของฟอร์มด้วย jQuery
@@ -1776,10 +1889,20 @@ License: For each use you must have a valid license purchased only from above li
                                     timelineItems += '</div>';
                                 }
                             }
+                            bg_class = "";
+                            if (item.main_order == "3") {
+                                if (item.minor_order == "1") {
+                                    item.step_desc = "<span class='fw-bolder fs-3'>" + item.step_desc + "</span>";
+                                    bg_class = "timeline-item-custom";
+
+                                } else {
+                                    item.step_desc = "<span class=''>" + item.step_desc + "</span>";
+                                }
+
+                            }
 
                             // เพิ่ม timeline item ปกติ
-                            // เพิ่ม timeline item ปกติ
-                            timelineItems += '<div class="timeline-item">';
+                            timelineItems += '<div class="timeline-item ' + bg_class + ' ">';
                             timelineItems += '<div class="timeline-label fw-bolder text-gray-800 fs-6">' + timestamp_text + '</div>';
                             timelineItems += '<div class="timeline-badge">';
                             if (item.complete_flag !== null) {
@@ -1815,9 +1938,29 @@ License: For each use you must have a valid license purchased only from above li
                             if (item.step_desc && item.complete_flag !== null) {
                                 timelineItems += '<div class="fw-mormal timeline-content ps-3">';
                                 //console.log(item);
-                                timelineItems += item.step_desc;
+
                                 if (item.location_name) {
-                                    timelineItems += '<B> (' + item.button_name + ')</B> - <span class="locationclickBTN" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
+                                    switch (item.minor_order) {
+                                        case "1":
+                                            //timelineItems += item.step_desc;
+                                            timelineItems += '<span class="text-danger fw-bolder">ถึงที่ </span>' + item.step_desc + ' ที่ <span class="locationclickBTN fw-bolder fs-3" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
+                                            break;
+                                        case "3":
+                                            timelineItems += '<span class="text-danger fw-bolder">เริ่ม </span>' + item.step_desc;
+                                            break;
+                                        case "7":
+                                            timelineItems += '<span class="text-danger fw-bolder">เสร็จแล้ว </span>' + item.step_desc;
+                                            break;
+                                        case "9":
+                                            timelineItems += '<span class="text-danger fw-bolder">ออกจากที่ </span>' + item.step_desc;
+                                            break;
+                                        default:
+                                            // code block
+                                    }
+                                    //timelineItems += item.step_desc;
+                                    //timelineItems += '<B> (' + item.button_name + ')</B> - <span class="locationclickBTN" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
+                                } else {
+                                    timelineItems += item.step_desc;
                                 }
                                 if (item.main_order == '99') {
                                     var attachedFiles = item.attached_file;
@@ -1841,17 +1984,19 @@ License: For each use you must have a valid license purchased only from above li
                             } else {
                                 timelineItems += '<div class="fw-mormal timeline-content ' + content_color + ' ps-3 ">' + item.step_desc;
                                 if (item.location_name) {
-                                    timelineItems += ' - <span class="locationclickBTN" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
+                                    timelineItems += ' - <span class="locationclickBTN fw-bolder fs-3" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
+
                                 }
                                 timelineItems += '</div>';
                             }
+
 
                             timelineItems += '</div>';
                         }
 
 
 
-
+                        //console.log(timelineItems);
 
                         // เพิ่ม HTML element ลงใน timeline container
                         $('.timeline-label').html(timelineItems);
@@ -1936,6 +2081,39 @@ License: For each use you must have a valid license purchased only from above li
                             $('#jobStatusNext').hide();
                             $('#status_update').hide();
                         }
+
+                        // Change Status BTN
+                        initialWordforAttached = "";
+                        if (data_arr[0].main_order == "3") {
+                            initialWordforAttached = data_arr[0].stage + " " + data_arr[0].location_name;
+                            switch (data_arr[0].minor_order) {
+                                case "1":
+                                    STC_Title = "ถึงที่หมาย";
+                                    STC_Text = data_arr[0].location_name;
+                                    STC_btn = "ยืนยัน" + MAIN_CONFIRM_BTN;
+                                    break;
+                                case "3":
+                                    STC_Title = "เริ่มดำเนินการ" + data_arr[0].step_desc;
+                                    STC_Text = data_arr[0].location_name;
+                                    STC_btn = "ยืนยัน" + MAIN_CONFIRM_BTN;
+                                    break;
+                                case "7":
+                                    STC_Title = data_arr[0].step_desc + "เสร็จ";
+                                    STC_Text = data_arr[0].location_name;
+                                    STC_btn = "ยืนยัน" + MAIN_CONFIRM_BTN;
+                                    break;
+                                case "9":
+                                    STC_Title = "ออกจาก";
+                                    STC_Text = data_arr[0].location_name;
+                                    STC_btn = "ยืนยัน" + MAIN_CONFIRM_BTN;
+                                    break;
+                                default:
+                            }
+                        } else {
+                            STC_Title = MAIN_STAGE;
+                            STC_Text = "";
+                            STC_btn = "ยืนยัน";
+                        }
                     })
                     .fail(function() {
                         // just in case posting your form failed
@@ -1943,15 +2121,21 @@ License: For each use you must have a valid license purchased only from above li
                     });
             }
 
+
+            $('#addAttachedFileModal').on('show.bs.modal', function() {
+                $("#newFileDesc").val(initialWordforAttached);
+            });
+
             // status_update
             $('#status_update').on('click', function() {
                 Swal.fire({
-                    title: MAIN_STAGE,
+                    title: STC_Title,
+                    text: STC_Text,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: MAIN_CONFIRM_BTN,
+                    confirmButtonText: STC_btn,
                     cancelButtonText: 'ยกเลิก'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -2187,9 +2371,6 @@ License: For each use you must have a valid license purchased only from above li
 
             }
 
-
-
-
             function resizeImage(file, maxFileSize) {
                 return new Promise((resolve, reject) => {
                     var reader = new FileReader();
@@ -2293,7 +2474,6 @@ License: For each use you must have a valid license purchased only from above li
                         sliderHTML += '<img src="' + imagePath + '" class="card-rounded shadow mw-100" alt="" />';
                         sliderHTML += '</div>';
                     }
-
                 }
                 sliderHTML += '</div>';
 
@@ -2528,7 +2708,7 @@ License: For each use you must have a valid license purchased only from above li
                     .done(function(data) {
 
                         var data_arr = JSON.parse(data);
-                        console.log(data_arr);
+                        //console.log(data_arr);
 
                         var location = data_arr[0];
 
@@ -2563,15 +2743,6 @@ License: For each use you must have a valid license purchased only from above li
             $('#printJob').click(function() {
                 window.open(`PDF_jobCard.php?job_id=${MAIN_job_id}&trip_id=${MAIN_trip_id}`, '_blank');
             });
-
-
-
-
-
-
-
-
-
 
 
             // Run When Initail Setting ===========================================

@@ -128,6 +128,7 @@ include 'check_cookie.php';
                                                         <th class="font-weight-bold text-center">ประเภทงาน</th>
                                                         <th class="font-weight-bold text-center">ชื่องาน</th>
                                                         <th class="font-weight-bold text-center">ชื่อลูกค้า</th>
+                                                        <th class="font-weight-bold text-center">เอกสารอ้างอิง</th>
                                                         <th class="font-weight-bold text-center">สถานะ</th>
                                                         <th class="font-weight-bold text-center"></th>
                                                     </tr>
@@ -149,7 +150,7 @@ include 'check_cookie.php';
                                                         ";
                                                     }
 
-                                                    $sql = "SELECT a.id, a.job_no, a.job_date, a.job_type, a.job_name, a.client_name, a.status FROM job_order_header a Order By id DESC";
+                                                    $sql = "SELECT * FROM job_order_header a Order By id DESC";
 
 
 
@@ -162,6 +163,50 @@ include 'check_cookie.php';
                                                     if ($result->num_rows > 0) {
                                                         // วนลูปผ่านแต่ละแถวของผลลัพธ์
                                                         while ($row = $result->fetch_assoc()) {
+
+
+                                                            $refDoc_Data = ""; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
+                                                            // ตรวจสอบและเก็บข้อมูลที่ไม่ใช่ Null
+                                                            $customerJobNo = $row['customer_job_no'];
+                                                            if (!empty($customerJobNo)) {
+                                                                $refDoc_Data .= "Job NO ของลูกค้า: " . $customerJobNo . "<br>";
+                                                            }
+
+                                                            $booking = $row['booking'];
+                                                            if (!empty($booking)) {
+                                                                $refDoc_Data .= "Booking (บุ๊กกิ้ง): " . $booking . "<br>";
+                                                            }
+
+                                                            $customerPoNo = $row['customer_po_no'];
+                                                            if (!empty($customerPoNo)) {
+                                                                $refDoc_Data .= "PO No.: " . $customerPoNo . "<br>";
+                                                            }
+
+                                                            $billOfLading = $row['bill_of_lading'];
+                                                            if (!empty($billOfLading)) {
+                                                                $refDoc_Data .= "B/L(ใบขน): " . $billOfLading . "<br>";
+                                                            }
+
+                                                            $customerInvoiceNo = $row['customer_invoice_no'];
+                                                            if (!empty($customerInvoiceNo)) {
+                                                                $refDoc_Data .= "Invoice No.: " . $customerInvoiceNo . "<br>";
+                                                            }
+
+                                                            $agent = $row['agent'];
+                                                            if (!empty($agent)) {
+                                                                $refDoc_Data .= "Agent(เอเย่นต์): " . $agent . "<br>";
+                                                            }
+
+                                                            $goods = $row['goods'];
+                                                            if (!empty($goods)) {
+                                                                $refDoc_Data .= "ชื่อสินค้า: " . $goods . "<br>";
+                                                            }
+
+                                                            $quantity = $row['quantity'];
+                                                            if (!empty($quantity)) {
+                                                                $refDoc_Data .= "QTY/No. of Package: " . $quantity . "<br>";
+                                                            }
+
                                                             // แสดงผลลงในแต่ละ <td> ด้วยการใช้ echo
                                                             echo '<tr>';
                                                             echo '<td class="font-weight-bold text-center">' . $row["job_no"] . '</td>';
@@ -170,6 +215,7 @@ include 'check_cookie.php';
                                                             echo '<td class="font-weight-bold text-center">' . $row["job_type"] . '</td>';
                                                             echo '<td>' . $row["job_name"] . '</td>';
                                                             echo '<td>' . $row["client_name"] . '</td>';
+                                                            echo '<td>' . $refDoc_Data . '</td>';
                                                             // ตรวจสอบสถานะ
                                                             $status = $row["status"];
                                                             $statusBadge = "";
