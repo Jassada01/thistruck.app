@@ -125,6 +125,7 @@ include 'check_cookie.php';
                                                     <tr>
                                                         <th class="font-weight-bold text-center">เลข Job</th>
                                                         <th class="font-weight-bold text-center">วันที่</th>
+                                                        <th class="font-weight-bold text-center" data-bs-toggle="tooltip" title="แสดงข้อมูลเวลาเริ่มของของทริปแรกของใบงาน">วันปฏิบัติงาน</th>
                                                         <th class="font-weight-bold text-center">ประเภทงาน</th>
                                                         <th class="font-weight-bold text-center">ชื่องาน</th>
                                                         <th class="font-weight-bold text-center">ชื่อลูกค้า</th>
@@ -140,6 +141,7 @@ include 'check_cookie.php';
                                                     include "function/connectionDb.php";
 
                                                     // ส่วนของการดึงข้อมูลจากฐานข้อมูล
+                                                    /*
                                                     if ($inactive) {
                                                         $sql = "SELECT a.id, a.job_no, a.job_date, a.job_type, a.job_name, a.client_name, a.status FROM job_order_header a Order By id DESC";
                                                     } else {
@@ -149,8 +151,11 @@ include 'check_cookie.php';
                                                         ORDER BY a.id DESC
                                                         ";
                                                     }
-
-                                                    $sql = "SELECT * FROM job_order_header a Order By id DESC";
+                                                    */
+                                                    $sql = "SELECT a.*, b.jobStartDateTime FROM job_order_header a 
+                                                    Left Join (SELECT a.job_id, a.jobStartDateTime FROM job_order_detail_trip_info a
+                                                    group By a.job_id) b ON a.id = b.job_id
+                                                    Order By a.id DESC";
 
 
 
@@ -212,6 +217,7 @@ include 'check_cookie.php';
                                                             echo '<td class="font-weight-bold text-center">' . $row["job_no"] . '</td>';
                                                             //echo '<td class="font-weight-bold text-center">' . $row["job_date"] . '</td>';
                                                             echo "<td class='text-center'><span class='dateFormatter'>{$row['job_date']}</span></td>";
+                                                            echo "<td class='text-center'><span class='datetimeFormatter'>{$row['jobStartDateTime']}</span></td>";
                                                             echo '<td class="font-weight-bold text-center">' . $row["job_type"] . '</td>';
                                                             echo '<td>' . $row["job_name"] . '</td>';
                                                             echo '<td>' . $row["client_name"] . '</td>';
@@ -360,6 +366,16 @@ include 'check_cookie.php';
                 //var formattedDate = moment(dateString, 'D MMM YYYY', 'th').format('D MMM YYYY');
                 var formattedDate = moment(dateString).format('D MMM YYYY');
                 var diffDays = moment().diff(moment(formattedDate, 'D MMM YYYY', 'th'), 'days');
+                //if (Math.abs(diffDays) < 90) {
+                //    $(this).addClass('text-danger fw-bold');
+                //}
+                $(this).text(formattedDate);
+            });
+
+            $('.datetimeFormatter').each(function() {
+                var dateString = $(this).text();
+                //var formattedDate = moment(dateString, 'D MMM YYYY', 'th').format('D MMM YYYY');
+                var formattedDate = moment(dateString).format('D MMM YY HH:mm');
                 //if (Math.abs(diffDays) < 90) {
                 //    $(this).addClass('text-danger fw-bold');
                 //}

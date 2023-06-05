@@ -449,7 +449,7 @@ include 'check_cookie.php';
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div class="row my-5">
+                                                                                    <div class="row my-5 d-none">
                                                                                         <div class="col-md-3">
                                                                                             <label class="form-label">หมายเลขตู้ 2</label>
                                                                                             <input class="form-control mb-2 mb-md-0 containerID2" name="containerID2" />
@@ -1595,6 +1595,7 @@ include 'check_cookie.php';
             let EditLocation_seq = "";
             let EditLocation_ID = "";
             let Editjob_characteristic = "";
+            let Editjob_Note = "";
             let changeActionMode = 0;
 
             // Change Status BTN =======================
@@ -2042,7 +2043,7 @@ include 'check_cookie.php';
                         //console.log(data);
                         var data_arr = JSON.parse(data);
                         MAIN_TIMELINE_DATA = data_arr;
-                        //console.log(data_arr);
+                        console.log(data_arr);
 
 
                         // ==================================================
@@ -2170,7 +2171,7 @@ include 'check_cookie.php';
                                 if (item.location_name) {
                                     timelineItems += ' - <span class="locationclickBTN fw-bolder fs-3" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
                                     if (MAIN_TRIP_STATUS != "รอเจ้าหน้าที่ยืนยัน") {
-                                        timelineItems += '    <span class="badge badge-circle badge-light locationChangeBtn" data-plan_order="' + item.plan_order + '" data-location_id="' + item.location_id + '" data-job_characteristic="' + item.step_desc + '" ><i class="fas fa-sync-alt"></i></span>';
+                                        timelineItems += '    <span class="badge badge-circle badge-light locationChangeBtn" data-plan_order="' + item.plan_order + '" data-location_id="' + item.location_id + '" data-job_characteristic="' + item.step_desc + '" data-job_note="'+item.job_note+'"><i class="fas fa-sync-alt"></i></span>';
                                     }
                                 }
                                 timelineItems += '</div>';
@@ -3140,7 +3141,7 @@ include 'check_cookie.php';
                                 </div>
                                 <h4 class="card-label">${item.job_characteristicShow}</h4>
                             </div>
-                                <a class="btn btn-link btn-color-muted btn-active-color-primary mb-2 changeLocation" location_id="${item.location_id}" job_characteristic="${item.job_characteristic}" value="${idx}">เปลี่ยนสถานที่</a>
+                                <a class="btn btn-link btn-color-muted btn-active-color-primary mb-2 changeLocation" location_id="${item.location_id}" job_characteristic="${item.job_characteristic}" job_note="${item.job_note}" value="${idx}">เปลี่ยนสถานที่</a>
                                 <a class="btn btn-link btn-color-muted btn-active-color-primary mb-2 delete_item_box" value="${item.unique_key}">x</a>
                             </div>
                             <div class="card-body">
@@ -3205,11 +3206,13 @@ include 'check_cookie.php';
                 var target = ($(this).attr('value'));
                 var location_id = ($(this).attr('location_id'));
                 var tmpjob_characteristic = ($(this).attr('job_characteristic'));
+                var tmpjob_note = ($(this).attr('job_note'));
 
                 //console.log(tmpjob_characteristic);
                 EditLocation_seq = target;
                 EditLocation_ID = location_id;
                 EDITjob_characteristic = tmpjob_characteristic.trim();
+                Editjob_Note = tmpjob_note.trim();
 
                 $('#addLocationModal').modal('show');
             });
@@ -3285,6 +3288,7 @@ include 'check_cookie.php';
 
             $('#addLocationModal').on('show.bs.modal', function() {
                 $('#locationForm').trigger('reset');
+                $("#job_note").val(Editjob_Note);
                 loadLocationForSelect();
                 TEMP_MAIN_DATA = {};
             });
@@ -3417,11 +3421,13 @@ include 'check_cookie.php';
                 var target = $(this).data('plan_order');
                 var tmpjob_characteristic = $(this).data('job_characteristic');
                 var location_id = $(this).data('location_id');
+                var tmp_job_note = $(this).data('job_note');
 
                 //console.log(tmpjob_characteristic);
                 EditLocation_seq = target;
                 EditLocation_ID = location_id;
                 EDITjob_characteristic = tmpjob_characteristic.trim();
+                Editjob_Note = tmp_job_note.trim();
 
                 changeActionMode = 1;
                 $('#addLocationModal').modal('show');

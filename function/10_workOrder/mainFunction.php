@@ -184,6 +184,61 @@ function SendNoticeJobConfirm($userId, $accessToken, $message, $link)
 	*/
 }
 
+function SendNoticeJobConfirmforCustomerClient($userId, $accessToken, $textHeader, $message)
+{
+	$data = [
+		'to' => $userId,
+		'messages' => [
+			[
+				'type' => 'flex',
+				'altText' => $textHeader,
+				'contents' => [
+					'type' => 'bubble',
+					'body' => [
+						'type' => 'box',
+						'layout' => 'vertical',
+						'contents' => [
+							[
+								'type' => 'text',
+								'text' => $message,
+								'wrap' => true
+							],
+							[
+								'type' => 'separator',
+								'margin' => 'xl'
+							]
+						]
+					]
+				]
+			]
+		]
+	];
+
+	$url = 'https://api.line.me/v2/bot/message/push';
+
+	$headers = [
+		'Content-Type: application/json',
+		'Authorization: Bearer ' . $accessToken
+	];
+
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$result = curl_exec($ch);
+	curl_close($ch);
+
+	/*
+	if ($result === false) {
+		echo 'เกิดข้อผิดพลาดในการส่งข้อความ: ' . curl_error($ch);
+	} else {
+		echo 'ส่งข้อความและลิงก์ Line Message API สำเร็จ!';
+	}
+	*/
+}
+
 
 
 
@@ -717,6 +772,7 @@ function loadTripTimeLine()
 				   a.minor_order,
 				   b.latitude, 
 				   b.longitude,
+				   b.job_note,
 				   b.location_id AS location_id,
 				   '' AS random_code
 			FROM   job_order_detail_trip_action_log a
@@ -739,12 +795,13 @@ function loadTripTimeLine()
 				   1           AS minor_order,
 				   0.0 as latitude,
 				   0.0 as longitude,
+				   '' AS job_note,
 				   '' AS location_id,
 				   z.random_code
 			FROM   jobattachedlog z
 			WHERE  z.trip_id = $MAIN_trip_id) a
 	ORDER  BY Coalesce(a.timestamp, '9999-12-31 23:59:59') ASC,
-			  a.id; ";
+			  a.id";
 
 
 	$res = $conn->query(trim($sql));
@@ -820,6 +877,9 @@ function confirmJob()
 
 	$result = $conn->query($sql);
 
+	$client_line_token = "";
+	$customer_line_token = "";
+
 	$refDoc_Data = ""; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
 	$agent = "";
 	if ($result->num_rows > 0) {
@@ -867,7 +927,7 @@ function confirmJob()
 			}
 		}
 	}
-
+	/*
 	$sql = "SELECT 
 			a.id, 
 			a.job_id,
@@ -891,6 +951,35 @@ function confirmJob()
 			a.job_id = $MAIN_JOB_ID
 			AND a.status = 'รอเจ้าหน้าที่ยืนยัน' 
 			and a.complete_flag IS NULL;";
+*/
+
+	$sql = "SELECT 
+		a.id, 
+		a.job_id,
+		a.driver_name, 
+		c.job_name, 
+		a.job_no, 
+		a.tripNo, 
+		a.status, 
+		a.random_code, 
+		b.line_id,
+		a.jobStartDateTime,
+		a.containersize,
+		d.insInvAdd1, d.insInvAdd2, d.insInvAdd3,
+		c.remark,
+		e.Line_token AS client_line_token,
+		f.line_token AS customer_line_token
+	FROM 
+		job_order_detail_trip_info a 
+		Inner Join job_order_header c ON a.job_id = c.id
+		LEFT Join truck_driver_info b ON a.driver_id = b.driver_id
+		inner Join job_order_detail_trip_cost d ON a.id = d.trip_id AND a.job_id = d.job_id
+		LEFT JOIN client_info e ON c.ClientID = e.ClientID
+		LEFT JOIN customers f ON c.customer_id = f.customer_id
+	WHERE 
+		a.job_id = $MAIN_JOB_ID
+		AND a.status = 'รอเจ้าหน้าที่ยืนยัน' 
+		and a.complete_flag IS NULL";
 
 	// ส่งคำสั่ง SQL ไปยังฐานข้อมูล
 	$result = $conn->query($sql);
@@ -914,6 +1003,8 @@ function confirmJob()
 			$insInvAdd2 = $row['insInvAdd2'];
 			$insInvAdd3 = $row['insInvAdd3'];
 			$hdRemark = $row['remark'];
+			$client_line_token = $row['client_line_token'];
+			$customer_line_token = $row['customer_line_token'];
 			$progress = "";
 
 
@@ -965,38 +1056,36 @@ function confirmJob()
 				$map_url = $row3['map_url'];
 				$JSC = $row3['JSC'];
 
-				$jobActionLog = $jobActionLog."\n".$JSC." : ".$location_code;
+				$jobActionLog = $jobActionLog . "\n" . $JSC . " : " . $location_code;
 			}
 
 			// Send Line Notification =======================================================
-			if (trim($User_line_id != "")) {
+			$thai_date = date('d F y', strtotime($jobStartDateTime));
+			$thai_date = str_replace(
+				['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+				[
+					'ม.ค.',
+					'ก.พ.',
+					'มี.ค.',
+					'เม.ย.',
+					'พ.ค.',
+					'มิ.ย.',
+					'ก.ค.',
+					'ส.ค.',
+					'ก.ย.',
+					'ต.ค.',
+					'พ.ย.',
+					'ธ.ค.'
+				],
+				$thai_date
+			);
 
-				$thai_date = date('d F y', strtotime($jobStartDateTime));
-				$thai_date = str_replace(
-					['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-					[
-						'ม.ค.',
-						'ก.พ.',
-						'มี.ค.',
-						'เม.ย.',
-						'พ.ค.',
-						'มิ.ย.',
-						'ก.ค.',
-						'ส.ค.',
-						'ก.ย.',
-						'ต.ค.',
-						'พ.ย.',
-						'ธ.ค.'
-					],
-					$thai_date
-				);
+			$formattedTime = date('H:i', strtotime($jobStartDateTime));
+			$formattedDate = $thai_date . ' เวลา ' . $formattedTime . ' น.';
 
-				$formattedTime = date('H:i', strtotime($jobStartDateTime));
-				$formattedDate = $thai_date . ' เวลา ' . $formattedTime . ' น.';
-
-				$message = "มีงานใหม่เข้า
+			$message = "มีงานใหม่เข้า
 เริ่มงาน : $formattedDate
-คนขับ : $driver_name
+คนขับ : $driver_name 
 Job ID : $job_no
 Trip ID : $tripNo
 ชื่องาน : $job_name
@@ -1015,8 +1104,22 @@ $insInvAdd3
 $hdRemark
 ";
 
-				$link = $SERVER_NAME . 'tripDetail.php?r=' . $random_code;
+			$link = $SERVER_NAME . 'tripDetail.php?r=' . $random_code;
+
+			// Send Line Notice to Driver 
+			if (trim($User_line_id != "")) {
+
 				SendNoticeJobConfirm($User_line_id, $Line_Token, $message, $link);
+			}
+
+			if (trim($client_line_token != "")) {
+
+				SendNoticeJobConfirmforCustomerClient($client_line_token, $Line_Token, 'ยืนยันงาน', $message);
+			}
+
+			if (trim($customer_line_token != "")) {
+
+				SendNoticeJobConfirmforCustomerClient($customer_line_token, $Line_Token, 'ยืนยันงาน', $message);
 			}
 		}
 		// Update Job Status 

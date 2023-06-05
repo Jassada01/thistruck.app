@@ -228,7 +228,7 @@ include 'check_cookie.php';
                                                         <label for="capacity" class="col-sm-3 col-form-label text-end-pc">น้ำหนักบรรทุก</label>
                                                         <div class="col-sm-3">
                                                             <div class="input-group">
-                                                                <input type="number" class="form-control" id="capacity" name="capacity" autocomplete="off" />
+                                                                <input type="text" class="form-control" id="capacity" name="capacity" autocomplete="off" />
                                                                 <span class="input-group-text" id="basic-addon2">ตัน</span>
                                                             </div>
                                                         </div>

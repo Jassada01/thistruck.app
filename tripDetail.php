@@ -653,7 +653,7 @@ License: For each use you must have a valid license purchased only from above li
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="row my-5">
+                                                                                <div class="row my-5 d-none">
                                                                                     <div class="col-md-3">
                                                                                         <label class="form-label">หมายเลขตู้ 2</label>
                                                                                         <input class="form-control mb-2 mb-md-0 containerID2" name="containerID2" />

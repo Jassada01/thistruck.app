@@ -13,19 +13,20 @@ foreach ($events['events'] as $event) {
         $replyToken = $event['replyToken'];
 
         if ($messageType == 'text') {
-            $text = $event['message']['text'];
+            $text = trim($event['message']['text']);
 
-            // ตรวจสอบว่าคำว่า 'ID' อยู่ในข้อความหรือไม่
-            if (strpos(strtolower($text), 'id') !== false) {
-                // หากมีคำว่า 'ID' ในข้อความ
+            // Check if the trimmed text is 'id'
+            if (strcasecmp($text, 'id') == 0) {
                 $userId = $event['source']['userId'];
-
-                // ทำการตอบกลับด้วยค่าของ userID
                 replyTextMessage($replyToken, $userId);
+            } 
+            else if (strcasecmp($text, 'group') == 0) {
+                $groupID = $event['source']['groupId'];
+                replyTextMessage($replyToken, $groupID);
             }
-            else
-            {
-                replyTextMessage($replyToken, "นี่เป็นช่องทางสำหรับการส่งข้อมูลแจ้งเตือนเท่านั้น ถ้าคุณมีคำถามหรือต้องการข้อมูลเพิ่มเติม, กรุณาติดต่อเราที่หมายเลข 063-914-4536 นะคะ");
+            else {
+                // Do nothing
+                //replyTextMessage($replyToken, "นี่เป็นช่องทางสำหรับการส่งข้อมูลแจ้งเตือนเท่านั้น ถ้าคุณมีคำถามหรือต้องการข้อมูลเพิ่มเติม, กรุณาติดต่อเราที่หมายเลข 063-914-4536 นะคะ");
             }
         }
     }
@@ -62,5 +63,3 @@ function replyTextMessage($replyToken, $text)
     $context = stream_context_create($options);
     $result = file_get_contents($url, false, $context);
 }
-
-?>

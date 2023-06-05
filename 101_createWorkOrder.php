@@ -553,7 +553,7 @@ include 'check_cookie.php';
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="row my-5">
+                                                                <div class="row my-5 d-none">
                                                                     <div class="col-md-3">
                                                                         <label class="form-label">หมายเลขตู้ 2</label>
                                                                         <input class="form-control mb-2 mb-md-0 containerID2" name="containerID2" />
