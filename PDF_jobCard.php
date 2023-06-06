@@ -577,15 +577,15 @@ if ($result->num_rows > 0) {
 				//$pdf->Cell(0, 10, $trip_detail_job_note, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 				$pdf->MultiCell(50, 5, str_replace("\n", ' ', $trip_detail_job_note) . "", 0, 'L', false, 1, '', '', true);
 			} else {
-				$pdf->SetXY(46, 162 + ($cnt * 14)); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetXY(46, 162 + ($cnt * 18)); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 18);
 				$pdf->Cell(0, 10, $trip_detail_location_code, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
-				$pdf->SetXY(46, 166 + ($cnt * 14)); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetXY(46, 166 + ($cnt * 18)); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 14);
 				$pdf->Cell(0, 10, $trip_detail_job_characteristic, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
-				$pdf->SetXY(32, 172 + ($cnt * 14)); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetXY(32, 172 + ($cnt * 18)); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 				$pdf->SetFont('thsarabunb', 'B', 11);
 				//$pdf->Cell(0, 10, $trip_detail_job_note, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 				$pdf->MultiCell(50, 5, str_replace("\n", ' ', $trip_detail_job_note) . "", 0, 'L', false, 1, '', '', true);
@@ -599,19 +599,19 @@ if ($result->num_rows > 0) {
 					switch ($row3['minor_order']) {
 						case '1':
 							$timeStampX = 120.5;
-							$timeStampY = 162.5 + ($cnt * 13.5);
+							$timeStampY = 162.5 + ($cnt * 18);
 							break;
 						case '3':
 							$timeStampX = 168.5;
-							$timeStampY = 162.5 + ($cnt * 13.5);
+							$timeStampY = 162.5 + ($cnt * 18);
 							break;
 						case '7':
 							$timeStampX = 120.5;
-							$timeStampY = 168.5 + ($cnt * 13.5);
+							$timeStampY = 168.5 + ($cnt * 18);
 							break;
 						case '9':
 							$timeStampX = 168.5;
-							$timeStampY = 168.5 + ($cnt * 13.5);
+							$timeStampY = 168.5 + ($cnt * 18);
 							break;
 						default:
 							// NULL

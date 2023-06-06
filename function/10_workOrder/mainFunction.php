@@ -240,6 +240,29 @@ function SendNoticeJobConfirmforCustomerClient($userId, $accessToken, $textHeade
 }
 
 
+function countValues($data) {
+    // นับจำนวนครั้งที่แต่ละค่าปรากฎใน array
+    $counts = array_count_values($data);
+
+    // สร้าง string สำหรับผลลัพธ์
+    $result = "";
+
+    // วนซ้ำผ่าน array ของจำนวนการนับ
+    foreach($counts as $value => $count) {
+        // ถ้าไม่ใช่ค่าแรก, ใส่ comma ก่อน
+        if ($result != "") {
+            $result .= ", ";
+        }
+        // ต่อ string นี้ลงไปในผลลัพธ์
+        $result .= $count . "x" . $value;
+    }
+
+    // return ผลลัพธ์
+    return $result;
+}
+
+
+
 
 
 // ======== Function ========
@@ -985,6 +1008,7 @@ function confirmJob()
 	$result = $conn->query($sql);
 	$progress = "";
 	// ตรวจสอบผลลัพธ์การค้นหา
+	$totalQTYData = array();
 	if ($result->num_rows > 0) {
 		// วนลูปแสดงผลลัพธ์
 		while ($row = $result->fetch_assoc()) {
@@ -1006,6 +1030,13 @@ function confirmJob()
 			$client_line_token = $row['client_line_token'];
 			$customer_line_token = $row['customer_line_token'];
 			$progress = "";
+
+			if (trim($containersize) == "")
+			{
+				$containersize = "ไม่ระบุ";
+			}
+
+			array_push($totalQTYData, $containersize);
 
 
 
@@ -1082,7 +1113,7 @@ function confirmJob()
 
 			$formattedTime = date('H:i', strtotime($jobStartDateTime));
 			$formattedDate = $thai_date . ' เวลา ' . $formattedTime . ' น.';
-
+			$formattedJobDate = $thai_date;
 			$message = "มีงานใหม่เข้า
 เริ่มงาน : $formattedDate
 คนขับ : $driver_name 
@@ -1111,16 +1142,6 @@ $hdRemark
 
 				SendNoticeJobConfirm($User_line_id, $Line_Token, $message, $link);
 			}
-
-			if (trim($client_line_token != "")) {
-
-				SendNoticeJobConfirmforCustomerClient($client_line_token, $Line_Token, 'ยืนยันงาน', $message);
-			}
-
-			if (trim($customer_line_token != "")) {
-
-				SendNoticeJobConfirmforCustomerClient($customer_line_token, $Line_Token, 'ยืนยันงาน', $message);
-			}
 		}
 		// Update Job Status 
 		$sql = "UPDATE job_order_header set status = 'กำลังดำเนินการ', update_by = '$update_user' WHERE id = $MAIN_JOB_ID";
@@ -1129,7 +1150,28 @@ $hdRemark
 			echo  $conn->errno;
 			exit();
 		}
+		$totalQTYDataText = countValues($totalQTYData);
+		$messageforClientandCustomer = "คอนเฟิร์มงาน
+วันที่ : $formattedJobDate
+ชื่องาน : $job_name
+เลขที่อ้างอิง :
+$refDoc_Data
+ขนาด : $totalQTYDataText
+=========================
+$jobActionLog 
+========================";
+		// Process after finished each trip =======================================
+		if (trim($client_line_token != "")) {
+
+			SendNoticeJobConfirmforCustomerClient($client_line_token, $Line_Token, 'คอนเฟิร์มงาน', $messageforClientandCustomer);
+		}
+
+		if (trim($customer_line_token != "")) {
+
+			SendNoticeJobConfirmforCustomerClient($customer_line_token, $Line_Token, 'คอนเฟิร์มงาน', $messageforClientandCustomer);
+		}
 	}
+
 	mysqli_close($conn);
 }
 

@@ -330,7 +330,7 @@ include 'check_cookie.php';
 
                 "date-th-desc": function(a, b) {
                     return b - a;
-                }
+                },
             });
 
 
@@ -346,6 +346,9 @@ include 'check_cookie.php';
                 order: [
                     [0, "desc"]
                 ] // เรียงลำดับตามคอลัมน์แรก (index 0) ในลำดับ DESC
+                ,
+                
+                "pageLength": 50 // กำหนดให้แสดงแถวต่อหน้าเริ่มต้นที่ 50 แถว
 
             });
             jobTable.on('draw', function() {

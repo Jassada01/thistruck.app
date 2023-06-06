@@ -1808,8 +1808,9 @@ License: For each use you must have a valid license purchased only from above li
                 ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
                 ajaxData['MAIN_trip_id'] = MAIN_trip_id;
                 ajaxData['driver_name'] = $('.truckDriver').find(":selected").text();;
+                ajaxData['truck_licenseNo'] = $('.truckinJob').find(":selected").text();;
                 // data.driver_name = $(this).find('.truckDriver').find(":selected").text();
-                //console.log(ajaxData);
+                console.log(ajaxData);
 
                 $.ajax({
                         type: 'POST',
@@ -1830,7 +1831,7 @@ License: For each use you must have a valid license purchased only from above li
                             showConfirmButton: false,
                             timer: 1500
                         }).then(() => {
-                            location.reload();
+                            //location.reload();
                             //null
                         });
                     })

@@ -38,17 +38,19 @@
 
         <div class="row mt-4">
             <div class="col-md-12">
-                <h3>Scan QR Code เพื่อเข้ากลุ่ม</h3>
+                <h3>Scan QR Code เพิ่มบอทเป็นเพื่อน</h3>
                 <img src="assets/media/misc/LineGroupQRCode.png" alt="QR Code" class="img-fluid img-resize" style="max-height: 400px;">
             </div>
 
             <div class="col-md-12 mt-10">
                 <h3>กดแชต</h3>
+                <h3>หากต้องการใช้งานบอทภายในกลุ่มเชิญบอทเข้ากลุ่มที่ต้องการ</h3>
                 <img src="assets/media/misc/p2.jpg" alt="Add Friend" class="img-fluid img-resize" style="max-height: 400px;">
             </div>
 
             <div class="col-md-12 mt-10">
-                <h3>พิมพ์คำว่า ID จากนั้นรอข้อความตอบกลับจากระบบ</h3>
+                <h3>กรณีตอบกลับส่วนตัวเช่น คนขับ ผู้ใช้งานระบบ พิมพ์คำว่า ID จากนั้นรอข้อความตอบกลับจากระบบ</h3>
+                <h3>กรณีตอบกลับไปที่กลุ่มเช่น กลุ่มของลูกค้า กลุ่มผู้ว่าจ้าง พิมพ์คำว่า Group จากนั้นรอข้อความตอบกลับจากระบบ</h3>
                 <img src="assets/media/misc/p3.jpg" alt="ID" class="img-fluid img-resize" style="max-height: 400px;">
             </div>
 
