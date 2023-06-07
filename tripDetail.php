@@ -1831,7 +1831,7 @@ License: For each use you must have a valid license purchased only from above li
                             showConfirmButton: false,
                             timer: 1500
                         }).then(() => {
-                            //location.reload();
+                            location.reload();
                             //null
                         });
                     })
