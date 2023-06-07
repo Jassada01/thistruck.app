@@ -1295,15 +1295,13 @@ function InsertAttachedfileDataTripLog()
 	}
 
 
-
-
 	// เชื่อมต่อฐานข้อมูล MySQL
 	include "../connectionDb.php";
 
 	// สร้างคำสั่ง SQL เพื่อเพิ่มข้อมูลลงในตาราง jobAttachedLog
-	$sql = "INSERT INTO jobAttachedLog (trip_id, file_desc, random_code) VALUES ('$trip_id', '$file_desc', '$random_code')";
+	$sql = "INSERT INTO jobattachedlog (trip_id, file_desc, random_code) VALUES ('$trip_id', '$file_desc', '$random_code')";
 
-	//echo $sql;
+	echo $sql;
 
 	if (!$conn->query($sql)) {
 		echo  $conn->errno;

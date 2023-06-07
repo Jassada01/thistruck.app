@@ -397,7 +397,7 @@ include 'check_cookie.php';
                                                                 <div class="row row-cols-1 g-10">
                                                                     <form id="jobDetailCostForm">
                                                                         <div class="row mb-3">
-                                                                            <label for="hire_price" class="col-sm-5 col-form-label  text-end-pc">ราคาจ้าง</label>
+                                                                            <label for="hire_price" class="col-sm-5 col-form-label  text-end-pc">ราคางาน</label>
                                                                             <div class="col-sm-7">
                                                                                 <input type="number" step="0.01" class="form-control" id="hire_price" name="hire_price" required>
                                                                             </div>
@@ -421,19 +421,19 @@ include 'check_cookie.php';
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
-                                                                            <label for="container_return" class="col-sm-5 col-form-label  text-end-pc">ค่าคืน/รับตู้</label>
+                                                                            <label for="container_return" class="col-sm-5 col-form-label  text-end-pc">ค่ารับตู้/คืนตู้</label>
                                                                             <div class="col-sm-7">
                                                                                 <input type="number" step="0.01" class="form-control" id="container_return" name="container_return" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
-                                                                            <label for="container_cleaning_repair" class="col-sm-5 col-form-label  text-end-pc">ค่าซ่อม/ล้างตู้</label>
+                                                                            <label for="container_cleaning_repair" class="col-sm-5 col-form-label  text-end-pc">ค่าซ่อมตู้</label>
                                                                             <div class="col-sm-7">
                                                                                 <input type="number" step="0.01" class="form-control" id="container_cleaning_repair" name="container_cleaning_repair" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
-                                                                            <label for="container_drop_lift" class="col-sm-5 col-form-label  text-end-pc">ค่ายก/วางตู้</label>
+                                                                            <label for="container_drop_lift" class="col-sm-5 col-form-label  text-end-pc">ค่าล้งตู้</label>
                                                                             <div class="col-sm-7">
                                                                                 <input type="number" step="0.01" class="form-control" id="container_drop_lift" name="container_drop_lift" required>
                                                                             </div>
