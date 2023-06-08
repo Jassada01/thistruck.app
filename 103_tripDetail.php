@@ -253,9 +253,9 @@ include 'check_cookie.php';
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="col-sm-9 mt-3 d-flex align-items-center px-3">
-                                            <h1><i class="bi bi-file-text fs-3"></i></i> เลขที่เอกสาร</h1>
                                         </div>
                                         <div class="card-toolbar">
+                                            <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="driverLink">ลิ้งของคนขับ</button>
                                             <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="printJob">Export ใบงานเป็น PDF</button>
                                         </div>
                                     </div>
@@ -1577,6 +1577,7 @@ include 'check_cookie.php';
             let MAIN_job_no = "";
             let updatePlan_no = "";
             let MAIN_TRIP_RANDOMCODE = "";
+            let MAINRANDOMCODE = "";
             //var LOAD_PROCESS_COUNT = 0;
 
             //alert(MAIN_job_id);
@@ -1820,6 +1821,7 @@ include 'check_cookie.php';
                         $('.sealNo2').val(data_arr.JobDetailTrip[0].seal_no2);
                         $('.containerWeight2').val(data_arr.JobDetailTrip[0].containerWeight2);
                         $('.subcontrackCheckbox').prop('checked', data_arr.JobDetailTrip[0].subcontrackCheckbox == '1'); // ตัวอย่างการกำหนดค่าใน checkbox element
+
 
                         jobStartDateTime_picker.setDate(data_arr.JobDetailTrip[0].jobStartDateTime);
 
@@ -2171,7 +2173,7 @@ include 'check_cookie.php';
                                 if (item.location_name) {
                                     timelineItems += ' - <span class="locationclickBTN fw-bolder fs-3" location_name="' + item.location_name + '" latitude="' + item.latitude + '" longitude="' + item.longitude + '" location_id="' + item.location_id + '"><U>' + item.location_name + "</U></span>";
                                     if (MAIN_TRIP_STATUS != "รอเจ้าหน้าที่ยืนยัน") {
-                                        timelineItems += '    <span class="badge badge-circle badge-light locationChangeBtn" data-plan_order="' + item.plan_order + '" data-location_id="' + item.location_id + '" data-job_characteristic="' + item.step_desc + '" data-job_note="'+item.job_note+'"><i class="fas fa-sync-alt"></i></span>';
+                                        timelineItems += '    <span class="badge badge-circle badge-light locationChangeBtn" data-plan_order="' + item.plan_order + '" data-location_id="' + item.location_id + '" data-job_characteristic="' + item.step_desc + '" data-job_note="' + item.job_note + '"><i class="fas fa-sync-alt"></i></span>';
                                     }
                                 }
                                 timelineItems += '</div>';
@@ -3433,6 +3435,10 @@ include 'check_cookie.php';
                 $('#addLocationModal').modal('show');
             });
 
+
+            
+           
+
             //sednMSGtoDriver
             //var driver_type = $(this).find(':selected').data('driver_type');
             $('body').on('click', '#sednMSGtoDriver', function() {
@@ -3482,6 +3488,11 @@ include 'check_cookie.php';
 
                 }
             });
+
+            $('body').on('click', '#driverLink', function() {
+                window.open("tripDetail.php?r=" + MAIN_TRIP_RANDOMCODE);
+            });
+
 
 
 

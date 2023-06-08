@@ -30,6 +30,7 @@ include 'check_cookie.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
     <!-- Data table CSS -->
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" rel="stylesheet" type="text/css" />
 
     <!--end::Global Stylesheets Bundle-->
 </head>
@@ -110,12 +111,7 @@ include 'check_cookie.php';
                                         <div class="col-sm-9 mt-3 d-flex align-items-center px-3">
                                             <h1><i class="bi bi-layers fs-3"></i> รายการใบงาน</h1>
                                         </div>
-                                        <div class="card-toolbar">
-                                            <div class="form-check d-none">
-                                                <input type="checkbox" class="form-check-input" id="active" name="active" value="1" <?php echo $checkword; ?>>
-                                                <label class="form-check-label" for="active">เฉพาะรายการที่ยังใช้งาน</label>
-                                            </div>
-                                        </div>
+
                                     </div>
                                     <div class="card-body">
                                         <div class="table-responsive">
@@ -207,7 +203,7 @@ include 'check_cookie.php';
                                                     DATE_FORMAT(a.job_date, '%m%Y') = '062023' 
                                                     AND a.status <> 'ยกเลิก' 
                                                   Order By 
-                                                    a.id LIMIT 1 ";
+                                                    a.id ";
 
                                                 //echo  $sql;
                                             } else {
@@ -218,32 +214,45 @@ include 'check_cookie.php';
                                             // ส่งคำสั่ง SQL ไปยังฐานข้อมูล
                                             $result = mysqli_query($conn, $sql);
 
-                                            echo "<table class='table table-bordered table-hover table-striped w-100' id='reportDable'>";
-
-                                            // Fetch the result of the query
-                                            while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-                                                // If we haven't printed the header row yet, do so
-                                                if (!isset($headerPrinted)) {
-                                                    echo "<tr>";
-                                                    foreach ($row as $fieldName => $value) {
-                                                        echo "<th>$fieldName</th>";
-                                                    }
-                                                    echo "</tr>";
-                                                    $headerPrinted = true;
-                                                }
-
-                                                // Print each data row
-                                                echo "<tr>";
-                                                foreach ($row as $value) {
-                                                    echo "<td>$value</td>";
-                                                }
-                                                echo "</tr>";
-                                            }
-
-                                            echo "</table>";
 
                                             // ปิดการเชื่อมต่อฐานข้อมูล
                                             mysqli_close($conn);
+
+                                            if ($result->num_rows > 0) {
+                                                echo "<table class='table table-bordered table-hover table-striped w-100' id='dataTable'>";
+
+                                                // output data of each row
+                                                while ($row = $result->fetch_assoc()) {
+                                                    // create table header only for the first row (where the table is not yet created)
+                                                    if (!isset($tableHeaderCreated)) {
+                                                        echo "<thead class='bg-primary text-white'>";
+                                                        echo "<tr>";
+                                                        foreach ($row as $header => $value) {
+                                                            echo "<th>" . htmlspecialchars($header) . "</th>";
+                                                        }
+                                                        echo "</tr>";
+                                                        echo "</thead>";
+                                                        echo "<tbody>";
+                                                        $tableHeaderCreated = true;
+                                                    }
+
+                                                    echo "<tr>";
+                                                    foreach ($row as $value) {
+                                                        if ($value == 0 || $value == "0.00") {
+                                                            echo "<td>" . "" . "</td>";
+                                                        } else {
+                                                            echo "<td>" . htmlspecialchars($value) . "</td>";
+                                                        }
+                                                    }
+                                                    echo "</tr>";
+                                                }
+                                                echo "</tbody>";
+                                                echo "</table>";
+                                            } else {
+                                                echo "0 results";
+                                            }
+
+
 
 
 
@@ -283,9 +292,20 @@ include 'check_cookie.php';
     <!--end::Global Javascript Bundle-->
     <!-- Sweet Alert 2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.all.min.js"></script>
+
     <!-- Data table JS -->
+    <!-- เรียกใช้งานไลบรารี DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- เรียกใช้งานไลบรารี DataTables Buttons -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json"></script>
 
     <!--Date Picker ภาษาไทย -->
@@ -319,15 +339,20 @@ include 'check_cookie.php';
             });
 
 
-            let clientTable = $("#reportDable").DataTable({
-                search: {
-                    return: true,
-                },
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json"
-                },
-                "pageLength": 50 // กำหนดให้แสดงแถวต่อหน้าเริ่มต้นที่ 50 แถว
+
+            var datatable;
+
+            //$("#dataTable").DataTable();
+            datatable = $('#dataTable').DataTable({
+                "info": false,
+                'order': [],
+                'pageLength': 50,
+                dom: 'Bfrtip',
+                buttons: [
+                    'excel'
+                ]
             });
+
 
 
 
