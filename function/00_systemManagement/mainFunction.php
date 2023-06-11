@@ -348,14 +348,14 @@ function sendLineMSG()
 	$result = $conn->query($sql);
 	$row = $result->fetch_assoc();
 	$server_name = $row['value'];
-	
-	
+
+
 	mysqli_close($conn);
 
 
 	$accessToken = $Line_Token;
 	$userId = $line_id; // เปลี่ยนเป็น User ID ของผู้รับข้อความ
-	$link = $server_name.$link;
+	$link = $server_name . $link;
 
 
 	$data = [
@@ -415,8 +415,66 @@ function sendLineMSG()
 	} else {
 		echo 'ส่งข้อความและลิงก์ Line Message API สำเร็จ!';
 	}
+}
+
+// F=9
+function sendLineMSGtoCliandCus()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// Line_Token
+	$sql = "SELECT * FROM master_data WHERE type = 'system_value' AND name = 'Line Token'";
+	$result = $conn->query($sql);
+	$row = $result->fetch_assoc();
+	$Line_Token = $row['value'];
+
+	// Server Name 
+	
+
+	mysqli_close($conn);
 
 
+	$accessToken = $Line_Token;
+	$userId = $line_id; // เปลี่ยนเป็น User ID ของผู้รับข้อความ
+
+
+	$data = [
+		'to' => $userId,
+		'messages' => [
+			[
+				'type' => 'text',
+				'text' => $message
+			]
+		]
+	];
+
+	$url = 'https://api.line.me/v2/bot/message/push';
+
+	$headers = [
+		'Content-Type: application/json',
+		'Authorization: Bearer ' . $accessToken
+	];
+
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$result = curl_exec($ch);
+	curl_close($ch);
+	if ($result === false) {
+		echo 'เกิดข้อผิดพลาดในการส่งข้อความ: ' . curl_error($ch);
+	} else {
+		echo 'ส่งข้อความและลิงก์ Line Message API สำเร็จ!';
+	}
 }
 
 
@@ -452,6 +510,10 @@ switch ($f) {
 		}
 	case 8: {
 			sendLineMSG();
+			break;
+		}
+	case 9: {
+			sendLineMSGtoCliandCus();
 			break;
 		}
 }

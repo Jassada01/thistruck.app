@@ -197,7 +197,8 @@ include 'check_cookie.php';
                                             <h1><i class="bi bi-file-text fs-3"></i></i> เลขที่เอกสาร</h1>
                                         </div>
                                         <div class="card-toolbar">
-                                            <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="printJob"><i class="fa fa-file-pdf-o"></i>Export ใบงานเป็น PDF</button>
+                                            <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="printJob"><i class="fas fa-file-pdf fs-3"></i>ใบงาน</button>
+                                            <button type="button" class="btn btn-sm btn-color-success btn-active-light-success" id="LineUpdateStatus"><i class="fab fa-line fs-3"></i>ส่งLine</button>
                                             <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary" id="cancelJob" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                                 <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
                                                 <span class="svg-icon svg-icon-2">
@@ -841,6 +842,9 @@ include 'check_cookie.php';
             let generateJobCodeFlg = false;
             let tempGooglrMapRoute = [];
             let targetTrip_id = "";
+            let MAIN_LINE_MSG = "";
+            let MAIN_LINE_CUS = "";
+            let MAIN_LINE_CLI = "";
 
 
             // Set Initial Select 2
@@ -936,7 +940,7 @@ include 'check_cookie.php';
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
-                        //console.log(data_arr);
+                        console.log(data_arr);
 
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
@@ -969,6 +973,9 @@ include 'check_cookie.php';
                         $("#goods").val(jobHeaderForm.goods);
                         $("#quantity").val(jobHeaderForm.quantity);
                         $("#remark").val(jobHeaderForm.remark);
+
+                        MAIN_LINE_CUS = jobHeaderForm.CsutomerLine;
+                        MAIN_LINE_CLI = jobHeaderForm.ClientLine;
 
                         var jobDetailTrips = data_arr.JobDetailTrip;
                         //console.log(jobDetailTrips);
@@ -1102,7 +1109,51 @@ include 'check_cookie.php';
                             });
                         }
 
+                        // Generate Line Msg to customer/Client ====================================
 
+                        var tripDetails = data_arr.JobDetailTrip; // ดึงข้อมูล JobDetailTrip จาก Object
+                        var tripText = "\n";
+                        $.each(tripDetails, function(index, trip) {
+                            var tripNumber = trip.tripSeq;
+                            var driverName = trip.driver_name;
+                            var driverPhone = trip.Driver_Phone_no;
+                            var licenseNo = trip.truck_licenseNo;
+                            var containerID = trip.containerID;
+                            var sealNo = trip.seal_no;
+                            var containerWeight = trip.containerWeight;
+                            var status = trip.status;
+
+                            tripText += "\nทริปที่ " + tripNumber + " ";
+                            tripText += "พขร. " + driverName + "\n";
+                            tripText += "เบอร์โทร " + driverPhone + "\n";
+                            tripText += "ทะเบียน " + licenseNo + "\n";
+
+                            // เพิ่มเงื่อนไขเช็คค่าข้อมูลก่อนการสร้างข้อความ
+                            if (containerID !== "" && containerID !== undefined) {
+                                tripText += "เบอร์ตู้ " + containerID + "\n";
+                            }
+
+                            if (sealNo !== "" && sealNo !== undefined) {
+                                tripText += "เบอร์ซีล " + sealNo + "\n";
+                            }
+
+                            if (containerWeight !== "" && containerWeight !== undefined && containerWeight !== "0.00") {
+                                tripText += "น้ำหนักตู้ " + containerWeight + "\n";
+                            }
+
+                            tripText += "สถานะ " + status + "\n";
+
+                            //console.log(tripText); // แสดงข้อความในคอนโซล
+                            // หรือสามารถนำข้อความไปแสดงในส่วนอื่นของเว็บไซต์ได้ตามต้องการ
+                        });
+                        MAIN_LINE_MSG = "";
+                        MAIN_LINE_MSG += "\nวันที่ " + jobHeaderForm.job_date;
+                        MAIN_LINE_MSG += "\nชื่องาน " + jobHeaderForm.job_name;
+                        MAIN_LINE_MSG += "\nเลขที่อ้างอิง:\n" + jobHeaderForm.refDoc_Data;
+                        MAIN_LINE_MSG += data_arr.jobActionLog;
+                        MAIN_LINE_MSG += tripText;
+
+                        //console.log(MAIN_LINE_MSG);
 
 
                         $('#loading-spinner').hide();
@@ -1691,6 +1742,58 @@ include 'check_cookie.php';
                 window.open(googleMapsUrl, '_blank');
             });
 
+            $('#LineUpdateStatus').click(function() {
+                Swal.fire({
+                    title: "ส่งไลน์หาลูกค้า/ผู้จ้าง",
+                    html: '<div class="swal2-lg"><input type="checkbox" id="customerCheckbox" ' + (MAIN_LINE_CUS == "" ? "disabled" : "checked") + '> <label for="customerCheckbox">ส่งหาลูกค้า</label></div><div class="swal2-lg"><input type="checkbox" id="clientCheckbox" ' + (MAIN_LINE_CLI == "" ? "disabled" : "checked") + '> <label for="clientCheckbox">ส่งหาผู้จ้าง</label></div><textarea id="messageTextarea" class="form-control" rows="5">' + MAIN_LINE_MSG + '</textarea>',
+                    showCancelButton: true,
+                    confirmButtonText: "ส่ง",
+                    cancelButtonText: "ยกเลิก",
+                    reverseButtons: true,
+                    confirmButtonColor: "#28a745",
+                    preConfirm: function() {
+                        var message = $('#messageTextarea').val();
+                        var customerChecked = $('#customerCheckbox').prop('checked');
+                        var clientChecked = $('#clientCheckbox').prop('checked');
+
+                        //console.log("ข้อความที่ส่งไลน์: " + message);
+                        //console.log("ส่งหาลูกค้า: " + customerChecked);
+                        if (customerChecked) {
+                            SendLineMSG(message, MAIN_LINE_CUS, "ส่งข้อความหาลูกค้าสำเร็จ");
+                        }
+                        //console.log("ส่งหาผู้จ้าง: " + clientChecked);
+                        if (clientChecked) {
+                            SendLineMSG(message, MAIN_LINE_CLI, "ส่งข้อความหาผู้ว่าจ้างสำเร็จ");
+                        }
+                    }
+                });
+
+
+            });
+
+
+
+            function SendLineMSG(Message, LineToken, completeType) {
+                var ajaxData = {};
+                ajaxData['f'] = '9';
+                ajaxData['line_id'] = LineToken;
+                ajaxData['message'] = Message;
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/00_systemManagement/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        toastr.success(completeType);
+
+                    })
+                    .fail(function() {
+                        toastr.options.positionClass = 'toast-top-right';
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
 
             // END Process ===========================================
 

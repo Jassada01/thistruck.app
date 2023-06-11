@@ -560,20 +560,71 @@ function loadJobdatabyJobID()
 	include "../connectionDb.php";
 
 	// Step 1 Load data from job_order_template_header
-	$sql = "SELECT * FROM job_order_header where id = $MAIN_JOB_ID";
-
+	//$sql = "SELECT * FROM job_order_header where id = $MAIN_JOB_ID";
+	$sql = "SELECT a.*, b.Line_token AS ClientLine, c.line_token AS CsutomerLine FROM job_order_header a 
+	Left join client_info b ON a.ClientID = b.ClientID
+	left Join customers c ON a.customer_id = c.customer_id
+	WHERE a.id = $MAIN_JOB_ID";
 
 	$res = $conn->query(trim($sql));
 	while ($row = $res->fetch_assoc()) {
+		$refDoc_Data = "";
+
+		$customerJobNo = $row['customer_job_no'];
+		if (!empty($customerJobNo)) {
+			$refDoc_Data .= "Job NO ของลูกค้า: " . $customerJobNo . "\n";
+		}
+
+		$booking = $row['booking'];
+		if (!empty($booking)) {
+			$refDoc_Data .= "Booking (บุ๊กกิ้ง): " . $booking . "\n";
+		}
+
+		$customerPoNo = $row['customer_po_no'];
+		if (!empty($customerPoNo)) {
+			$refDoc_Data .= "PO No.: " . $customerPoNo . "\n";
+		}
+
+		$billOfLading = $row['bill_of_lading'];
+		if (!empty($billOfLading)) {
+			$refDoc_Data .= "B/L(ใบขน): " . $billOfLading . "\n";
+		}
+
+		$customerInvoiceNo = $row['customer_invoice_no'];
+		if (!empty($customerInvoiceNo)) {
+			$refDoc_Data .= "Invoice No.: " . $customerInvoiceNo . "\n";
+		}
+
+		$agent = $row['agent'];
+		if (!empty($agent)) {
+			$refDoc_Data .= "Agent(เอเย่นต์): " . $agent . "\n";
+		}
+
+		$goods = $row['goods'];
+		if (!empty($goods)) {
+			$refDoc_Data .= "ชื่อสินค้า: " . $goods . "\n";
+		}
+
+		$quantity = $row['quantity'];
+		if (!empty($quantity)) {
+			$refDoc_Data .= "QTY/No. of Package: " . $quantity . "\n";
+		}
+		$row['refDoc_Data'] = $refDoc_Data;
 		$data_Array['jobHeader'][] = $row;
 	}
 
 
 
 	// Step 2 Load data from job_order_template_detail_cost
-	$sql = "SELECT * FROM job_order_detail_trip_info where job_id = $MAIN_JOB_ID";
+	//$sql = "SELECT * FROM job_order_detail_trip_info where job_id = $MAIN_JOB_ID";
 	//$sql = "SELECT a.*, CONCAT(a.containerID, ' ', a.containerID2) AS container_code FROM job_order_detail_trip_info a where job_id = $MAIN_JOB_ID";
+	$sql = "SELECT a.*, b.contact_number AS Driver_Phone_no FROM job_order_detail_trip_info a 
+	Left join truck_driver_info b ON a.driver_id = b.driver_id
+	where a.job_id = $MAIN_JOB_ID";
+
+
 	$res = $conn->query(trim($sql));
+	$firstTrip_id = "";
 	while ($row = $res->fetch_assoc()) {
 		$row['container_show'] = "";
 		if ($row['containerID2'] != "") {
@@ -582,9 +633,29 @@ function loadJobdatabyJobID()
 			$row['container_show'] = $row['containerID'];
 		}
 
+		if ($firstTrip_id == "") {
+			$firstTrip_id  = $row['id'];
+		}
+
 		$data_Array['JobDetailTrip'][] = $row;
 	}
+	// Get Trip Route  
+	$sql = "SELECT a.job_characteristic_id, a.job_characteristic, a.location_code, a.map_url, b.attr1 AS JSC , b.attr2 AS Color
+			FROM job_order_detail_trip_list a Inner JOIN master_data b ON a.job_characteristic_id = b.id AND b.type = 'job_characteristic' 
+			WHERE a.trip_id = $firstTrip_id Order By a.plan_order";
+	$result3 = $conn->query($sql);
+	$jobActionLog = "";
 
+
+	while ($row3 = $result3->fetch_assoc()) {
+		$location_code = $row3['location_code'];
+		$map_url = $row3['map_url'];
+		$JSC = $row3['JSC'];
+		//$Color = $row3['Color'];
+		$jobActionLog = $jobActionLog . "\n" . $JSC . " : " . $location_code;
+	}
+
+	$data_Array['jobActionLog'] = $jobActionLog;
 
 	mysqli_close($conn);
 	echo json_encode($data_Array, JSON_UNESCAPED_UNICODE);
@@ -1081,6 +1152,7 @@ function confirmJob()
 					$progress = $row2['progress'];
 					$id2 = $row2['id'];
 
+					/* RELEASE HERE ===========================================================================*/
 					// อัพเดทค่าใน job_order_detail_trip_info
 					$sql = "UPDATE job_order_detail_trip_info SET status = '$progress', update_user = '$update_user' WHERE id = $id";
 					// ทำการ Update ข้อมูล 
@@ -1099,15 +1171,23 @@ function confirmJob()
 
 					// แสดงผลลัพธ์ในรูปแบบ JSON
 					//echo json_encode($row2);
+
+					
 				}
 			} else {
 				echo "0 results";
 			}
 
 
-			$sql = "SELECT a.job_characteristic_id, a.job_characteristic, a.location_code, a.map_url, b.attr1 AS JSC , b.attr2 AS Color
+			//$sql = "SELECT a.job_characteristic_id, a.job_characteristic, a.location_code, a.map_url, b.attr1 AS JSC , b.attr2 AS Color
+			//FROM job_order_detail_trip_list a Inner JOIN master_data b ON a.job_characteristic_id = b.id AND b.type = 'job_characteristic' 
+			//WHERE a.trip_id = $id Order By a.plan_order";
+
+			$sql = "SELECT a.job_characteristic_id, a.job_characteristic, a.location_code, c.map_url, b.attr1  AS JSC , c.latitude, c.longitude , b.attr2 AS Color, c.location_name
 			FROM job_order_detail_trip_list a Inner JOIN master_data b ON a.job_characteristic_id = b.id AND b.type = 'job_characteristic' 
-			WHERE a.trip_id = $id Order By a.plan_order";
+			Left Join locations c ON a.location_id = c.location_id
+			WHERE a.trip_id = $id  Order By a.plan_order";
+
 			$result3 = $conn->query($sql);
 			$jobActionLog = array();
 
@@ -1118,12 +1198,31 @@ function confirmJob()
 				$map_url = $row3['map_url'];
 				$JSC = $row3['JSC'];
 				$Color = $row3['Color'];
+				$latitude = $row3['latitude'];
+				$longitude = $row3['longitude'];
+				$location_name = $row3['location_name'];
+
+				// URL encode the place name
+				$placeName = urlencode($location_name);
+
+				// Generate the Google Maps link
+				$googleMapsLink = "https://www.google.com/maps/search/?api=1&query={$latitude},{$longitude}&query_place_id={$placeName}";
+
+
+				/*
+
+				echo "\n";
+				echo "\n" . $row3['location_code'];
+				echo "\n" . $row3['map_url'];
+				echo "\n" . $row3['JSC'];
+				echo "\n" . $row3['Color'];
+				*/
 
 				$jobActionLog[] = array(
 					"action" => $JSC,
 					"color" => $Color,
 					"code" => $location_code,
-					"link" => $map_url
+					"link" => $googleMapsLink
 				);
 				//$jobActionLog = $jobActionLog . "\n" . $JSC . " : " . $location_code;
 			}
@@ -1236,6 +1335,7 @@ function confirmJob()
 			$link = $SERVER_NAME . 'tripDetail.php?r=' . $random_code;
 
 
+			//print_r($jsonJobActionTimeLine);
 
 			$main_msg =  [
 				[
@@ -1533,7 +1633,7 @@ function confirmJob()
 		}
 
 
-
+		/* RELEASE HERE ===========================================================================*/
 		// Update Job Status 
 		$sql = "UPDATE job_order_header set status = 'กำลังดำเนินการ', update_by = '$update_user' WHERE id = $MAIN_JOB_ID";
 		//echo $sql;
@@ -1674,7 +1774,7 @@ function confirmJob()
 											],
 											1 => [
 												'type' => 'text',
-												'text' => $totalQTYDataText ,
+												'text' => $totalQTYDataText,
 												'flex' => 5,
 												'size' => 'sm',
 												'wrap' => true,
