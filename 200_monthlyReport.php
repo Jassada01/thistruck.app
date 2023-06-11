@@ -5,10 +5,14 @@
 include 'system_config.php';
 $CURRENT_URL = str_replace($SERVERDIRNAME, "", $_SERVER['REQUEST_URI']);
 include 'check_cookie.php';
+$selectMonth = date('mY');
+if (isset($_GET['selectMonth'])) {
+    $selectMonth = $_GET['selectMonth'];
+}
 ?>
 
 <head>
-    <title>รายงานประจำเดือน</title>
+    <title>รายงานประจำเดือน <?php echo $selectMonth; ?></title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta property="og:locale" content="en_US" />
@@ -33,6 +37,11 @@ include 'check_cookie.php';
     <link href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" rel="stylesheet" type="text/css" />
 
     <!--end::Global Stylesheets Bundle-->
+    <style>
+        th {
+            white-space: nowrap;
+        }
+    </style>
 </head>
 <!--end::Head-->
 <!--begin::Body-->
@@ -54,6 +63,7 @@ include 'check_cookie.php';
                 if ($inactive) {
                     $checkword = "";
                 }
+
                 ?>
                 <!--end::Header-->
                 <!--begin::Content-->
@@ -65,7 +75,7 @@ include 'check_cookie.php';
                             <!--begin::Page title-->
                             <div data-kt-swapper="true" data-kt-swapper-mode="prepend" data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}" class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
                                 <!--begin::Title-->
-                                <h1 class="d-flex align-items-center text-dark fw-bolder fs-3 my-1">รายการใบงาน</h1>
+                                <h1 class="d-flex align-items-center text-dark fw-bolder fs-3 my-1">รายงานประจำเดือน</h1>
                                 <!--end::Title-->
                                 <!--begin::Separator-->
                                 <span class="h-20px border-gray-200 border-start mx-4"></span>
@@ -79,7 +89,7 @@ include 'check_cookie.php';
                                     </li>
                                     <!--end::Item-->
                                     <!--begin::Item-->
-                                    <li class="breadcrumb-item text-dark">รายการใบงาน</li>
+                                    <li class="breadcrumb-item text-dark">รายงานประจำเดือน</li>
                                     <!--end::Item-->
                                 </ul>
                                 <!--end::Breadcrumb-->
@@ -88,11 +98,8 @@ include 'check_cookie.php';
                             <!--end::Page title-->
                             <!--begin::Actions-->
                             <div class="d-flex align-items-center py-1">
-                                <!--begin::Wrapper-->
-                                <!--end::Wrapper-->
-                                <!--begin::Button-->
-                                <a href="101_createWorkOrder.php" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> สร้างใบงาน</a>
-                                <!--end::Button-->
+                                <select class="form-select form-select-solid" id="selectMonth">
+                                </select>
                             </div>
                             <!--end::Actions-->
                         </div>
@@ -109,7 +116,7 @@ include 'check_cookie.php';
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="col-sm-9 mt-3 d-flex align-items-center px-3">
-                                            <h1><i class="bi bi-layers fs-3"></i> รายการใบงาน</h1>
+                                            <h1><i class="bi bi-layers fs-3"></i> รายงานประจำเดือน</h1>
                                         </div>
 
                                     </div>
@@ -200,7 +207,7 @@ include 'check_cookie.php';
                                                         job_id
                                                     ) c ON a.id = c.job_id 
                                                   Where 
-                                                    DATE_FORMAT(a.job_date, '%m%Y') = '062023' 
+                                                    DATE_FORMAT(a.job_date, '%m%Y') = '$selectMonth' 
                                                     AND a.status <> 'ยกเลิก' 
                                                   Order By 
                                                     a.id ";
@@ -237,11 +244,15 @@ include 'check_cookie.php';
                                                     }
 
                                                     echo "<tr>";
-                                                    foreach ($row as $value) {
-                                                        if ($value == 0 || $value == "0.00") {
-                                                            echo "<td>" . "" . "</td>";
+                                                    foreach ($row as $header => $value) {
+                                                        if ($header == "job_no") {
+                                                            echo "<td><a href='102_confirmWorkOrder.php?job_id=" . $row['job_id'] . "'>" . htmlspecialchars($value) . "</a></td>";
                                                         } else {
-                                                            echo "<td>" . htmlspecialchars($value) . "</td>";
+                                                            if ($value == 0 || $value == "0.00") {
+                                                                echo "<td>" . "" . "</td>";
+                                                            } else {
+                                                                echo "<td>" . htmlspecialchars($value) . "</td>";
+                                                            }
                                                         }
                                                     }
                                                     echo "</tr>";
@@ -251,10 +262,6 @@ include 'check_cookie.php';
                                             } else {
                                                 echo "0 results";
                                             }
-
-
-
-
 
                                             ?>
 
@@ -339,19 +346,73 @@ include 'check_cookie.php';
             });
 
 
+            var selectMonth = $("#selectMonth");
+            var selectedValue = "<?php echo $selectMonth; ?>";
 
-            var datatable;
+            // สร้าง Option สำหรับเดือนตั้งแต่ 07-2022 จนถึง 01-2023
+            var currentDate = new Date();
+            var currentYear = currentDate.getFullYear();
+            var currentMonth = currentDate.getMonth() + 1;
+
+            for (var year = currentYear; year >= 2000; year--) {
+                var startMonth = (year === currentYear) ? currentMonth : 12;
+                var endMonth = (year === 2000) ? 7 : 1;
+
+                for (var month = startMonth; month >= endMonth; month--) {
+                    var monthString = month.toString().padStart(2, "0");
+                    var option = $("<option></option>")
+                        .attr("value", monthString + year)
+                        .text(monthString + "-" + year);
+                    selectMonth.append(option);
+
+                    if (year === 2023 && month === 1) {
+                        break;
+                    }
+                }
+
+                if (year === 2023 && month === 1) {
+                    break;
+                }
+            }
+
+            if (selectedValue && selectedValue !== "") {
+                // เลือกตัวเลือกที่มีค่าตรงกับ SelectedValue
+                selectMonth.val(selectedValue);
+            }
+
+            // เมื่อมีการเปลี่ยนค่าใน Select
+            selectMonth.on("change", function() {
+                var selectedValue = $(this).val();
+
+                // เปลี่ยนหน้าเพจไปที่ 200_monthlyReport.php พร้อมกับส่งพารามิเตอร์ selectMonth
+                window.location.href = "200_monthlyReport.php?selectMonth=" + selectedValue;
+            });
+
+
+
 
             //$("#dataTable").DataTable();
-            datatable = $('#dataTable').DataTable({
+            var datatable = $('#dataTable').DataTable({
                 "info": false,
+                autoWidth: false,
+                wrap: false,
                 'order': [],
-                'pageLength': 50,
+                'pageLength': 10,
                 dom: 'Bfrtip',
-                buttons: [
-                    'excel'
-                ]
+                buttons: [{
+                    extend: 'excel',
+                    text: 'Export Excel',
+                    className: 'btn btn-success',
+                    init: function(api, node, config) {
+                        $(node).removeClass('dt-button').html('<i class="far fa-file-excel"></i> ' + config.text);
+                    }
+                }],
+
+                lengthMenu: [10, 25, 50, 100], // ตัวเลือกในการกำหนดจำนวนแถวที่แสดงในหน้าเดียว
             });
+
+            // selectMonth
+
 
 
 
@@ -376,6 +437,10 @@ include 'check_cookie.php';
                 //}
                 $(this).text(formattedDate);
             });
+
+
+
+
 
 
         });

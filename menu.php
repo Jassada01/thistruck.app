@@ -48,6 +48,23 @@
                         </div>
                         <div data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion me-lg-1">
                             <span class="menu-link py-3">
+                                <span class="menu-title">รายงาน</span>
+                                <span class="menu-arrow d-lg-none"></span>
+                            </span>
+                            <div class="menu-sub menu-sub-lg-down-accordion menu-sub-lg-dropdown menu-rounded-0 py-lg-4 w-lg-225px">
+                                <div class="menu-item">
+                                    <a class="menu-link py-3" href="200_monthlyReport.php">
+                                        <span class="menu-icon">
+                                        <i class="bi bi-bar-chart-line fs-3"></i>
+
+                                        </span>
+                                        <span class="menu-title">รายงานประจำเดือน</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion me-lg-1">
+                            <span class="menu-link py-3">
                                 <span class="menu-title">ตั้งค่า Master </span>
                                 <span class="menu-arrow d-lg-none"></span>
                             </span>

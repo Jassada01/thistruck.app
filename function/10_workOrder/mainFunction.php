@@ -120,43 +120,75 @@ function getRunningNo($running_type, $running_prefix, $date)
 }
 
 
-function SendNoticeJobConfirm($userId, $accessToken, $message, $link)
+// สร้างฟังก์ชันเพื่อสร้างส่วนของ JSON
+function createActionBox($action, $color, $code, $link)
 {
+	return array(
+		"type" => "box",
+		"layout" => "horizontal",
+		"contents" => array(
+			array(
+				"type" => "text",
+				"text" => $action,
+				"size" => "sm",
+				"gravity" => "center",
+				"wrap" => true,
+				"flex" => 2,
+				"align" => "end"
+			),
+			array(
+				"type" => "box",
+				"layout" => "vertical",
+				"contents" => array(
+					array(
+						"type" => "filler"
+					),
+					array(
+						"type" => "box",
+						"layout" => "vertical",
+						"contents" => array(),
+						"width" => "12px",
+						"height" => "12px",
+						"borderWidth" => "2px",
+						"borderColor" => $color,
+						"cornerRadius" => "30px"
+					),
+					array(
+						"type" => "filler"
+					)
+				),
+				"flex" => 1,
+				"alignItems" => "center"
+			),
+			array(
+				"type" => "text",
+				"text" => $code,
+				"flex" => 4,
+				"size" => "sm",
+				"gravity" => "center",
+				"action" => array(
+					"type" => "uri",
+					"label" => "action",
+					"uri" => $link
+				)
+			)
+		),
+		"spacing" => "lg"
+	);
+}
+
+
+
+function SendNoticeJobConfirm($userId, $accessToken, $message)
+{
+
+
+
+	//echo ($messages);
+
 	$data = [
 		'to' => $userId,
-		'messages' => [
-			[
-				'type' => 'flex',
-				'altText' => 'มีงานใหม่เข้า',
-				'contents' => [
-					'type' => 'bubble',
-					'body' => [
-						'type' => 'box',
-						'layout' => 'vertical',
-						'contents' => [
-							[
-								'type' => 'text',
-								'text' => $message,
-								'wrap' => true
-							],
-							[
-								'type' => 'separator',
-								'margin' => 'xl'
-							],
-							[
-								'type' => 'button',
-								'style' => 'primary',
-								'action' => [
-									'type' => 'uri',
-									'label' => 'ดูรายละเอียด',
-									'uri' => $link
-								]
-							]
-						]
-					]
-				]
-			]
-		]
+		'messages' => $message
 	];
 
 	$url = 'https://api.line.me/v2/bot/message/push';
@@ -175,13 +207,12 @@ function SendNoticeJobConfirm($userId, $accessToken, $message, $link)
 	$result = curl_exec($ch);
 	curl_close($ch);
 
-	/*
+
 	if ($result === false) {
 		echo 'เกิดข้อผิดพลาดในการส่งข้อความ: ' . curl_error($ch);
 	} else {
 		echo 'ส่งข้อความและลิงก์ Line Message API สำเร็จ!';
 	}
-	*/
 }
 
 function SendNoticeJobConfirmforCustomerClient($userId, $accessToken, $textHeader, $message)
@@ -240,25 +271,26 @@ function SendNoticeJobConfirmforCustomerClient($userId, $accessToken, $textHeade
 }
 
 
-function countValues($data) {
-    // นับจำนวนครั้งที่แต่ละค่าปรากฎใน array
-    $counts = array_count_values($data);
+function countValues($data)
+{
+	// นับจำนวนครั้งที่แต่ละค่าปรากฎใน array
+	$counts = array_count_values($data);
 
-    // สร้าง string สำหรับผลลัพธ์
-    $result = "";
+	// สร้าง string สำหรับผลลัพธ์
+	$result = "";
 
-    // วนซ้ำผ่าน array ของจำนวนการนับ
-    foreach($counts as $value => $count) {
-        // ถ้าไม่ใช่ค่าแรก, ใส่ comma ก่อน
-        if ($result != "") {
-            $result .= ", ";
-        }
-        // ต่อ string นี้ลงไปในผลลัพธ์
-        $result .= $count . "x" . $value;
-    }
+	// วนซ้ำผ่าน array ของจำนวนการนับ
+	foreach ($counts as $value => $count) {
+		// ถ้าไม่ใช่ค่าแรก, ใส่ comma ก่อน
+		if ($result != "") {
+			$result .= ", ";
+		}
+		// ต่อ string นี้ลงไปในผลลัพธ์
+		$result .= $count . "x" . $value;
+	}
 
-    // return ผลลัพธ์
-    return $result;
+	// return ผลลัพธ์
+	return $result;
 }
 
 
@@ -903,7 +935,7 @@ function confirmJob()
 	$client_line_token = "";
 	$customer_line_token = "";
 
-	$refDoc_Data = ""; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
+	$refDoc_Data = " "; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
 	$agent = "";
 	if ($result->num_rows > 0) {
 		// วนลูปผลลัพธ์ที่ได้จากฐานข้อมูล
@@ -1031,8 +1063,7 @@ function confirmJob()
 			$customer_line_token = $row['customer_line_token'];
 			$progress = "";
 
-			if (trim($containersize) == "")
-			{
+			if (trim($containersize) == "") {
 				$containersize = "ไม่ระบุ";
 			}
 
@@ -1074,21 +1105,90 @@ function confirmJob()
 			}
 
 
-
-			$sql = "SELECT a.job_characteristic_id, a.job_characteristic, a.location_code, a.map_url, b.attr1 AS JSC 
+			$sql = "SELECT a.job_characteristic_id, a.job_characteristic, a.location_code, a.map_url, b.attr1 AS JSC , b.attr2 AS Color
 			FROM job_order_detail_trip_list a Inner JOIN master_data b ON a.job_characteristic_id = b.id AND b.type = 'job_characteristic' 
-			WHERE a.trip_id = $id Order By a.plan_order;";
+			WHERE a.trip_id = $id Order By a.plan_order";
 			$result3 = $conn->query($sql);
-			$jobActionLog = "";
+			$jobActionLog = array();
+
 			while ($row3 = $result3->fetch_assoc()) {
 				$job_characteristic_id = $row3['job_characteristic_id'];
 				$job_characteristic = $row3['job_characteristic'];
 				$location_code = $row3['location_code'];
 				$map_url = $row3['map_url'];
 				$JSC = $row3['JSC'];
+				$Color = $row3['Color'];
 
-				$jobActionLog = $jobActionLog . "\n" . $JSC . " : " . $location_code;
+				$jobActionLog[] = array(
+					"action" => $JSC,
+					"color" => $Color,
+					"code" => $location_code,
+					"link" => $map_url
+				);
+				//$jobActionLog = $jobActionLog . "\n" . $JSC . " : " . $location_code;
 			}
+
+			// สร้าง Array สำหรับ JSON ที่เราต้องการสร้าง
+			$jsonJobActionTimeLine = array();
+
+			// วนลูปเพื่อสร้างส่วนของ JSON จากแต่ละองค์ประกอบใน $jobActionLog
+			$idxjobActionLog = 0;
+			foreach ($jobActionLog as $log) {
+				$idxjobActionLog = $idxjobActionLog + 1;
+				$jsonJobActionTimeLine[] = createActionBox($log['action'], $log['color'], $log['code'], $log['link']);
+
+				//echo $idxjobActionLog < count($jobActionLog);
+				if ($idxjobActionLog < count($jobActionLog)) {
+					$jsonJobActionTimeLine[] = [
+						'type' => 'box',
+						'layout' => 'horizontal',
+						'contents' => [
+							0 => [
+								'type' => 'box',
+								'layout' => 'baseline',
+								'contents' => [
+									0 => [
+										'type' => 'filler',
+									],
+								],
+								'flex' => 2,
+							],
+							1 => [
+								'type' => 'box',
+								'layout' => 'horizontal',
+								'contents' => [
+									0 => [
+										'type' => 'filler',
+									],
+									1 => [
+										'type' => 'box',
+										'layout' => 'vertical',
+										'contents' => [],
+										'width' => '2px',
+										'backgroundColor' => '#B7B7B7',
+									],
+									2 => [
+										'type' => 'filler',
+									],
+								],
+								'flex' => 1,
+							],
+							2 => [
+								'type' => 'box',
+								'layout' => 'vertical',
+								'contents' => [],
+								'flex' => 4,
+							],
+						],
+						'spacing' => 'lg',
+						'height' => '30px',
+					];
+				}
+			}
+
+			// แปลง Array เป็น JSON
+			//$jsonJobActionTimeLine = json_encode($jsonArray, JSON_PRETTY_PRINT);
+
 
 			// Send Line Notification =======================================================
 			$thai_date = date('d F y', strtotime($jobStartDateTime));
@@ -1114,35 +1214,326 @@ function confirmJob()
 			$formattedTime = date('H:i', strtotime($jobStartDateTime));
 			$formattedDate = $thai_date . ' เวลา ' . $formattedTime . ' น.';
 			$formattedJobDate = $thai_date;
-			$message = "มีงานใหม่เข้า
-เริ่มงาน : $formattedDate
-คนขับ : $driver_name 
-Job ID : $job_no
-Trip ID : $tripNo
-ชื่องาน : $job_name
-สถานะ : $progress
-เลขที่อ้างอิง :
-$refDoc_Data
-ขนาด : $containersize
-=========================
-$jobActionLog 
-========================
-ที่อยู่ออกใบเสร็จ
-$insInvAdd1
-$insInvAdd2
-$insInvAdd3
 
-$hdRemark
-";
+			$fullAddress = " ";
+
+			if (!empty($insInvAdd1)) {
+				$fullAddress .= $insInvAdd1 . "\n";
+			}
+
+			if (!empty($insInvAdd2)) {
+				// "\n" คือ การขึ้นบรรทัดใหม่
+				$fullAddress .= $insInvAdd2 . "\n";
+			}
+
+			if (!empty($insInvAdd3)) {
+				$fullAddress .= $insInvAdd3 . "\n";
+			}
+
+			// ลบบรรทัดว่างที่สุดท้ายออก
+			$fullAddress = rtrim($fullAddress, "\n");
 
 			$link = $SERVER_NAME . 'tripDetail.php?r=' . $random_code;
 
+
+
+			$main_msg =  [
+				[
+					'type' => 'flex',
+					'altText' => "มีงานใหม่เข้า",
+					'contents' => [
+						'type' => 'bubble',
+						'header' => [
+							'type' => 'box',
+							'layout' => 'vertical',
+							'contents' => [
+								0 => [
+									'type' => 'text',
+									'text' => 'มีงานใหม่เข้า',
+									'size' => 'md',
+									'color' => '#FFFFFF',
+									'wrap' => true,
+									'weight' => 'bold',
+									'style' => 'normal',
+									'align' => 'end',
+								],
+								1 => [
+									'type' => 'text',
+									'text' => $job_name,
+									'size' => 'lg',
+									'color' => '#FFFFFF',
+									'wrap' => true,
+									'weight' => 'bold',
+									'style' => 'normal',
+									'align' => 'start',
+								],
+								2 => [
+									'type' => 'box',
+									'layout' => 'horizontal',
+									'contents' => [
+										0 => [
+											'type' => 'text',
+											'text' =>  $job_no,
+											'color' => '#FFFFFF',
+											'align' => 'start',
+											'weight' => 'bold',
+										],
+										1 => [
+											'type' => 'text',
+											'text' =>  $tripNo,
+											'color' => '#FFFFFF',
+											'align' => 'end',
+										],
+									],
+									'paddingTop' => 'sm',
+								],
+							],
+							'backgroundColor' => '#0367D3',
+							'paddingTop' => '20px',
+						],
+						'body' => [
+							'type' => 'box',
+							'layout' => 'vertical',
+							'contents' => [
+								0 => [
+									'type' => 'box',
+									'layout' => 'vertical',
+									'margin' => 'lg',
+									'spacing' => 'sm',
+									'contents' => [
+										0 => [
+											'type' => 'box',
+											'layout' => 'baseline',
+											'contents' => [
+												0 => [
+													'type' => 'text',
+													'text' => 'คนขับ ',
+													'size' => 'sm',
+													'color' => '#aaaaaa',
+													'flex' => 1,
+													'wrap' => true,
+												],
+												1 => [
+													'type' => 'text',
+													'text' => $driver_name,
+													'flex' => 5,
+													'size' => 'sm',
+													'color' => '#666666',
+													'wrap' => true,
+												],
+											],
+										],
+										1 => [
+											'type' => 'box',
+											'layout' => 'baseline',
+											'spacing' => 'sm',
+											'contents' => [
+												0 => [
+													'type' => 'text',
+													'text' => 'วันที่',
+													'color' => '#aaaaaa',
+													'size' => 'sm',
+													'flex' => 1,
+												],
+												1 => [
+													'type' => 'text',
+													'text' => $formattedJobDate,
+													'wrap' => true,
+													'color' => '#666666',
+													'size' => 'sm',
+													'flex' => 5,
+												],
+											],
+										],
+										2 => [
+											'type' => 'box',
+											'layout' => 'baseline',
+											'spacing' => 'sm',
+											'contents' => [
+												0 => [
+													'type' => 'text',
+													'text' => 'เริ่มงาน',
+													'color' => '#aaaaaa',
+													'flex' => 1,
+													'size' => 'sm',
+													'wrap' => true,
+												],
+												1 => [
+													'type' => 'text',
+													'text' => $formattedDate,
+													'flex' => 5,
+													'size' => 'sm',
+													'wrap' => true,
+													'color' => '#666666',
+												],
+											],
+										],
+										3 => [
+											'type' => 'box',
+											'layout' => 'baseline',
+											'contents' => [
+												0 => [
+													'type' => 'text',
+													'text' => 'เอกสารอ้างอิง',
+													'size' => 'sm',
+													'color' => '#aaaaaa',
+													'flex' => 5,
+													'wrap' => true,
+												],
+											],
+										],
+										4 => [
+											'type' => 'box',
+											'layout' => 'vertical',
+											'contents' => [
+												0 => [
+													'type' => 'text',
+													'text' => $refDoc_Data,
+													'color' => '#666666',
+													'size' => 'sm',
+													'wrap' => true,
+												],
+											],
+										],
+										5 => [
+											'type' => 'box',
+											'layout' => 'baseline',
+											'contents' => [
+												0 => [
+													'type' => 'text',
+													'text' => 'แผนปฏิบัติงาน',
+													'size' => 'sm',
+													'color' => '#aaaaaa',
+													'flex' => 5,
+													'wrap' => true,
+												],
+											],
+										],
+									],
+								],
+								1 => [
+									'type' => 'box',
+									'layout' => 'vertical',
+									'contents' => $jsonJobActionTimeLine,
+									'paddingTop' => 'xxl',
+								],
+								2 => [
+									'type' => 'box',
+									'layout' => 'vertical',
+									'margin' => 'lg',
+									'spacing' => 'sm',
+									'contents' => [
+										0 => [
+											'type' => 'box',
+											'layout' => 'baseline',
+											'contents' => [
+												0 => [
+													'type' => 'text',
+													'text' => 'ที่อยู่ออกใบเสร็จ',
+													'size' => 'sm',
+													'color' => '#aaaaaa',
+													'flex' => 5,
+													'wrap' => true,
+												],
+											],
+										],
+										1 => [
+											'type' => 'box',
+											'layout' => 'vertical',
+											'contents' => [
+												0 => [
+													'type' => 'text',
+													'text' => $fullAddress,
+													'color' => '#666666',
+													'size' => 'sm',
+													'wrap' => true,
+												],
+											],
+										],
+									],
+								],
+								3 => [
+									'type' => 'box',
+									'layout' => 'vertical',
+									'margin' => 'lg',
+									'spacing' => 'sm',
+									'contents' => [
+										0 => [
+											'type' => 'box',
+											'layout' => 'baseline',
+											'contents' => [
+												0 => [
+													'type' => 'text',
+													'text' => 'หมายเหตุ',
+													'size' => 'sm',
+													'color' => '#aaaaaa',
+													'flex' => 5,
+													'wrap' => true,
+												],
+											],
+										],
+										1 => [
+											'type' => 'box',
+											'layout' => 'vertical',
+											'contents' => [
+												0 => [
+													'type' => 'text',
+													'color' => '#666666',
+													'size' => 'sm',
+													'wrap' => true,
+													'text' => !empty($hdRemark) ? $hdRemark : '-',
+												],
+											],
+										],
+									],
+								],
+							],
+							'paddingTop' => 'xs',
+						],
+						'footer' => [
+							'type' => 'box',
+							'layout' => 'vertical',
+							'spacing' => 'sm',
+							'contents' => [
+								0 => [
+									'type' => 'button',
+									'style' => 'primary',
+									'height' => 'sm',
+									'action' => [
+										'type' => 'uri',
+										'label' => 'รายละเอียด',
+										'uri' => $link,
+									],
+									'adjustMode' => 'shrink-to-fit',
+									'color' => '#0367D3',
+									'margin' => 'none',
+									'position' => 'relative',
+								],
+								1 => [
+									'type' => 'box',
+									'layout' => 'vertical',
+									'contents' => [],
+									'margin' => 'sm',
+								],
+							],
+							'flex' => 0,
+						],
+					]
+				]
+			];
+
+
+
+			//echo $message;
 			// Send Line Notice to Driver 
 			if (trim($User_line_id != "")) {
 
-				SendNoticeJobConfirm($User_line_id, $Line_Token, $message, $link);
+				SendNoticeJobConfirm($User_line_id, $Line_Token, $main_msg);
 			}
 		}
+
+
+
 		// Update Job Status 
 		$sql = "UPDATE job_order_header set status = 'กำลังดำเนินการ', update_by = '$update_user' WHERE id = $MAIN_JOB_ID";
 		//echo $sql;
@@ -1150,25 +1541,259 @@ $hdRemark
 			echo  $conn->errno;
 			exit();
 		}
+
 		$totalQTYDataText = countValues($totalQTYData);
-		$messageforClientandCustomer = "คอนเฟิร์มงาน
-วันที่ : $formattedJobDate
-ชื่องาน : $job_name
-เลขที่อ้างอิง :
-$refDoc_Data
-ขนาด : $totalQTYDataText
-=========================
-$jobActionLog 
-========================";
+		$main_msgforCustomer =  [
+			[
+				'type' => 'flex',
+				'altText' => "คอนเฟิร์มงาน",
+				'contents' => [
+					'type' => 'bubble',
+					'header' => [
+						'type' => 'box',
+						'layout' => 'vertical',
+						'contents' => [
+							0 => [
+								'type' => 'text',
+								'text' => 'คอนเฟิร์มงาน',
+								'size' => 'md',
+								'color' => '#FFFFFF',
+								'wrap' => true,
+								'weight' => 'bold',
+								'style' => 'normal',
+								'align' => 'end',
+							],
+							1 => [
+								'type' => 'text',
+								'text' => $job_name,
+								'size' => 'lg',
+								'color' => '#FFFFFF',
+								'wrap' => true,
+								'weight' => 'bold',
+								'style' => 'normal',
+								'align' => 'start',
+							],
+						],
+						'backgroundColor' => '#0367D3',
+						'paddingTop' => '10px',
+					],
+					'body' => [
+						'type' => 'box',
+						'layout' => 'vertical',
+						'contents' => [
+							0 => [
+								'type' => 'box',
+								'layout' => 'vertical',
+								'margin' => 'lg',
+								'spacing' => 'sm',
+								'contents' => [
+									0 => [
+										'type' => 'box',
+										'layout' => 'baseline',
+										'spacing' => 'sm',
+										'contents' => [
+											0 => [
+												'type' => 'text',
+												'text' => 'วันที่',
+												'color' => '#aaaaaa',
+												'size' => 'sm',
+												'flex' => 1,
+											],
+											1 => [
+												'type' => 'text',
+												'text' => $formattedJobDate,
+												'wrap' => true,
+												'color' => '#666666',
+												'size' => 'sm',
+												'flex' => 5,
+											],
+										],
+									],
+									1 => [
+										'type' => 'box',
+										'layout' => 'baseline',
+										'spacing' => 'sm',
+										'contents' => [
+											0 => [
+												'type' => 'text',
+												'text' => 'เริ่มงาน',
+												'color' => '#aaaaaa',
+												'flex' => 1,
+												'size' => 'sm',
+												'wrap' => true,
+											],
+											1 => [
+												'type' => 'text',
+												'text' => $formattedDate,
+												'flex' => 5,
+												'size' => 'sm',
+												'wrap' => true,
+												'color' => '#666666',
+											],
+										],
+									],
+									2 => [
+										'type' => 'box',
+										'layout' => 'baseline',
+										'contents' => [
+											0 => [
+												'type' => 'text',
+												'text' => 'เอกสารอ้างอิง',
+												'size' => 'sm',
+												'color' => '#aaaaaa',
+												'flex' => 5,
+												'wrap' => true,
+											],
+										],
+									],
+									3 => [
+										'type' => 'box',
+										'layout' => 'vertical',
+										'contents' => [
+											0 => [
+												'type' => 'text',
+												'text' => $refDoc_Data,
+												'color' => '#666666',
+												'size' => 'sm',
+												'wrap' => true,
+											],
+										],
+									],
+									4 => [
+										'type' => 'box',
+										'layout' => 'baseline',
+										'spacing' => 'sm',
+										'contents' => [
+											0 => [
+												'type' => 'text',
+												'text' => 'ขนาด',
+												'color' => '#aaaaaa',
+												'flex' => 1,
+												'size' => 'sm',
+												'wrap' => true,
+											],
+											1 => [
+												'type' => 'text',
+												'text' => $totalQTYDataText ,
+												'flex' => 5,
+												'size' => 'sm',
+												'wrap' => true,
+												'color' => '#666666',
+											],
+										],
+									],
+									5 => [
+										'type' => 'box',
+										'layout' => 'baseline',
+										'contents' => [
+											0 => [
+												'type' => 'text',
+												'text' => 'แผนปฏิบัติงาน',
+												'size' => 'sm',
+												'color' => '#aaaaaa',
+												'flex' => 5,
+												'wrap' => true,
+											],
+										],
+									],
+								],
+							],
+							1 => [
+								'type' => 'box',
+								'layout' => 'vertical',
+								'contents' => $jsonJobActionTimeLine,
+								'paddingTop' => 'xxl',
+							],
+							2 => [
+								'type' => 'box',
+								'layout' => 'vertical',
+								'margin' => 'lg',
+								'spacing' => 'sm',
+								'contents' => [
+									0 => [
+										'type' => 'box',
+										'layout' => 'baseline',
+										'contents' => [
+											0 => [
+												'type' => 'text',
+												'text' => 'ที่อยู่ออกใบเสร็จ',
+												'size' => 'sm',
+												'color' => '#aaaaaa',
+												'flex' => 5,
+												'wrap' => true,
+											],
+										],
+									],
+									1 => [
+										'type' => 'box',
+										'layout' => 'vertical',
+										'contents' => [
+											0 => [
+												'type' => 'text',
+												'text' => $fullAddress,
+												'color' => '#666666',
+												'size' => 'sm',
+												'wrap' => true,
+											],
+										],
+									],
+								],
+							],
+							3 => [
+								'type' => 'box',
+								'layout' => 'vertical',
+								'margin' => 'lg',
+								'spacing' => 'sm',
+								'contents' => [
+									0 => [
+										'type' => 'box',
+										'layout' => 'baseline',
+										'contents' => [
+											0 => [
+												'type' => 'text',
+												'text' => 'หมายเหตุ',
+												'size' => 'sm',
+												'color' => '#aaaaaa',
+												'flex' => 5,
+												'wrap' => true,
+											],
+										],
+									],
+									1 => [
+										'type' => 'box',
+										'layout' => 'vertical',
+										'contents' => [
+											0 => [
+												'type' => 'text',
+												'color' => '#666666',
+												'size' => 'sm',
+												'wrap' => true,
+												'text' => !empty($hdRemark) ? $hdRemark : '-',
+											],
+										],
+									],
+								],
+							],
+						],
+						'paddingTop' => 'xs',
+					],
+				]
+			]
+		];
+
+
 		// Process after finished each trip =======================================
+
 		if (trim($client_line_token != "")) {
 
-			SendNoticeJobConfirmforCustomerClient($client_line_token, $Line_Token, 'คอนเฟิร์มงาน', $messageforClientandCustomer);
+			//SendNoticeJobConfirmforCustomerClient($client_line_token, $Line_Token, 'คอนเฟิร์มงาน', $messageforClientandCustomer);
+			SendNoticeJobConfirm($client_line_token, $Line_Token, $main_msgforCustomer);
 		}
 
 		if (trim($customer_line_token != "")) {
 
-			SendNoticeJobConfirmforCustomerClient($customer_line_token, $Line_Token, 'คอนเฟิร์มงาน', $messageforClientandCustomer);
+			//SendNoticeJobConfirmforCustomerClient($customer_line_token, $Line_Token, 'คอนเฟิร์มงาน', $messageforClientandCustomer);
+			SendNoticeJobConfirm($customer_line_token, $Line_Token, $main_msgforCustomer);
 		}
 	}
 

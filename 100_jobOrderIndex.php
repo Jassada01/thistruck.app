@@ -32,6 +32,14 @@ include 'check_cookie.php';
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
 
     <!--end::Global Stylesheets Bundle-->
+
+
+    <style>
+        th {
+            white-space: nowrap;
+        }
+    </style>
+
 </head>
 <!--end::Head-->
 <!--begin::Body-->
@@ -122,17 +130,15 @@ include 'check_cookie.php';
                                             <table class="table table-bordered table-hover table-striped w-100 d-none" id="jobTable">
                                                 <thead class="bg-primary text-white">
                                                     <tr>
-                                                    <tr>
                                                         <th class="font-weight-bold text-center">เลข Job</th>
+                                                        <th class="font-weight-bold text-center">สถานะ</th>
                                                         <th class="font-weight-bold text-center">วันที่</th>
                                                         <th class="font-weight-bold text-center" data-bs-toggle="tooltip" title="แสดงข้อมูลเวลาเริ่มของของทริปแรกของใบงาน">วันปฏิบัติงาน</th>
                                                         <th class="font-weight-bold text-center">ประเภทงาน</th>
                                                         <th class="font-weight-bold text-center">ชื่องาน</th>
                                                         <th class="font-weight-bold text-center">ชื่อลูกค้า</th>
                                                         <th class="font-weight-bold text-center">เอกสารอ้างอิง</th>
-                                                        <th class="font-weight-bold text-center">สถานะ</th>
-                                                        <th class="font-weight-bold text-center"></th>
-                                                    </tr>
+                                                        <th class="font-weight-bold text-center">หมายเลขตู้สินค้า</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -152,8 +158,8 @@ include 'check_cookie.php';
                                                         ";
                                                     }
                                                     */
-                                                    $sql = "SELECT a.*, b.jobStartDateTime FROM job_order_header a 
-                                                    Left Join (SELECT a.job_id, a.jobStartDateTime FROM job_order_detail_trip_info a
+                                                    $sql = "SELECT a.*, b.jobStartDateTime, b.containerID FROM job_order_header a 
+                                                    Left Join (SELECT a.job_id, a.jobStartDateTime, a.containerID FROM job_order_detail_trip_info a
                                                     group By a.job_id) b ON a.id = b.job_id
                                                     Order By a.id DESC";
 
@@ -212,16 +218,6 @@ include 'check_cookie.php';
                                                                 $refDoc_Data .= "QTY/No. of Package: " . $quantity . "<br>";
                                                             }
 
-                                                            // แสดงผลลงในแต่ละ <td> ด้วยการใช้ echo
-                                                            echo '<tr>';
-                                                            echo '<td class="font-weight-bold text-center">' . $row["job_no"] . '</td>';
-                                                            //echo '<td class="font-weight-bold text-center">' . $row["job_date"] . '</td>';
-                                                            echo "<td class='text-center'><span class='dateFormatter'>{$row['job_date']}</span></td>";
-                                                            echo "<td class='text-center'><span class='datetimeFormatter'>{$row['jobStartDateTime']}</span></td>";
-                                                            echo '<td class="font-weight-bold text-center">' . $row["job_type"] . '</td>';
-                                                            echo '<td>' . $row["job_name"] . '</td>';
-                                                            echo '<td>' . $row["client_name"] . '</td>';
-                                                            echo '<td>' . $refDoc_Data . '</td>';
                                                             // ตรวจสอบสถานะ
                                                             $status = $row["status"];
                                                             $statusBadge = "";
@@ -250,13 +246,23 @@ include 'check_cookie.php';
                                                                     break;
                                                             }
 
-                                                            echo '<td class="text-center"><span class="badge ' . $statusColor . '">' . $statusBadge . '</span></td>';
+                                                            // แสดงผลลงในแต่ละ <td> ด้วยการใช้ echo
+                                                            echo '<tr>';
+                                                            //echo '<td class="font-weight-bold text-center">' . $row["job_no"] . '</td>';
+                                                            echo '<td class="font-weight-bold text-center"><a href="102_confirmWorkOrder.php?job_id=' . $row['id'] . '">' . $row["job_no"] . '</a></td>';
 
-                                                            echo '<td class="text-center">';
-                                                            echo '<div class="btn-group">';
-                                                            echo '<a type="button" href="102_confirmWorkOrder.php?job_id=' . $row['id'] . '" class="btn btn-sm btn-secondary btnDriverView"><i class="fa fa-eye"> </i> รายละเอียด</a>';
-                                                            echo '</div>';
-                                                            echo '</td>';
+
+                                                            echo '<td class="text-center"><span class="badge ' . $statusColor . '">' . $statusBadge . '</span></td>';
+                                                            //echo '<td class="font-weight-bold text-center">' . $row["job_date"] . '</td>';
+                                                            echo "<td class='text-center'><span class='dateFormatter'>{$row['job_date']}</span></td>";
+                                                            echo "<td class='text-center'><span class='datetimeFormatter'>{$row['jobStartDateTime']}</span></td>";
+                                                            echo '<td class="font-weight-bold text-center">' . $row["job_type"] . '</td>';
+                                                            echo '<td>' . $row["job_name"] . '</td>';
+                                                            echo '<td>' . $row["client_name"] . '</td>';
+                                                            echo '<td>' . $refDoc_Data . '</td>';
+                                                            echo '<td class="font-weight-bold text-center">' . $row["containerID"] . '</td>';
+
+
                                                             echo '</tr>';
                                                         }
                                                     }
@@ -344,10 +350,10 @@ include 'check_cookie.php';
                     "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json"
                 },
                 order: [
-                    [0, "desc"]
-                ] // เรียงลำดับตามคอลัมน์แรก (index 0) ในลำดับ DESC
-                ,
-                
+                        [0, "desc"]
+                    ] // เรียงลำดับตามคอลัมน์แรก (index 0) ในลำดับ DESC
+                    ,
+
                 "pageLength": 50 // กำหนดให้แสดงแถวต่อหน้าเริ่มต้นที่ 50 แถว
 
             });
