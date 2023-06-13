@@ -136,7 +136,7 @@ function getJobProgress()
 			WHERE 
 				a.complete_flag IS NULL 
 			Order BY 
-				a.id 
+				a.id DESC
 			";
 
 	$res = $conn->query(trim($sql));
