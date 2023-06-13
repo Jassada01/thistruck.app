@@ -1,6 +1,3 @@
-
-
-
 <div id="kt_header" class="header align-items-stretch">
     <!--begin::Container-->
     <div class="container-xxl d-flex align-items-stretch justify-content-between">
@@ -55,11 +52,18 @@
                                 <div class="menu-item">
                                     <a class="menu-link py-3" href="200_monthlyReport.php">
                                         <span class="menu-icon">
-                                        <i class="bi bi-bar-chart-line fs-3"></i>
-
+                                            <i class="bi bi-bar-chart-line fs-3"></i>
                                         </span>
                                         <span class="menu-title">รายงานประจำเดือน</span>
                                     </a>
+
+                                    <a class="menu-link py-3" href="201_monthlyReportDetail.php">
+                                        <span class="menu-icon">
+                                            <i class="bi bi-file-earmark-text fs-3"></i>
+                                        </span>
+                                        <span class="menu-title">รายงานประจำเดือน(รายทริป)</span>
+                                    </a>
+
                                 </div>
                             </div>
                         </div>
@@ -128,7 +132,7 @@
                                         </div>
                                         <!--end::Menu item-->
 
-                                        
+
                                     </div>
                                     <!--end::Menu sub-->
                                 </div>
@@ -176,22 +180,22 @@
                     <div class="d-flex align-items-center ms-1 ms-lg-3" id="kt_header_user_menu_toggle">
                         <!--begin::Menu wrapper-->
                         <div class="topbar-item cursor-pointer symbol px-3 px-lg-5 me-n3 me-lg-n5 symbol-30px symbol-md-35px" data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end" data-kt-menu-flip="bottom">
-                            
+
                             <div class="menu-content d-flex align-items-center px-3">
-                                    <!--begin::Avatar-->
-                                    <div class="symbol symbol-40px me-5">
-                                        <img alt="Logo" src="assets/media/uploadfile/<?php echo $MAIN_USER_DATA->picture;?>" />
-                                    </div>
-                                    <!--end::Avatar-->
-                                    <!--begin::Username-->
-                                    <div class="d-flex flex-column">
-                                        <div class="fw-bolder d-flex align-items-center fs-5"><?php echo $MAIN_USER_DATA->name;?>
-                                        </div>
-                                    </div>
-                                    <!--end::Username-->
+                                <!--begin::Avatar-->
+                                <div class="symbol symbol-40px me-5">
+                                    <img alt="Logo" src="assets/media/uploadfile/<?php echo $MAIN_USER_DATA->picture; ?>" />
                                 </div>
+                                <!--end::Avatar-->
+                                <!--begin::Username-->
+                                <div class="d-flex flex-column">
+                                    <div class="fw-bolder d-flex align-items-center fs-5"><?php echo $MAIN_USER_DATA->name; ?>
+                                    </div>
+                                </div>
+                                <!--end::Username-->
+                            </div>
                         </div>
-                        
+
                         <!--begin::Menu-->
                         <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px" data-kt-menu="true">
                             <!--begin::Menu item-->
@@ -199,15 +203,15 @@
                                 <div class="menu-content d-flex align-items-center px-3">
                                     <!--begin::Avatar-->
                                     <div class="symbol symbol-50px me-5">
-                                        <img alt="Logo" src="assets/media/uploadfile/<?php echo $MAIN_USER_DATA->picture;?>" />
+                                        <img alt="Logo" src="assets/media/uploadfile/<?php echo $MAIN_USER_DATA->picture; ?>" />
                                     </div>
                                     <!--end::Avatar-->
                                     <!--begin::Username-->
                                     <div class="d-flex flex-column">
-                                        <div class="fw-bolder d-flex align-items-center fs-5"><?php echo $MAIN_USER_DATA->name;?>
-                                            <span class="badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2"><?php echo $MAIN_USER_DATA->user_levelName;?></span>
+                                        <div class="fw-bolder d-flex align-items-center fs-5"><?php echo $MAIN_USER_DATA->name; ?>
+                                            <span class="badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2"><?php echo $MAIN_USER_DATA->user_levelName; ?></span>
                                         </div>
-                                        <a href="#" class="fw-bold text-muted text-hover-primary fs-7"><?php echo $MAIN_USER_DATA->email;?></a>
+                                        <a href="#" class="fw-bold text-muted text-hover-primary fs-7"><?php echo $MAIN_USER_DATA->email; ?></a>
                                     </div>
                                     <!--end::Username-->
                                 </div>

@@ -177,8 +177,8 @@ function getCalendarData()
 		job_order_detail_trip_info a 
 		LEFT JOIN job_order_detail_trip_action_log b ON a.id = b.trip_id 
 		AND a.job_id = b.job_id 
-		AND b.main_order = 7 
-		AND b.minor_order = 1
+		AND b.main_order = 1 
+		AND b.minor_order = 5
 	WHERE 
 		a.jobStartDateTime >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) 
 		AND a.jobStartDateTime <= DATE_ADD(CURDATE(), INTERVAL 3 MONTH) AND (a.complete_flag IS NULL OR a.complete_flag > 0) ";

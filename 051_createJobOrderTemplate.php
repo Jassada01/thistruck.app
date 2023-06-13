@@ -430,7 +430,7 @@ include 'check_cookie.php';
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
-                                                                            <label for="container_drop_lift" class="col-sm-5 col-form-label  text-end-pc">ค่าล้งตู้</label>
+                                                                            <label for="container_drop_lift" class="col-sm-5 col-form-label  text-end-pc">ค่าล้างตู้</label>
                                                                             <div class="col-sm-7">
                                                                                 <input type="number" step="0.01" class="form-control" id="container_drop_lift" name="container_drop_lift" required>
                                                                             </div>
@@ -445,7 +445,7 @@ include 'check_cookie.php';
                                                                         <div class="row mb-3">
                                                                             <label for="deduction_note" class="col-sm-5 col-form-label  text-end-pc">ใบหัก ณ ที่จ่ายกระทำแทน</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="deduction_note" name="deduction_note" required>
+                                                                                <input type="number" step="0.01" class="form-control success" id="deduction_note" name="deduction_note" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3 d-none">

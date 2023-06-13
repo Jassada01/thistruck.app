@@ -130,15 +130,15 @@ include 'check_cookie.php';
                                             <table class="table table-bordered table-hover table-striped w-100 d-none" id="jobTable">
                                                 <thead class="bg-primary text-white">
                                                     <tr>
-                                                        <th class="font-weight-bold text-center">เลข Job</th>
-                                                        <th class="font-weight-bold text-center">สถานะ</th>
-                                                        <th class="font-weight-bold text-center">วันที่</th>
-                                                        <th class="font-weight-bold text-center" data-bs-toggle="tooltip" title="แสดงข้อมูลเวลาเริ่มของของทริปแรกของใบงาน">วันปฏิบัติงาน</th>
-                                                        <th class="font-weight-bold text-center">ประเภทงาน</th>
-                                                        <th class="font-weight-bold text-center">ชื่องาน</th>
-                                                        <th class="font-weight-bold text-center">ชื่อลูกค้า</th>
-                                                        <th class="font-weight-bold text-center">เอกสารอ้างอิง</th>
-                                                        <th class="font-weight-bold text-center">หมายเลขตู้สินค้า</th>
+                                                        <th class="font-weight-bold text-center"><B>เลข Job</B></th>
+                                                        <th class="font-weight-bold text-center"><B>สถานะ</B></th>
+                                                        <th class="font-weight-bold text-center"><B>วันที่</B></th>
+                                                        <th class="font-weight-bold text-center"><B>ชื่องาน</B></th>
+                                                        <th class="font-weight-bold text-center" data-bs-toggle="tooltip" title="แสดงข้อมูลเวลาเริ่มของของทริปแรกของใบงาน"><B>วันปฏิบัติงาน</B></th>
+                                                        <th class="font-weight-bold text-center"><B>ประเภทงาน</B></th>
+                                                        <th class="font-weight-bold text-center"><B>ชื่อลูกค้า</B></th>
+                                                        <th class="font-weight-bold text-center"><B>เอกสารอ้างอิง</B></th>
+                                                        <th class="font-weight-bold text-center"><B>หมายเลขตู้สินค้า</B></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -158,10 +158,33 @@ include 'check_cookie.php';
                                                         ";
                                                     }
                                                     */
-                                                    $sql = "SELECT a.*, b.jobStartDateTime, b.containerID FROM job_order_header a 
-                                                    Left Join (SELECT a.job_id, a.jobStartDateTime, a.containerID FROM job_order_detail_trip_info a
-                                                    group By a.job_id) b ON a.id = b.job_id
-                                                    Order By a.id DESC";
+                                                    $sql = "SELECT 
+                                                    a.*, 
+                                                    b.jobStartDateTime, 
+                                                    b.containerID 
+                                                  FROM 
+                                                    job_order_header a 
+                                                    Left Join (
+                                                      SELECT 
+                                                        a.job_id, 
+                                                        a.jobStartDateTime, 
+                                                        REPLACE(
+                                                          GROUP_CONCAT(
+                                                            IF(
+                                                              a.containerID = '', NULL, a.containerID
+                                                            ) SEPARATOR ','
+                                                          ), 
+                                                          ',', 
+                                                          '<br>'
+                                                        ) AS containerID 
+                                                      FROM 
+                                                        job_order_detail_trip_info a 
+                                                      GROUP BY 
+                                                        a.job_id
+                                                    ) b ON a.id = b.job_id 
+                                                  Order By 
+                                                    a.id DESC;
+                                                  ";
 
 
 
@@ -254,10 +277,12 @@ include 'check_cookie.php';
 
                                                             echo '<td class="text-center"><span class="badge ' . $statusColor . '">' . $statusBadge . '</span></td>';
                                                             //echo '<td class="font-weight-bold text-center">' . $row["job_date"] . '</td>';
+                                                            
                                                             echo "<td class='text-center'><span class='dateFormatter'>{$row['job_date']}</span></td>";
+                                                            
+                                                            echo '<td>' . $row["job_name"] . '</td>';
                                                             echo "<td class='text-center'><span class='datetimeFormatter'>{$row['jobStartDateTime']}</span></td>";
                                                             echo '<td class="font-weight-bold text-center">' . $row["job_type"] . '</td>';
-                                                            echo '<td>' . $row["job_name"] . '</td>';
                                                             echo '<td>' . $row["client_name"] . '</td>';
                                                             echo '<td>' . $refDoc_Data . '</td>';
                                                             echo '<td class="font-weight-bold text-center">' . $row["containerID"] . '</td>';
@@ -373,8 +398,8 @@ include 'check_cookie.php';
             $('.dateFormatter').each(function() {
                 var dateString = $(this).text();
                 //var formattedDate = moment(dateString, 'D MMM YYYY', 'th').format('D MMM YYYY');
-                var formattedDate = moment(dateString).format('D MMM YYYY');
-                var diffDays = moment().diff(moment(formattedDate, 'D MMM YYYY', 'th'), 'days');
+                var formattedDate = moment(dateString).format('D MMM');
+                var diffDays = moment().diff(moment(formattedDate, 'D MMM', 'th'), 'days');
                 //if (Math.abs(diffDays) < 90) {
                 //    $(this).addClass('text-danger fw-bold');
                 //}
