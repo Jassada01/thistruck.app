@@ -94,50 +94,51 @@ function getJobProgress()
 	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
 	//$sql = "SELECT *  FROM job_order_detail_trip_action_log WHERE trip_id = $MAIN_trip_id AND complete_flag IS NULL ORDER BY id ASC LIMIT 1;";
 	$sql = "SELECT 
-				a.job_no, 
-				a.tripNo, 
-				a.id AS trip_ID, 
-				a.job_id, 
-				c.job_name, 
-				c.customer_name, 
-				a.truck_licenseNo, 
-				a.driver_name, 
-				b.image_path, 
-				TOTAL.CNT_TOTAL, 
-				IFNULL(COMP.CNT_COMPLETE, 0) AS CNT_COMPLETE, 
-				ROUND(
-				IFNULL(COMP.CNT_COMPLETE, 0) / TOTAL.CNT_TOTAL, 
-				2
-				) AS PCT 
+			a.job_no, 
+			a.tripNo, 
+			a.id AS trip_ID, 
+			a.job_id, 
+			c.job_name, 
+			c.customer_name, 
+			a.truck_licenseNo, 
+			a.jobStartDateTime,
+			a.status,
+			a.driver_name, 
+			b.image_path, 
+			TOTAL.CNT_TOTAL, 
+			IFNULL(COMP.CNT_COMPLETE, 0) AS CNT_COMPLETE, 
+			ROUND(
+			IFNULL(COMP.CNT_COMPLETE, 0) / TOTAL.CNT_TOTAL, 
+			2
+			) AS PCT 
+		FROM 
+			job_order_detail_trip_info a 
+			Inner Join (
+			SELECT 
+				a.trip_id, 
+				COUNT(*) AS CNT_TOTAL 
 			FROM 
-				job_order_detail_trip_info a 
-				Inner Join (
-				SELECT 
-					a.trip_id, 
-					COUNT(*) AS CNT_TOTAL 
-				FROM 
-					job_order_detail_trip_action_log a 
-				Group By 
-					a.trip_id
-				) TOTAL ON a.id = TOTAL.trip_id 
-				LEFT Join (
-				SELECT 
-					a.trip_id, 
-					COUNT(*) AS CNT_COMPLETE 
-				FROM 
-					job_order_detail_trip_action_log a 
-				Where 
-					a.complete_flag IS NOT NULL 
-				Group By 
-					a.trip_id
-				) COMP ON a.id = COMP.trip_id 
-				Inner Join truck_driver_info b ON a.driver_id = b.driver_id 
-				Inner Join job_order_header c ON a.job_id = c.id 
-			WHERE 
-				a.complete_flag IS NULL 
-			Order BY 
-				a.id DESC
-			";
+				job_order_detail_trip_action_log a 
+			Group By 
+				a.trip_id
+			) TOTAL ON a.id = TOTAL.trip_id 
+			LEFT Join (
+			SELECT 
+				a.trip_id, 
+				COUNT(*) AS CNT_COMPLETE 
+			FROM 
+				job_order_detail_trip_action_log a 
+			Where 
+				a.complete_flag IS NOT NULL 
+			Group By 
+				a.trip_id
+			) COMP ON a.id = COMP.trip_id 
+			Inner Join truck_driver_info b ON a.driver_id = b.driver_id 
+			Inner Join job_order_header c ON a.job_id = c.id 
+		WHERE 
+			a.complete_flag IS NULL 
+		Order BY 
+			a.id DESC";
 
 	$res = $conn->query(trim($sql));
 	mysqli_close($conn);
@@ -188,12 +189,81 @@ function getCalendarData()
 	$data_Array = array();
 
 	while ($row = $res->fetch_assoc()) {
-		$row['url'] = "103_tripDetail.php?job_id=".$row['job_id']."&trip_id=".$row['trip_id'];
+		$row['url'] = "103_tripDetail.php?job_id=" . $row['job_id'] . "&trip_id=" . $row['trip_id'];
 		$data_Array[] = $row;
 	}
 
 	echo json_encode($data_Array);
 }
+
+// F=3
+function getWorkBymonth()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
+	//$sql = "SELECT *  FROM job_order_detail_trip_action_log WHERE trip_id = $MAIN_trip_id AND complete_flag IS NULL ORDER BY id ASC LIMIT 1;";
+	if ($type == "job") {
+
+		$sql = "SELECT b.ClientName AS 'Category', COUNT(a.job_no) AS count FROM job_order_header a
+		Inner Join client_info b ON a.ClientID = b.ClientID
+		Where a.status <> 'ยกเลิก' AND DATE_FORMAT(a.job_date, '%m%Y') = '$selectMonth' 
+		Group By b.ClientName";
+	} else {
+
+		$sql = "SELECT c.ClientName AS 'Category', COUNT(b.tripNo) AS count FROM job_order_header a 
+		Inner Join job_order_detail_trip_info b ON a.id = b.job_id
+		Inner Join client_info c ON a.ClientID = c.ClientID
+		Where a.status <> 'ยกเลิก' AND DATE_FORMAT(a.job_date, '%m%Y') = '$selectMonth'  AND b.status <> 'ยกเลิก'
+		Group By c.ClientName";
+	}
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	echo json_encode($data_Array);
+}
+
+// F=4
+function getJobWorkLoad()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
+	$sql = "SELECT b.driver_name AS 'Category', COUNT(b.tripNo) AS count FROM job_order_header a 
+	Inner Join job_order_detail_trip_info b ON a.id = b.job_id
+	Where a.status <> 'ยกเลิก' AND DATE_FORMAT(a.job_date, '%m%Y') = DATE_FORMAT(current_timestamp, '%m%Y')  AND b.status <> 'ยกเลิก'
+	Group By b.driver_name ";
+
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	echo json_encode($data_Array);
+}
+
 
 
 
@@ -205,6 +275,14 @@ switch ($f) {
 		}
 	case 2: {
 			getCalendarData();
+			break;
+		}
+	case 3: {
+			getWorkBymonth();
+			break;
+		}
+	case 4: {
+			getJobWorkLoad();
 			break;
 		}
 }

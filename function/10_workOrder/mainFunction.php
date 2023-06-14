@@ -533,6 +533,18 @@ function insertNewJobData()
 			exit();
 		}
 	}
+
+	// Delete Action for ลานตู้ 
+	$sql = "DELETE FROM job_order_detail_trip_action_log WHERE id IN (SELECT a.id FROM job_order_detail_trip_action_log a
+	Inner Join job_order_detail_trip_list b ON a.trip_id = b.trip_id AND a.plan_order = b.plan_order
+	WHERE a.trip_id = $trip_id AND a.main_order = 3 AND a.minor_order NOT IN (1, 9) AND b.location_type like '%ลาน%')";
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+
 	// Close connection
 	mysqli_close($conn);
 	//echo json_encode($data_Array);
@@ -1172,7 +1184,7 @@ function confirmJob()
 					// แสดงผลลัพธ์ในรูปแบบ JSON
 					//echo json_encode($row2);
 
-					
+
 				}
 			} else {
 				echo "0 results";

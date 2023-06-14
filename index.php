@@ -152,6 +152,13 @@ include 'check_cookie.php';
         .dotted-line {
             border-bottom: 2px dotted black;
         }
+
+        #jobCountChart {
+            width: 100%;
+            height: 500px;
+            max-width: 100%;
+            overflow: hidden;
+        }
     </style>
 </head>
 <!--end::Head-->
@@ -239,10 +246,11 @@ include 'check_cookie.php';
                                                     <!--begin::Table head-->
                                                     <thead>
                                                         <tr class="fw-bolder text-muted">
-                                                            <th class="min-w-150px">รถ-พขร</th>
+                                                            <th class="min-w-120px">รถ-พขร</th>
                                                             <th class="min-w-140px">Job ID</th>
                                                             <th class="min-w-140px">ชื่องาน</th>
-                                                            <th class="min-w-120px">สถานะ</th>
+                                                            <th class="min-w-140px">เริ่มงาน/สถานะ</th>
+                                                            <th class="min-w-60px">Progress</th>
                                                         </tr>
                                                     </thead>
                                                     <!--end::Table head-->
@@ -351,6 +359,61 @@ include 'check_cookie.php';
                             </div>
                             <!--begin::Row-->
                             <div class="row gy-5 g-xl-8">
+                                <div class="col-sm-4">
+                                    <div class="card card-xl-stretch mb-5 mb-xl-8">
+                                        <!--begin::Header-->
+                                        <div class="card-header border-0 pt-5">
+                                            <h3 class="card-title align-items-start flex-column">
+                                                <span class="card-label fw-bolder fs-3 mb-1">Workload คนขับรถในเดือนนี้</span>
+                                            </h3>
+                                            <div class="card-toolbar">
+
+                                            </div>
+                                        </div>
+
+                                        <!--end::Header-->
+                                        <!--begin::Body-->
+                                        <div class="card-body py-3">
+                                            <div id="DriverCountChart" style="width: 100%; height: 500px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="card card-xl-stretch mb-5 mb-xl-8">
+                                        <!--begin::Header-->
+                                        <div class="card-header border-0 pt-5">
+                                            <h3 class="card-title align-items-start flex-column">
+                                                <span class="card-label fw-bolder fs-3 mb-1">สรุปงานรายเดือน</span>
+                                                <span class="text-muted mt-1 fw-bold fs-7" id="ReportShartShowName">รายใบงาน</span>
+                                            </h3>
+                                            <div class="card-toolbar">
+                                                <!--begin::Menu-->
+                                                <div class="d-flex align-items-center py-1 me-3">
+                                                    <select class="form-select form-select-solid" id="selectTypeGraph">
+                                                        <option d-name="รายใบงาน" value="job">รายใบงาน</option>
+                                                        <option d-name="รายทริป" value="trip">รายทริป</option>
+                                                    </select>
+                                                </div>
+                                                <div class="d-flex align-items-center py-1">
+                                                    <select class="form-select form-select-solid" id="selectMonthGraph">
+                                                    </select>
+                                                </div>
+                                                <!--end::Menu-->
+                                            </div>
+                                        </div>
+
+                                        <!--end::Header-->
+                                        <!--begin::Body-->
+                                        <div class="card-body py-3">
+                                            <div id="jobCountChart" style="width: 100%; height: 500px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!--begin::Row-->
+                            <div class="row gy-5 g-xl-8">
                                 <div class="col-sm-12">
                                     <div class="card card-xl-stretch mb-5 mb-xl-8">
                                         <!--begin::Header-->
@@ -406,12 +469,81 @@ include 'check_cookie.php';
 
     <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
 
+    <!--Amchart -->
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/material.js"></script>
+
+
+
     <!--end::Page Custom Javascript-->
     <script>
         // เมื่อ Document โหลดเสร็จแล้ว
         $(document).ready(function() {
             // Set Moment 
             moment.locale('th');
+
+
+
+            // Initial Setting =======================
+            am4core.useTheme(am4themes_animated);
+
+
+            // Global Var 
+            var selectMonthGraph = $("#selectMonthGraph");
+
+
+            // สร้าง Option สำหรับเดือนตั้งแต่ 07-2022 จนถึง 01-2023
+            var currentDate = new Date();
+            var currentYear = currentDate.getFullYear();
+            var currentMonth = currentDate.getMonth() + 1;
+
+            for (var year = currentYear; year >= 2000; year--) {
+                var startMonth = (year === currentYear) ? currentMonth : 12;
+                var endMonth = (year === 2000) ? 7 : 1;
+
+                for (var month = startMonth; month >= endMonth; month--) {
+                    var monthString = month.toString().padStart(2, "0");
+                    var option = $("<option></option>")
+                        .attr("value", monthString + year)
+                        .text(monthString + "-" + year);
+                    selectMonthGraph.append(option);
+
+                    if (year === 2023 && month === 1) {
+                        break;
+                    }
+                }
+
+                if (year === 2023 && month === 1) {
+                    break;
+                }
+            }
+
+
+            // เมื่อมีการเปลี่ยนค่าใน Select
+            selectMonthGraph.on("change", function() {
+                LoadMonthlyByClient()
+            });
+
+
+            $('#selectTypeGraph').change(function() {
+                var selectedOption = $(this).find('option:selected');
+
+                $("#ReportShartShowName").html(selectedOption.attr('d-name'));
+
+                LoadMonthlyByClient();
+
+                // ทำสิ่งอื่น ๆ ที่ต้องการกับข้อมูล name และ type ที่ได้
+            });
+
+
+
+
+
+
+
+
             // Thai date sorting plugin
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
                 "date-th-pre": function(a) {
@@ -506,7 +638,7 @@ include 'check_cookie.php';
 
                             // เพิ่มข้อมูล Job ID (job_no และ tripNo)
                             var jobIDCell = $('<td></td>');
-                            var jobIDLink = $('<a href="103_tripDetail.php?job_id=' + data.job_id + '&trip_id=' + data.trip_ID + '" class="text-dark fw-bolder text-hover-primary d-block fs-6">' + data.tripNo + '</a>');
+                            var jobIDLink = $('<a href="103_tripDetail.php?job_id=' + data.job_id + '&trip_id=' + data.trip_ID + '" class="text-dark fw-bolder text-hover-primary d-block fs-7">' + data.tripNo + '</a>');
                             var tripNo = $('<a href="102_confirmWorkOrder.php?job_id=' + data.job_id + '" class="text-muted fw-bold text-muted d-block fs-7">' + data.job_no + '</a>');
                             jobIDCell.append(jobIDLink);
                             jobIDCell.append(tripNo);
@@ -521,6 +653,14 @@ include 'check_cookie.php';
                             row.append(jobNameCell);
 
                             // เพิ่มข้อมูลสถานะ
+                            var jobNameCell = $('<td></td>');
+                            var jobNameLink = $('<a href="#" class="text-dark fw-bolder text-hover-primary d-block fs-6 Jobtime">' + data.jobStartDateTime + '</a>');
+                            var customerName = $('<span class="text-muted fw-bold text-muted d-block fs-7">' + data.status + '</span>');
+                            jobNameCell.append(jobNameLink);
+                            jobNameCell.append(customerName);
+                            row.append(jobNameCell);
+
+                            // เพิ่มข้อมูลProgress
                             var statusCell = $('<td class="text-end"></td>');
                             var statusDiv = $('<div class="d-flex flex-column w-100 me-2"></div>');
                             var statusStackDiv = $('<div class="d-flex flex-stack mb-2"></div>');
@@ -540,6 +680,12 @@ include 'check_cookie.php';
                         //console.log(initial_tripNo);
                         $('#select_tripTimeline').select2({});
                         $('#select_tripTimeline').val(initial_tripNo).trigger('change');
+                        $('.Jobtime').each(function() {
+                            var dateString = $(this).text();
+                            var formattedDate = moment(dateString).format('D MMM HH:mm');
+                            var diffDays = moment().diff(moment(formattedDate, 'D MMM YYYY', 'th'), 'days');
+                            $(this).text(formattedDate);
+                        });
 
 
                     })
@@ -747,7 +893,8 @@ include 'check_cookie.php';
                             var event = {
                                 title: data_arr[i].title,
                                 start: data_arr[i].start,
-                                end: data_arr[i].end,
+                                end: data_arr[i].start,
+                                //end: data_arr[i].end,
                                 url: data_arr[i].url,
                                 color: null // เพิ่ม property color เพื่อกำหนดสี
                             };
@@ -791,10 +938,128 @@ include 'check_cookie.php';
                         alert("Posting failed.");
                     });
             }
+
+
+            function LoadMonthlyByClient() {
+                var ajaxData = {};
+                ajaxData['f'] = '3';
+                ajaxData['type'] = $('#selectTypeGraph').val();
+                ajaxData['selectMonth'] = $('#selectMonthGraph').val();
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/index/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        var data_arr = JSON.parse(data);
+                        //console.log();
+                        // สร้างตัวแปรสำหรับเก็บข้อมูลในรูปแบบที่ AmChart รองรับ
+                        var chartData = [];
+                        for (var i = 0; i < data_arr.length; i++) {
+                            var dataItem = data_arr[i];
+                            var chartItem = {
+                                "category": dataItem.Category,
+                                "value": parseInt(dataItem.count)
+                            };
+                            chartData.push(chartItem);
+                        }
+
+
+                        if (jobCountChart) {
+                            jobCountChart.dispose();
+                        }
+
+                        var jobCountChart = am4core.create("jobCountChart", am4charts.PieChart);
+                        jobCountChart.data = chartData;
+
+                        var pieSeries = jobCountChart.series.push(new am4charts.PieSeries());
+                        pieSeries.dataFields.value = "value";
+                        pieSeries.dataFields.category = "category";
+
+                        // ซ่อน Label ที่แสดงบน Pie Chart
+                        pieSeries.labels.template.disabled = true;
+
+                        // กำหนดให้ Legend แสดง Category และ Value
+                        pieSeries.legendSettings.valueText = "{value}";
+
+                        jobCountChart.legend = new am4charts.Legend();
+                        jobCountChart.legend.position = "left";
+
+                        jobCountChart.exporting.menu = new am4core.ExportMenu();
+                        //chart.exporting.menu = new am4core.ExportMenu();
+
+
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+            function LoadJobWorkLoad() {
+                var ajaxData = {};
+                ajaxData['f'] = '4';
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/index/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        //console.log(data);
+                        var data_arr = JSON.parse(data);
+                        console.log(data_arr);
+
+                        var DriverLoadchart = am4core.create("DriverCountChart", am4charts.XYChart);
+                        DriverLoadchart.data = data_arr;
+
+                        var categoryAxis = DriverLoadchart.yAxes.push(new am4charts.CategoryAxis());
+                        categoryAxis.dataFields.category = "Category";
+                        categoryAxis.renderer.grid.template.location = 0;
+                        categoryAxis.renderer.inversed = true;
+
+                        var valueAxis = DriverLoadchart.xAxes.push(new am4charts.ValueAxis());
+
+                        var series = DriverLoadchart.series.push(new am4charts.ColumnSeries());
+                        series.dataFields.categoryY = "Category";
+                        series.dataFields.valueX = "count";
+                        series.tooltipText = "{valueX.value}";
+                        series.columns.template.strokeOpacity = 0;
+                        series.columns.template.column.cornerRadiusTopRight = 10;
+                        series.columns.template.column.cornerRadiusBottomRight  = 10;
+
+                        var labelBullet = series.bullets.push(new am4charts.LabelBullet());
+                        labelBullet.label.horizontalCenter = "left";
+                        labelBullet.label.dx = 10;
+                        labelBullet.label.text = "{values.valueX.workingValue.formatNumber('#.')}";
+
+                        DriverLoadchart.exporting.menu = new am4core.ExportMenu();
+
+                        DriverLoadchart.cursor = new am4charts.XYCursor();
+
+                        // เพิ่ม scrollbar
+                        //var scrollbarY = new am4core.Scrollbar();
+                        //DriverLoadchart.scrollbarY = scrollbarY;
+
+
+
+
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
             // Initial Run When start ===============================================================
             //Initialcalendar();
             loadProgress();
             loadCalendar();
+            LoadMonthlyByClient();
+            LoadJobWorkLoad();
 
 
         });
