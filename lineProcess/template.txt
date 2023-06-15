@@ -1,0 +1,502 @@
+{
+  "type": "bubble",
+  "header": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "text",
+        "text": "Zhongce (ZC) Export - CCSCM",
+        "size": "xl",
+        "color": "#FFFFFF",
+        "wrap": true,
+        "weight": "bold",
+        "style": "normal",
+        "align": "start"
+      },
+      {
+        "type": "box",
+        "layout": "horizontal",
+        "contents": [
+          {
+            "type": "text",
+            "text": "J-2306-032",
+            "color": "#FFFFFF",
+            "align": "start",
+            "weight": "bold"
+          },
+          {
+            "type": "text",
+            "text": "T-2306-049",
+            "color": "#FFFFFF",
+            "align": "end"
+          }
+        ],
+        "paddingTop": "sm"
+      }
+    ],
+    "backgroundColor": "#0367D3",
+    "paddingTop": "20px"
+  },
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "box",
+        "layout": "vertical",
+        "margin": "lg",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "คนขับ ",
+                "size": "sm",
+                "color": "#aaaaaa",
+                "flex": 1,
+                "wrap": true
+              },
+              {
+                "type": "text",
+                "text": "โย",
+                "flex": 5,
+                "size": "sm",
+                "color": "#666666",
+                "wrap": true
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "text",
+                "text": "วันที่",
+                "color": "#aaaaaa",
+                "size": "sm",
+                "flex": 1
+              },
+              {
+                "type": "text",
+                "text": "8 มิ.ย. 23",
+                "wrap": true,
+                "color": "#666666",
+                "size": "sm",
+                "flex": 5
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "text",
+                "text": "เริ่มงาน",
+                "color": "#aaaaaa",
+                "flex": 1,
+                "size": "sm",
+                "wrap": true
+              },
+              {
+                "type": "text",
+                "text": "08 มิ.ย. 23 เวลา 12:00 น.",
+                "flex": 5,
+                "size": "sm",
+                "wrap": true,
+                "color": "#666666"
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "เอกสารอ้างอิง",
+                "size": "sm",
+                "color": "#aaaaaa",
+                "flex": 5,
+                "wrap": true
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Job NO ของลูกค้า: AAAAA \n ขนาด : ไม่ระบุ",
+                "color": "#666666",
+                "size": "sm",
+                "wrap": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "text",
+                "text": "รับสินค้า",
+                "size": "sm",
+                "gravity": "center",
+                "wrap": true,
+                "flex": 2,
+                "align": "end"
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "filler"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [],
+                    "width": "12px",
+                    "height": "12px",
+                    "borderWidth": "2px",
+                    "borderColor": "#EF454D",
+                    "cornerRadius": "30px"
+                  },
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 1,
+                "alignItems": "center"
+              },
+              {
+                "type": "text",
+                "text": "CANADIAN (RY)",
+                "flex": 4,
+                "size": "sm",
+                "gravity": "center",
+                "action": {
+                  "type": "uri",
+                  "label": "action",
+                  "uri": "http://linecorp.com/"
+                }
+              }
+            ],
+            "spacing": "lg"
+          },
+          {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 2
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "filler"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [],
+                    "width": "2px",
+                    "backgroundColor": "#B7B7B7"
+                  },
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 1
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [],
+                "flex": 4
+              }
+            ],
+            "spacing": "lg",
+            "height": "30px"
+          },
+          {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "text",
+                "text": "ส่งสินค้า",
+                "size": "sm",
+                "gravity": "center",
+                "wrap": true,
+                "flex": 2,
+                "align": "end"
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "filler"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [],
+                    "width": "12px",
+                    "height": "12px",
+                    "borderWidth": "2px",
+                    "borderColor": "#EF454D",
+                    "cornerRadius": "30px"
+                  },
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 1,
+                "alignItems": "center"
+              },
+              {
+                "type": "text",
+                "text": "CO",
+                "flex": 4,
+                "size": "sm",
+                "gravity": "center",
+                "action": {
+                  "type": "uri",
+                  "label": "action",
+                  "uri": "http://linecorp.com/"
+                }
+              }
+            ],
+            "spacing": "lg"
+          },
+          {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 2
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "filler"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [],
+                    "width": "2px",
+                    "backgroundColor": "#B7B7B7"
+                  },
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 1
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [],
+                "flex": 4
+              }
+            ],
+            "spacing": "lg",
+            "height": "30px"
+          },
+          {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "text",
+                "text": "คืนตู้เปล่า",
+                "size": "sm",
+                "gravity": "center",
+                "wrap": true,
+                "flex": 2,
+                "align": "end"
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "filler"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [],
+                    "width": "12px",
+                    "height": "12px",
+                    "borderWidth": "2px",
+                    "borderColor": "#EF454D",
+                    "cornerRadius": "30px"
+                  },
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 1,
+                "alignItems": "center"
+              },
+              {
+                "type": "text",
+                "text": "KCD",
+                "flex": 4,
+                "size": "sm",
+                "gravity": "center",
+                "action": {
+                  "type": "uri",
+                  "label": "action",
+                  "altUri": {
+                    "desktop": "http://linecorp.com/"
+                  },
+                  "uri": "http://linecorp.com/"
+                }
+              }
+            ],
+            "spacing": "lg"
+          }
+        ],
+        "paddingTop": "xxl"
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "margin": "lg",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "ที่อยู่ออกใบเสร็จ",
+                "size": "sm",
+                "color": "#aaaaaa",
+                "flex": 5,
+                "wrap": true
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "ค่าผ่านท่า ค่ารับตู้ ค่าชอร์  \n ออกใบเสร็จเต็มรูปแบบ\nCCSCM LOGISTICS (THAILAND) CO.,LTD. 456/245-246 Moo. 10 T.Thungsukla , Sriracha , Chonburi 20230   TAX ID :0205561035337",
+                "color": "#666666",
+                "size": "sm",
+                "wrap": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "margin": "lg",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "หมายเหตุ",
+                "size": "sm",
+                "color": "#aaaaaa",
+                "flex": 5,
+                "wrap": true
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "color": "#666666",
+                "size": "sm",
+                "wrap": true,
+                "text": "-"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "paddingTop": "xs"
+  },
+  "footer": {
+    "type": "box",
+    "layout": "vertical",
+    "spacing": "sm",
+    "contents": [
+      {
+        "type": "button",
+        "style": "primary",
+        "height": "sm",
+        "action": {
+          "type": "uri",
+          "label": "รายละเอียด",
+          "uri": "https://linecorp.com"
+        },
+        "adjustMode": "shrink-to-fit",
+        "color": "#0367D3",
+        "margin": "none",
+        "position": "relative"
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [],
+        "margin": "sm"
+      }
+    ],
+    "flex": 0
+  }
+}
