@@ -316,7 +316,11 @@ include 'check_cookie.php';
                                                                     include "function/connectionDb.php";
 
                                                                     // Query data from master_data where type = 'Job_Type'
-                                                                    $sql = "SELECT id as trip_id, job_id, tripNo FROM job_order_detail_trip_info Order By create_date DESC Limit 100";
+                                                                    //$sql = "SELECT id as trip_id, job_id, tripNo FROM job_order_detail_trip_info Order By create_date DESC Limit 100";
+                                                                    $sql = "SELECT id as trip_id, job_id, tripNo
+                                                                    FROM job_order_detail_trip_info
+                                                                    WHERE create_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                                                                    ORDER BY create_date DESC  ";
                                                                     $result = mysqli_query($conn, $sql);
 
                                                                     // Loop through data and create dropdown options
