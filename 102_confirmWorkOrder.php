@@ -622,6 +622,46 @@ include 'check_cookie.php';
         </div>
     </div>
 
+
+    <div class="modal fade" id="LineNotificationMSG" tabindex="-1" aria-labelledby="LineNotificationMSGLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="LineNotificationMSGLabel">การแจ้งเตือนผ่าน Line</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <form>
+                            <h6 class="mb-3">ส่งหา:</h6>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <input class="form-check-input" type="checkbox" value="" id="sendToCustomer">
+                                    <label class="form-check-label ms-1" for="sendToCustomer">ลูกค้า</label>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <input class="form-check-input" type="checkbox" value="" id="sendToEmployer">
+                                    <label class="form-check-label ms-1" for="sendToEmployer">ผู้ว่าจ้าง</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="message" class="form-label">ข้อความที่ต้องการส่ง</label>
+                                <textarea class="form-control" id="line_message" rows="10"></textarea>
+                            </div>
+                        </form>
+
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary" id="sendLineMsgBtn">ส่งข้อความ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Modal แผนที่ -->
     <div class="modal fade" id="showGoogleMapModal" tabindex="-1" aria-labelledby="showGoogleMapModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -1147,7 +1187,7 @@ include 'check_cookie.php';
                             // หรือสามารถนำข้อความไปแสดงในส่วนอื่นของเว็บไซต์ได้ตามต้องการ
                         });
                         MAIN_LINE_MSG = "";
-                        MAIN_LINE_MSG += "\nวันที่ " + jobHeaderForm.job_date;
+                        MAIN_LINE_MSG += "วันที่ " + jobHeaderForm.job_date;
                         MAIN_LINE_MSG += "\nชื่องาน " + jobHeaderForm.job_name;
                         MAIN_LINE_MSG += "\nเลขที่อ้างอิง:\n" + jobHeaderForm.refDoc_Data;
                         MAIN_LINE_MSG += data_arr.jobActionLog;
@@ -1235,7 +1275,7 @@ include 'check_cookie.php';
                         },
                     })
                     .done(function(data) {
-                        //console.log(data);
+                        console.log(data);
                         $('#loading-spinner').hide();
                         Swal.fire({
                             icon: 'success',
@@ -1243,7 +1283,7 @@ include 'check_cookie.php';
                             showConfirmButton: false,
                             timer: 1500
                         }).then(() => {
-                            location.reload();
+                            //location.reload();
                             //null
                         });
                     })
@@ -1743,6 +1783,21 @@ include 'check_cookie.php';
             });
 
             $('#LineUpdateStatus').click(function() {
+                $("#LineNotificationMSG").modal('show');
+                // Disabling the checkboxes if the values are empty
+                if (!MAIN_LINE_CUS) {
+                    $("#sendToCustomer").prop('disabled', true);
+                } else {
+                    $("#sendToCustomer").prop('checked', true);
+                }
+                if (!MAIN_LINE_CLI) {
+                    $("#sendToEmployer").prop('disabled', true);
+                } else {
+                    $("#sendToEmployer").prop('checked', true);
+                }
+
+                $("#line_message").val(MAIN_LINE_MSG);
+                /*
                 Swal.fire({
                     title: "ส่งไลน์หาลูกค้า/ผู้จ้าง",
                     html: '<div class="swal2-lg"><input type="checkbox" id="customerCheckbox" ' + (MAIN_LINE_CUS == "" ? "disabled" : "checked") + '> <label for="customerCheckbox">ส่งหาลูกค้า</label></div><div class="swal2-lg"><input type="checkbox" id="clientCheckbox" ' + (MAIN_LINE_CLI == "" ? "disabled" : "checked") + '> <label for="clientCheckbox">ส่งหาผู้จ้าง</label></div><textarea id="messageTextarea" class="form-control" rows="5">' + MAIN_LINE_MSG + '</textarea>',
@@ -1766,7 +1821,10 @@ include 'check_cookie.php';
                             SendLineMSG(message, MAIN_LINE_CLI, "ส่งข้อความหาผู้ว่าจ้างสำเร็จ");
                         }
                     }
+
+
                 });
+                */
 
 
             });
@@ -1785,6 +1843,7 @@ include 'check_cookie.php';
                         data: (ajaxData)
                     })
                     .done(function(data) {
+                        console.log(data);
                         toastr.success(completeType);
 
                     })
@@ -1794,6 +1853,26 @@ include 'check_cookie.php';
                         alert("Posting failed.");
                     });
             }
+
+
+            $('#sendLineMsgBtn').click(function() {
+                var line_message = $('#line_message').val(); // Read the message from the textarea
+                var sendToCustomer = $('#sendToCustomer').prop('checked'); // Check if the checkbox is checked
+                var sendToEmployer = $('#sendToEmployer').prop('checked'); // Check if the checkbox is checked
+
+                // Now you can use these variables
+                if (sendToCustomer) {
+                    SendLineMSG(line_message, MAIN_LINE_CUS, "ส่งข้อความหาลูกค้าสำเร็จ");
+                }
+                //console.sendToEmployer("ส่งหาผู้จ้าง: " + clientChecked);
+                if (sendToEmployer) {
+                    SendLineMSG(line_message, MAIN_LINE_CLI, "ส่งข้อความหาผู้ว่าจ้างสำเร็จ");
+                }
+                // Close the modal
+                $('#LineNotificationMSG').modal('hide');
+
+                // Here you could make an AJAX request or do whatever you want with these variables
+            });
 
             // END Process ===========================================
 

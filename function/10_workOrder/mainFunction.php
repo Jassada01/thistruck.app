@@ -293,6 +293,29 @@ function countValues($data)
 	return $result;
 }
 
+// Send Line Notify ==================
+function sendLineNotify($LINE_TOKEN, $message)
+{
+	$message = "\n" . $message;
+	$headers = [
+		'Authorization: Bearer ' . $LINE_TOKEN,
+		'Content-Type: application/x-www-form-urlencoded'
+	];
+	$data = ['message' => $message];
+
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, 'https://notify-api.line.me/api/notify');
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+	$result = curl_exec($ch);
+	curl_close($ch);
+
+	return $result;
+}
+
+
 
 
 
@@ -1202,6 +1225,7 @@ function confirmJob()
 
 			$result3 = $conn->query($sql);
 			$jobActionLog = array();
+			$jobActionLogtext = "";
 
 			while ($row3 = $result3->fetch_assoc()) {
 				$job_characteristic_id = $row3['job_characteristic_id'];
@@ -1236,7 +1260,7 @@ function confirmJob()
 					"code" => $location_code,
 					"link" => $googleMapsLink
 				);
-				//$jobActionLog = $jobActionLog . "\n" . $JSC . " : " . $location_code;
+				$jobActionLogtext = $jobActionLogtext . "\n" . $JSC . " : " . $location_code;
 			}
 
 			// สร้าง Array สำหรับ JSON ที่เราต้องการสร้าง
@@ -1893,19 +1917,45 @@ function confirmJob()
 			]
 		];
 
+		$messagefor_lineNotification = "คอนเฟิร์มงาน
+$job_name
+วันที่ : $formattedJobDate
+เริ่มงาน : $formattedDate
+เอกสารอ้างอิง : 
+$refDoc_Data
+ขนาด : $totalQTYDataText
+=== แผนปฏิบัติงาน ===$jobActionLogtext
+
+=== ที่อยู่ออกใบเสร็จ ===
+$fullAddress
+หมายเหตุ : 
+$hdRemark";
+		
+		//echo $messagefor_lineNotification ;
 
 		// Process after finished each trip =======================================
-
+		$prefix = "NOTIFY_";
 		if (trim($client_line_token != "")) {
 
 			//SendNoticeJobConfirmforCustomerClient($client_line_token, $Line_Token, 'คอนเฟิร์มงาน', $messageforClientandCustomer);
-			SendNoticeJobConfirm($client_line_token, $Line_Token, $main_msgforCustomer);
+
+			if (substr($client_line_token, 0, strlen($prefix)) == $prefix) {
+				$client_line_token = substr($client_line_token, strlen($prefix));
+				sendLineNotify($client_line_token, $messagefor_lineNotification);
+			} else {
+				SendNoticeJobConfirm($client_line_token, $Line_Token, $main_msgforCustomer);
+			}
 		}
 
 		if (trim($customer_line_token != "")) {
 
 			//SendNoticeJobConfirmforCustomerClient($customer_line_token, $Line_Token, 'คอนเฟิร์มงาน', $messageforClientandCustomer);
-			SendNoticeJobConfirm($customer_line_token, $Line_Token, $main_msgforCustomer);
+			if (substr($customer_line_token, 0, strlen($prefix)) == $prefix) {
+				$customer_line_token = substr($customer_line_token, strlen($prefix));
+				sendLineNotify($customer_line_token, $messagefor_lineNotification);
+			} else {
+				SendNoticeJobConfirm($customer_line_token, $Line_Token, $main_msgforCustomer);
+			}
 		}
 	}
 
