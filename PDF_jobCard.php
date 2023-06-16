@@ -195,105 +195,73 @@ $switchcnt = 1;
 
 if (!empty($customer_job_no)) {
 	$switchcnt += 1;
-	if ($switchcnt % 2 == 0)
-	{
+	if ($switchcnt % 2 == 0) {
 		$refDoc1 .=  "Job NO ของลูกค้า : " . $customer_job_no . "\n";
+	} else {
+		$refDoc2 .=  "Job NO ของลูกค้า : " . $customer_job_no . "\n";
 	}
-	else
-	{
-		$refDoc2 .=  "Job NO ของลูกค้า : " . $customer_job_no. "\n";
-	}
-	
 }
 
 if (!empty($customer_po_no)) {
 	$switchcnt += 1;
-	if ($switchcnt % 2 == 0)
-	{
-		$refDoc1 .=  "PO NO ของลูกค้า : " . $customer_po_no. "\n";
-	}
-	else
-	{
-		$refDoc2 .=  "PO NO ของลูกค้า : " . $customer_po_no. "\n";
-
+	if ($switchcnt % 2 == 0) {
+		$refDoc1 .=  "PO NO ของลูกค้า : " . $customer_po_no . "\n";
+	} else {
+		$refDoc2 .=  "PO NO ของลูกค้า : " . $customer_po_no . "\n";
 	}
 }
 
 if (!empty($customer_invoice_no)) {
 	$switchcnt += 1;
-	if ($switchcnt % 2 == 0)
-	{
-		$refDoc1 .=  "Invoice NO ของลูกค้า : " . $customer_invoice_no. "\n";
-	}
-	else
-	{
-		$refDoc2 .=  "Invoice NO ของลูกค้า : " . $customer_invoice_no. "\n";
-
+	if ($switchcnt % 2 == 0) {
+		$refDoc1 .=  "Invoice NO ของลูกค้า : " . $customer_invoice_no . "\n";
+	} else {
+		$refDoc2 .=  "Invoice NO ของลูกค้า : " . $customer_invoice_no . "\n";
 	}
 }
 
 if (!empty($goods)) {
 	$switchcnt += 1;
-	if ($switchcnt % 2 == 0)
-	{
-		$refDoc1 .=  "Goods : " . $goods. "\n";
-	}
-	else
-	{
-		$refDoc2 .=  "Goods : " . $goods. "\n";
-
+	if ($switchcnt % 2 == 0) {
+		$refDoc1 .=  "Goods : " . $goods . "\n";
+	} else {
+		$refDoc2 .=  "Goods : " . $goods . "\n";
 	}
 }
 
 if (!empty($booking)) {
 	$switchcnt += 1;
-	if ($switchcnt % 2 == 0)
-	{
-		$refDoc1 .=  "Booking : " . $booking. "\n";
-	}
-	else
-	{
-		$refDoc2 .=  "Booking : " . $booking. "\n";
-
+	if ($switchcnt % 2 == 0) {
+		$refDoc1 .=  "Booking : " . $booking . "\n";
+	} else {
+		$refDoc2 .=  "Booking : " . $booking . "\n";
 	}
 }
 
 if (!empty($bill_of_lading)) {
 	$switchcnt += 1;
-	if ($switchcnt % 2 == 0)
-	{
-		$refDoc1 .=  "Bill of Lading : " . $bill_of_lading. "\n";
+	if ($switchcnt % 2 == 0) {
+		$refDoc1 .=  "Bill of Lading : " . $bill_of_lading . "\n";
+	} else {
+		$refDoc2 .=  "Bill of Lading : " . $bill_of_lading . "\n";
 	}
-	else
-	{
-		$refDoc2 .=  "Bill of Lading : " . $bill_of_lading. "\n";
-	}
-	
 }
 
 if (!empty($agent)) {
 	$switchcnt += 1;
-	if ($switchcnt % 2 == 0)
-	{
-		$refDoc1 .=  "Agent : " . $agent. "\n";
+	if ($switchcnt % 2 == 0) {
+		$refDoc1 .=  "Agent : " . $agent . "\n";
+	} else {
+		$refDoc2 .=  "Agent : " . $agent . "\n";
 	}
-	else
-	{
-		$refDoc2 .=  "Agent : " . $agent. "\n";
-	}
-	
 }
 
 if (!empty($quantity)) {
 	$switchcnt += 1;
-	if ($switchcnt % 2 == 0)
-	{
-	$refDoc1 .=  "Quantity : " . $quantity. "\n";
-	}
-	else
-	{
-	$refDoc2 .=  "Quantity : " . $quantity. "\n";
-
+	if ($switchcnt % 2 == 0) {
+		$refDoc1 .=  "Quantity : " . $quantity . "\n";
+	} else {
+		$refDoc2 .=  "Quantity : " . $quantity . "\n";
 	}
 }
 
@@ -375,7 +343,7 @@ if ($result->num_rows > 0) {
 		$pdf->Cell(0, 10, $job_no, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 		// trip_tripNo
-		$pdf->SetXY(164, 50); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetXY(164, 50.2); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 		$pdf->SetFont('thsarabunb', 'B', 18);
 		$pdf->Cell(0, 10, $trip_tripNo, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
@@ -492,7 +460,19 @@ if ($result->num_rows > 0) {
 		//$pdf->SetFont('thsarabunb', 'B', 16);
 		//$pdf->Cell(0, 10, $trip_truckType, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 		//$pdf->setFillColor(255, 255, 255);
-		$pdf->MultiCell(210, 5, $remark . "", 0, 'L', false, 1, '', '', true);
+
+		// Split the string into an array by newline
+		$lines = explode("\n", $remark);
+
+		// Remove empty lines from array
+		$lines = array_filter($lines, 'trim');
+
+		// If the array has more than 4 lines, replace newlines with ', '
+		if (count($lines) > 4) {
+			$remark = implode(", ", $lines);
+		}
+		$pdf->MultiCell(185, 5, $remark, 0, 'L', false, 1, '', '', true);
+
 
 		//trip_jobStartDateTime
 
@@ -643,7 +623,7 @@ if ($result->num_rows > 0) {
 
 					$pdf->SetXY($timeStampX, $timeStampY); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 					$pdf->SetFont('thsarabunb', 'B', 15);
-					$pdf->Cell(0, 10, $formattedDate , 0, 1, 'L', false, '', 0, false, 'T', 'C');
+					$pdf->Cell(0, 10, $formattedDate, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 				}
 
 
