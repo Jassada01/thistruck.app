@@ -696,15 +696,15 @@ include 'check_cookie.php';
                                         <div class="card">
                                             <div class="card-header">
                                                 <div class="col-sm-6 mt-3 d-flex align-items-center px-3">
-                                                    <h1><i class="bi bi-map fs-3"></i> รายละเอียด Trip</h1>
+                                                    <h1> รายละเอียด Trip</h1>
                                                 </div>
 
 
                                                 <div class="card-toolbar">
-                                                    <button type="button" class="btn btn-sm  btn-color-success btn-active-light-success" data-bs-toggle="modal" data-bs-target="#addAttachedFileModal">
+                                                    <button type="button" class="btn btn-lg btn-success px-3  me-3" data-bs-toggle="modal" data-bs-target="#addAttachedFileModal">
                                                         แนบไฟล์/รูปภาพ
                                                     </button>
-                                                    <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary" id="cancelJob" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                    <button type="button" class="btn btn-icon btn-color-primary btn-active-light-primary" id="cancelJob" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                                         <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
                                                         <span class="svg-icon svg-icon-2">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
