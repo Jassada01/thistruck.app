@@ -130,6 +130,7 @@ include 'check_cookie.php';
                                             <table class="table table-bordered table-hover table-striped w-100 d-none" id="jobTable">
                                                 <thead class="bg-primary text-white">
                                                     <tr>
+                                                        <th class="font-weight-bold text-center"></th>
                                                         <th class="font-weight-bold text-center"><B>เลข Job</B></th>
                                                         <th class="font-weight-bold text-center"><B>สถานะ</B></th>
                                                         <th class="font-weight-bold text-center"><B>วันที่</B></th>
@@ -271,15 +272,16 @@ include 'check_cookie.php';
 
                                                             // แสดงผลลงในแต่ละ <td> ด้วยการใช้ echo
                                                             echo '<tr>';
+                                                            echo '<td class="text-center dt-control" data-jobID="' . $row['id'] . '"></td>';
                                                             //echo '<td class="font-weight-bold text-center">' . $row["job_no"] . '</td>';
                                                             echo '<td class="font-weight-bold text-center"><a href="102_confirmWorkOrder.php?job_id=' . $row['id'] . '">' . $row["job_no"] . '</a></td>';
 
 
                                                             echo '<td class="text-center"><span class="badge ' . $statusColor . '">' . $statusBadge . '</span></td>';
                                                             //echo '<td class="font-weight-bold text-center">' . $row["job_date"] . '</td>';
-                                                            
+
                                                             echo "<td class='text-center'><span class='dateFormatter'>{$row['job_date']}</span></td>";
-                                                            
+
                                                             echo '<td>' . $row["job_name"] . '</td>';
                                                             echo "<td class='text-center'><span class='datetimeFormatter'>{$row['jobStartDateTime']}</span></td>";
                                                             echo '<td class="font-weight-bold text-center">' . $row["job_type"] . '</td>';
@@ -364,7 +366,31 @@ include 'check_cookie.php';
                 },
             });
 
+            function generateRandomString(length) {
+                var result = '';
+                var characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                var charactersLength = characters.length;
 
+                for (var i = 0; i < length; i++) {
+                    var randomIndex = Math.floor(Math.random() * charactersLength);
+                    result += characters.charAt(randomIndex);
+                }
+
+                return result;
+            }
+
+
+
+
+            function formatDetailTable(rndStr) {
+                // `d` is the original data object for the row
+                var temp = '';
+                temp += '<div class="table-responsive table-loading mt-1 ms-10 me-1 mb-3" id="' + rndStr + '">';
+                temp += '<i class="fas fa-circle-notch fa-spin"></i>';
+                temp += '<span class="loading-text  ms-2">กำลังโหลดข้อมูล...</span>';
+                temp += '</div>';
+                return (temp);
+            }
 
             let jobTable = $("#jobTable").DataTable({
 
@@ -375,7 +401,7 @@ include 'check_cookie.php';
                     "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json"
                 },
                 order: [
-                        [0, "desc"]
+                        [1, "desc"]
                     ] // เรียงลำดับตามคอลัมน์แรก (index 0) ในลำดับ DESC
                     ,
 
@@ -384,6 +410,25 @@ include 'check_cookie.php';
             });
             jobTable.on('draw', function() {
                 $('#jobTable').removeClass('d-none');
+            });
+
+            // Add event listener for opening and closing details
+            $('#jobTable tbody').on('click', 'td.dt-control', function() {
+                var tr = $(this).closest('tr');
+                var row = jobTable.row(tr);
+                var jobId = tr.find('td:nth-child(1)').data('jobid');
+                //console.log(jobId);
+                var randomStr = generateRandomString(10);
+                if (row.child.isShown()) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    // Open this row
+                    row.child(formatDetailTable(randomStr)).show();
+                    loadTrip_DetailforViewIndex(jobId, randomStr);
+                    tr.addClass('shown');
+                }
             });
 
             // ตรวจสอบการเปลี่ยนแปลงค่าของ checkbox
@@ -415,6 +460,146 @@ include 'check_cookie.php';
                 //}
                 $(this).text(formattedDate);
             });
+
+            function loadTrip_DetailforViewIndex(job_id, target_div) {
+                var ajaxData = {};
+                ajaxData['f'] = '17';
+                ajaxData['job_id'] = job_id;
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        //console.log(data);
+                        var data_arr = JSON.parse(data);
+
+                        // สร้าง div สำหรับการแสดงผลตาราง
+                        var tableContainer = $('<div class="table-responsive"></div>');
+
+                        // สร้างตาราง
+                        var table = $('<table class="table table-rounded table-striped gy-4 gs-4"></table>');
+
+                        // สร้าง thead
+                        var thead = $('<thead class="bg-success text-white"></thead>');
+
+                        // สร้างแถวของส่วนหัวของตาราง
+                        var headerRow = $('<tr class="fw-semibold fs-6 border-bottom border-gray-200"></tr>');
+
+                        // สร้างคอลัมน์ของส่วนหัวตาราง
+                        var headers = ['หมายเลขทริป', 'ทะเบียนรถบรรทุก', 'ชื่อคนขับ', 'หมายเลขตู้สินค้า', 'สถานะ'];
+                        for (var i = 0; i < headers.length; i++) {
+                            var th = $('<th></th>').text(headers[i]);
+                            th.css('font-weight', 'bold'); // เพิ่มการกำหนดคุณสมบัติ font-weight
+                            headerRow.append(th);
+                        }
+
+                        // เพิ่มแถวของส่วนหัวใน thead
+                        thead.append(headerRow);
+
+                        // สร้าง tbody
+                        var tbody = $('<tbody></tbody>');
+
+                        // สร้างแถวและเพิ่มข้อมูลในตาราง
+                        for (var j = 0; j < data_arr.length; j++) {
+                            var rowData = data_arr[j];
+                            var statusBadgeClass = "";
+                            var statusText = "";
+
+                            switch (rowData.status) {
+                                case "รับตู้หนัก : เข้าสถานที่แล้ว":
+                                case "รับตู้เปล่า : เข้าสถานที่แล้ว":
+                                case "คืนตู้หนัก : เข้าสถานที่แล้ว":
+                                case "คืนตู้เปล่า : เข้าสถานที่แล้ว":
+                                case "ส่งสินค้า : เข้าสถานที่แล้ว":
+                                case "รับสินค้า : เข้าสถานที่แล้ว":
+                                case "อื่นๆ : เข้าสถานที่แล้ว":
+                                    statusBadgeClass = "badge badge-primary";
+                                    break;
+                                case "รับตู้หนัก : กำลังดำเนินการ":
+                                case "รับตู้เปล่า : กำลังดำเนินการ":
+                                case "คืนตู้หนัก : กำลังดำเนินการ":
+                                case "คืนตู้เปล่า : เริ่มดำเนินการ":
+                                case "ส่งสินค้า : กำลังดำเนินการ":
+                                case "รับสินค้า : กำลังดำเนินการ":
+                                case "อื่นๆ : เริ่มดำเนินการ":
+                                    statusBadgeClass = "badge badge-warning";
+                                    break;
+                                case "รับตู้หนัก : ดำเนินการเสร็จ":
+                                case "รับตู้เปล่า : ดำเนินการเสร็จ":
+                                case "คืนตู้หนัก : ดำเนินการเสร็จ":
+                                case "คืนตู้เปล่า : ดำเนินการเสร็จ":
+                                case "ส่งสินค้า : ดำเนินการเสร็จแล้ว":
+                                case "รับสินค้า : ดำเนินการเสร็จ":
+                                case "อื่นๆ : ดำเนินการเสร็จ":
+                                    statusBadgeClass = "badge badge-info";
+                                    break;
+                                case "รับตู้หนัก : ออกจากสถานที่แล้ว":
+                                case "รับตู้เปล่า : ออกจากสถานที่แล้ว":
+                                case "คืนตู้หนัก : ออกจากสถานที่แล้ว":
+                                case "คืนตู้เปล่า : ออกจากสถานที่แล้ว":
+                                case "ส่งสินค้า : ออกจากสถานที่แล้ว":
+                                case "รับสินค้า : ออกจากสถานที่แล้ว":
+                                case "อื่นๆ : ออกจากสถานที่แล้ว":
+                                    statusBadgeClass = "badge badge-secondary";
+                                    break;
+                                case "เจ้าหน้าที่ยืนยันแล้ว":
+                                case "คนขับยืนยันแล้ว":
+                                case "ยืนยันเริ่มงานแล้ว":
+                                case "คนขับยืนยันจบงานแล้ว":
+                                case "จบงาน":
+                                    statusBadgeClass = "badge badge-success";
+                                    break;
+                                default:
+                                    statusBadgeClass = "badge badge-danger";
+                                    break;
+                            }
+                            statusText = '<span class="' + statusBadgeClass + '">' + rowData.status + '</span>'
+
+                            var row = $('<tr></tr>');
+
+                            // เพิ่มข้อมูลลงในแถว
+                            var tripNo = $('<td></td>').html('<a href="103_tripDetail.php?job_id=' + rowData.job_id + '&trip_id=' + rowData.id + '">' + rowData.tripNo + '</a>');
+                            row.append(tripNo);
+
+
+                            var truck_licenseNo = $('<td></td>').text(rowData.truck_licenseNo);
+                            row.append(truck_licenseNo);
+
+                            var driver_name = $('<td></td>').text(rowData.driver_name);
+                            row.append(driver_name);
+
+                            var containerID = $('<td></td>').text(rowData.containerID);
+                            row.append(containerID);
+
+                            var status = $('<td></td>').html(statusText);
+                            row.append(status);
+
+                            // เพิ่มแถวลงใน tbody
+                            tbody.append(row);
+                        }
+
+                        // เพิ่ม thead และ tbody ลงในตาราง
+                        table.append(thead);
+                        table.append(tbody);
+
+                        // เพิ่มตารางลงใน div สำหรับการแสดงผล
+                        tableContainer.append(table);
+
+                        // เพิ่ม div ที่มีตารางลงในหน้าเอกสาร
+                        $("#" + target_div).html(tableContainer);
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+
+
 
 
         });

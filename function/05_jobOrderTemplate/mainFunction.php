@@ -184,13 +184,15 @@ function insertNewJobTemplate()
 	$total_expenses = $_POST['jobDetailCostForm']['total_expenses'];
 	$wage_travel_cost = $_POST['jobDetailCostForm']['wage_travel_cost'];
 	$vehicle_expenses = $_POST['jobDetailCostForm']['vehicle_expenses'];
+	$Costremark = $_POST['jobDetailCostForm']['remark'];
+	$expenses_1 = $_POST['jobDetailCostForm']['expenses_1'];
 	$insInvAdd1 = $_POST['jobDetailCostForm']['insInvAdd1'];
 	$insInvAdd2 = $_POST['jobDetailCostForm']['insInvAdd2'];
 	$insInvAdd3 = $_POST['jobDetailCostForm']['insInvAdd3'];
 
 	// เตรียมคำสั่ง SQL สำหรับเพิ่มข้อมูล
-	$sql = "INSERT INTO job_order_template_detail_cost (job_order_template_header_id, hire_price, overtime_fee, port_charge, yard_charge, container_return, container_cleaning_repair, container_drop_lift, other_charge, deduction_note, total_expenses, wage_travel_cost, vehicle_expenses, insInvAdd1, insInvAdd2, insInvAdd3) 
-        VALUES ('$job_order_template_header_id', '$hire_price', '$overtime_fee', '$port_charge', '$yard_charge', '$container_return', '$container_cleaning_repair', '$container_drop_lift', '$other_charge', '$deduction_note', '$total_expenses', '$wage_travel_cost', '$vehicle_expenses', '$insInvAdd1', '$insInvAdd2', '$insInvAdd3')";
+	$sql = "INSERT INTO job_order_template_detail_cost (job_order_template_header_id, hire_price, overtime_fee, port_charge, yard_charge, container_return, container_cleaning_repair, container_drop_lift, other_charge, deduction_note, total_expenses, wage_travel_cost, vehicle_expenses, insInvAdd1, insInvAdd2, insInvAdd3, expenses_1, remark) 
+        VALUES ('$job_order_template_header_id', '$hire_price', '$overtime_fee', '$port_charge', '$yard_charge', '$container_return', '$container_cleaning_repair', '$container_drop_lift', '$other_charge', '$deduction_note', '$total_expenses', '$wage_travel_cost', '$vehicle_expenses', '$insInvAdd1', '$insInvAdd2', '$insInvAdd3', '$expenses_1', '$Costremark')";
 
 
 	// ทำการ Insert ข้อมูล 
@@ -358,13 +360,15 @@ function updateJobTemplateByID()
 	$total_expenses = $_POST['jobDetailCostForm']['total_expenses'];
 	$wage_travel_cost = $_POST['jobDetailCostForm']['wage_travel_cost'];
 	$vehicle_expenses = $_POST['jobDetailCostForm']['vehicle_expenses'];
+	$Costremark = $_POST['jobDetailCostForm']['remark'];
+	$expenses_1 = $_POST['jobDetailCostForm']['expenses_1'];
 	$insInvAdd1 = $_POST['jobDetailCostForm']['insInvAdd1'];
 	$insInvAdd2 = $_POST['jobDetailCostForm']['insInvAdd2'];
 	$insInvAdd3 = $_POST['jobDetailCostForm']['insInvAdd3'];
 
 	// เตรียมคำสั่ง SQL สำหรับอัพเดทข้อมูล
 	$sql = "UPDATE job_order_template_detail_cost 
-        SET hire_price = '$hire_price', overtime_fee = '$overtime_fee', port_charge = '$port_charge', yard_charge = '$yard_charge', container_return = '$container_return', container_cleaning_repair = '$container_cleaning_repair', container_drop_lift = '$container_drop_lift', other_charge = '$other_charge', deduction_note = '$deduction_note', total_expenses = '$total_expenses', wage_travel_cost = '$wage_travel_cost', vehicle_expenses = '$vehicle_expenses', insInvAdd1 = '$insInvAdd1', insInvAdd2 = '$insInvAdd2', insInvAdd3 = '$insInvAdd3'
+        SET hire_price = '$hire_price', overtime_fee = '$overtime_fee', port_charge = '$port_charge', yard_charge = '$yard_charge', container_return = '$container_return', container_cleaning_repair = '$container_cleaning_repair', container_drop_lift = '$container_drop_lift', other_charge = '$other_charge', deduction_note = '$deduction_note', total_expenses = '$total_expenses', wage_travel_cost = '$wage_travel_cost', vehicle_expenses = '$vehicle_expenses',expenses_1 = '$expenses_1', insInvAdd1 = '$insInvAdd1', insInvAdd2 = '$insInvAdd2', insInvAdd3 = '$insInvAdd3', remark = '$Costremark'
         WHERE job_order_template_header_id = '$job_order_template_header_id'";
 
 	// ทำการ Update ข้อมูล 

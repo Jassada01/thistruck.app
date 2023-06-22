@@ -368,6 +368,8 @@ function insertNewJobData()
 	$total_expenses = $_POST['jobDetailCostForm']['total_expenses'];
 	$wage_travel_cost = $_POST['jobDetailCostForm']['wage_travel_cost'];
 	$vehicle_expenses = $_POST['jobDetailCostForm']['vehicle_expenses'];
+	$Costremark = $_POST['jobDetailCostForm']['remark'];
+	$expenses_1 = $_POST['jobDetailCostForm']['expenses_1'];
 	$insInvAdd1 = $_POST['jobDetailCostForm']['insInvAdd1'];
 	$insInvAdd2 = $_POST['jobDetailCostForm']['insInvAdd2'];
 	$insInvAdd3 = $_POST['jobDetailCostForm']['insInvAdd3'];
@@ -426,11 +428,12 @@ function insertNewJobData()
 			$other_charge,
 			$deduction_note,
 			$wage_travel_cost,
-			$vehicle_expenses
+			$vehicle_expenses,
+			$expenses_1
 		]);
 
-		$sql = "INSERT INTO job_order_detail_trip_cost (job_id, job_no, trip_id, hire_price, overtime_fee, port_charge, yard_charge, container_return, container_cleaning_repair, container_drop_lift, other_charge, deduction_note, total_expenses, wage_travel_cost, vehicle_expenses, insInvAdd1, insInvAdd2, insInvAdd3)
-			VALUES ('{$job_id}', '{$job_no}', '{$trip_id}', '{$hire_price_true}', '{$overtime_fee}', '{$port_charge}', '{$yard_charge}', '{$container_return}', '{$container_cleaning_repair}', '{$container_drop_lift}', '{$other_charge}', '{$deduction_note}', '{$total_expenses}', '{$wage_travel_cost}', '{$vehicle_expenses}', '$insInvAdd1', '$insInvAdd2', '$insInvAdd3')";
+		$sql = "INSERT INTO job_order_detail_trip_cost (job_id, job_no, trip_id, hire_price, overtime_fee, port_charge, yard_charge, container_return, container_cleaning_repair, container_drop_lift, other_charge, deduction_note, total_expenses, wage_travel_cost, vehicle_expenses, insInvAdd1, insInvAdd2, insInvAdd3, expenses_1, remark)
+			VALUES ('{$job_id}', '{$job_no}', '{$trip_id}', '{$hire_price_true}', '{$overtime_fee}', '{$port_charge}', '{$yard_charge}', '{$container_return}', '{$container_cleaning_repair}', '{$container_drop_lift}', '{$other_charge}', '{$deduction_note}', '{$total_expenses}', '{$wage_travel_cost}', '{$vehicle_expenses}', '$insInvAdd1', '$insInvAdd2', '$insInvAdd3', '{$expenses_1}', '$Costremark')";
 
 		if (!$conn->query($sql)) {
 			echo  $conn->errno;
@@ -873,10 +876,12 @@ function updateTripInfo()
 	$insInvAdd1 = $_POST['jobDetailCostForm']['insInvAdd1'];
 	$insInvAdd2 = $_POST['jobDetailCostForm']['insInvAdd2'];
 	$insInvAdd3 = $_POST['jobDetailCostForm']['insInvAdd3'];
+	$expenses_1 = $_POST['jobDetailCostForm']['expenses_1'];
+	$costRemark = $_POST['jobDetailCostForm']['remark'];
 
 	// เตรียมคำสั่ง SQL สำหรับอัพเดทข้อมูล
 	$sql = "UPDATE job_order_detail_trip_cost 
-        SET hire_price = '$hire_price', overtime_fee = '$overtime_fee', port_charge = '$port_charge', yard_charge = '$yard_charge', container_return = '$container_return', container_cleaning_repair = '$container_cleaning_repair', container_drop_lift = '$container_drop_lift', other_charge = '$other_charge', deduction_note = '$deduction_note', total_expenses = '$total_expenses', wage_travel_cost = '$wage_travel_cost', vehicle_expenses = '$vehicle_expenses', insInvAdd1 = '$insInvAdd1', insInvAdd2 = '$insInvAdd2', insInvAdd3 = '$insInvAdd3'
+        SET hire_price = '$hire_price', overtime_fee = '$overtime_fee', port_charge = '$port_charge', yard_charge = '$yard_charge', container_return = '$container_return', container_cleaning_repair = '$container_cleaning_repair', container_drop_lift = '$container_drop_lift', other_charge = '$other_charge', deduction_note = '$deduction_note', total_expenses = '$total_expenses', wage_travel_cost = '$wage_travel_cost', vehicle_expenses = '$vehicle_expenses', expenses_1 = '$expenses_1', insInvAdd1 = '$insInvAdd1', insInvAdd2 = '$insInvAdd2', insInvAdd3 = '$insInvAdd3', remark = '$costRemark'
         WHERE trip_id = '$MAIN_trip_id'";
 
 	// ทำการ Update ข้อมูล 
@@ -1930,7 +1935,7 @@ $refDoc_Data
 $fullAddress
 หมายเหตุ : 
 $hdRemark";
-		
+
 		//echo $messagefor_lineNotification ;
 
 		// Process after finished each trip =======================================
@@ -2435,13 +2440,40 @@ function updateTripRoute_onlyLocation()
 		WHERE job_id = '$job_id' AND trip_id = '$trip_id' AND plan_order = '$plan_order'";
 
 
-	echo $sql;
+	//echo $sql;
 
 	if (!$conn->query($sql)) {
 		echo  $conn->errno;
 		exit();
 	}
 	mysqli_close($conn);
+}
+
+// F=17
+function loadTrip_DetailforViewIndex()
+{
+	//sleep(1);
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
+	$sql = "SELECT * FROM job_order_detail_trip_info Where job_id = $job_id Order By tripSeq";
+
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	echo json_encode($data_Array);
 }
 
 
@@ -2509,6 +2541,10 @@ switch ($f) {
 		}
 	case 16: {
 			updateTripRoute_onlyLocation();
+			break;
+		}
+	case 17: {
+			loadTrip_DetailforViewIndex();
 			break;
 		}
 }

@@ -196,6 +196,7 @@ if (isset($_GET['selectMonth'])) {
                                                         SUM(container_return) AS 'ค่ารับตู้/คืนตู้', 
                                                         SUM(container_cleaning_repair) AS 'ค่าซ่อมตู้', 
                                                         SUM(container_drop_lift) AS 'ค่าล้างตู้', 
+                                                        SUM(expenses_1) AS 'ค่าชอร์(SHORE)', 
                                                         SUM(other_charge) AS 'ค่าใช้จ่ายอื่นๆ', 
                                                         SUM(deduction_note) AS 'ใบหัก ณ ที่จ่ายกระทำแทน', 
                                                         SUM(total_expenses) AS 'ค่าใช้จ่ายรวมทั้งหมด', 

@@ -439,11 +439,23 @@ include 'check_cookie.php';
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
+                                                                            <label for="expenses_1" class="col-sm-5 col-form-label  text-end-pc">ค่าชอร์(SHORE)</label>
+                                                                            <div class="col-sm-7">
+                                                                                <input type="number" step="0.01" class="form-control" id="expenses_1" name="expenses_1" required>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row mb-3">
                                                                             <label for="other_charge" class="col-sm-5 col-form-label  text-end-pc">ค่าใช้จ่ายอื่นๆ</label>
                                                                             <div class="col-sm-7">
                                                                                 <input type="number" step="0.01" class="form-control" id="other_charge" name="other_charge" required>
                                                                             </div>
 
+                                                                        </div>
+                                                                        <div class="row mb-3">
+                                                                            <label for="remark" class="col-sm-5 col-form-label  text-end-pc"></label>
+                                                                            <div class="col-sm-7">
+                                                                                <textarea type="text" row='2' class="form-control" id="remark" name="remark" placeholder="กรุณาระบุกรณีมีค่าใช้จ่ายอื่นๆ"></textarea>
+                                                                            </div>
                                                                         </div>
                                                                         <div class="row mb-3">
                                                                             <label for="deduction_note" class="col-sm-5 col-form-label  text-end-pc">ใบหัก ณ ที่จ่ายกระทำแทน</label>
@@ -1534,6 +1546,8 @@ include 'check_cookie.php';
                         form.find('#wage_travel_cost').val(jobDetailCostForm.wage_travel_cost);
                         form.find('#vehicle_expenses').val(jobDetailCostForm.vehicle_expenses);
                         form.find('#total_expenses').val(jobDetailCostForm.total_expenses);
+                        form.find('#expenses_1').val(jobDetailCostForm.expenses_1);
+                        form.find('#remark').val(jobDetailCostForm.remark);
 
                         // เลือก form issue Invoice 
                         var form = $('#jobDetailinvAddForm');

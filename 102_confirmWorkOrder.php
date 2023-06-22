@@ -980,7 +980,7 @@ include 'check_cookie.php';
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
-                        console.log(data_arr);
+                        //console.log(data_arr);
 
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
@@ -1275,7 +1275,7 @@ include 'check_cookie.php';
                         },
                     })
                     .done(function(data) {
-                        console.log(data);
+                        //console.log(data);
                         $('#loading-spinner').hide();
                         Swal.fire({
                             icon: 'success',
