@@ -1283,7 +1283,7 @@ include 'check_cookie.php';
                             showConfirmButton: false,
                             timer: 1500
                         }).then(() => {
-                            //location.reload();
+                            location.reload();
                             //null
                         });
                     })

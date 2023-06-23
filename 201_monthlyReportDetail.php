@@ -202,7 +202,7 @@ if (isset($_GET['selectMonth'])) {
                                             mysqli_close($conn);
 
                                             if ($result->num_rows > 0) {
-                                                echo "<table class='table table-bordered table-hover table-striped w-100' id='dataTable'>";
+                                                echo "<table class='table table-bordered table-hover table-striped w-100  gy-1 gs-1 ' id='dataTable'>";
 
                                                 // output data of each row
                                                 while ($row = $result->fetch_assoc()) {

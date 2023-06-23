@@ -561,9 +561,13 @@ function insertNewJobData()
 	}
 
 	// Delete Action for ลานตู้ 
+	//$sql = "DELETE FROM job_order_detail_trip_action_log WHERE id IN (SELECT a.id FROM job_order_detail_trip_action_log a
+	//Inner Join job_order_detail_trip_list b ON a.trip_id = b.trip_id AND a.plan_order = b.plan_order
+	//WHERE a.trip_id = $trip_id AND a.main_order = 3 AND a.minor_order NOT IN (1, 9) AND b.location_type like '%ลาน%')";
+
 	$sql = "DELETE FROM job_order_detail_trip_action_log WHERE id IN (SELECT a.id FROM job_order_detail_trip_action_log a
 	Inner Join job_order_detail_trip_list b ON a.trip_id = b.trip_id AND a.plan_order = b.plan_order
-	WHERE a.trip_id = $trip_id AND a.main_order = 3 AND a.minor_order NOT IN (1, 9) AND b.location_type like '%ลาน%')";
+	WHERE a.trip_id = $trip_id AND a.main_order = 3 AND a.minor_order NOT IN (1, 9) AND (b.location_type like '%ลาน%' OR b.location_type like '%ท่าเรือ%'))"; // Add ท่าเรือ
 
 	if (!$conn->query($sql)) {
 		echo  $conn->errno;
