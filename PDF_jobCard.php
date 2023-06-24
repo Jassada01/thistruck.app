@@ -586,12 +586,13 @@ if ($result->num_rows > 0) {
 							$timeStampY = 162.5 + ($cnt * 18);
 							break;
 						case '7':
-							$timeStampX = 120.5;
+							$timeStampX = 168.5;
 							$timeStampY = 168.5 + ($cnt * 18);
 							break;
 						case '9':
-							$timeStampX = 168.5;
+							$timeStampX = 120.5;
 							$timeStampY = 168.5 + ($cnt * 18);
+							
 							break;
 						default:
 							// NULL
