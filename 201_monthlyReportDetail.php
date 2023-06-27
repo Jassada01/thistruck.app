@@ -163,7 +163,7 @@ if (isset($_GET['selectMonth'])) {
                                                 b.driver_name AS 'พขร', 
                                                 b.containerID AS 'เลขตู้', 
                                                 b.seal_no AS 'เลขซีล', 
-                                                b.containerWeight AS 'นำ้หนักตู้', 
+                                                b.containerWeight AS 'น้ำหนักตู้', 
                                                 CASE WHEN b.subcontrackCheckbox = 1 THEN '/' ELSE '' END AS 'ซับ', 
                                                 b.truckType AS 'ประเภทรถ', 
                                                 c.hire_price AS 'ราคางาน', 

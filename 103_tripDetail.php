@@ -157,6 +157,66 @@ include 'check_cookie.php';
             border-top-style: dashed;
             padding-top: 10px;
         }
+
+        .track {
+            position: relative;
+            background-color: #ddd;
+            height: 7px;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            margin-bottom: 70px;
+            margin-top: 10px
+        }
+
+        .track .step {
+            -webkit-box-flex: 1;
+            -ms-flex-positive: 1;
+            flex-grow: 1;
+            width: 25%;
+            margin-top: -18px;
+            text-align: center;
+            position: relative
+        }
+
+        .track .step.active:before {
+            background: #4CAF50
+        }
+
+        .track .step::before {
+            height: 7px;
+            position: absolute;
+            content: "";
+            width: 100%;
+            left: 0;
+            top: 18px
+        }
+
+        .track .step.active .icon {
+            background: #4CAF50;
+            color: #000
+        }
+
+        .track .icon {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            position: relative;
+            border-radius: 100%;
+            background: #ddd
+        }
+
+        .track .step.active .text {
+            font-weight: 400;
+            color: #000
+        }
+
+        .track .text {
+            display: block;
+            margin-top: 7px;
+            color: #AAA
+        }
     </style>
 
 </head>
@@ -263,7 +323,7 @@ include 'check_cookie.php';
                                         <div class="row">
                                             <div class="container">
                                                 <form id="jobHeaderMainForm">
-                                                    <div class="mb-3 row d-none">
+                                                    <div class="row d-none">
                                                         <label for="main_book_no" class="col-sm-3 col-form-label text-end-pc">เล่มที่</label>
                                                         <div class="col-sm-3">
                                                             <input type="text" class="form-control" id="main_book_no" name="main_book_no" placeholder="เลขอัตโนมัติ" disabled>
@@ -271,6 +331,13 @@ include 'check_cookie.php';
                                                         <label for="main_no" class="col-sm-3 col-form-label text-end-pc">เลขที่</label>
                                                         <div class="col-sm-3">
                                                             <input type="text" class="form-control" id="main_no" name="main_no" placeholder="เลขอัตโนมัติ" disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-5 row">
+                                                        <div class="col-12">
+                                                            <div class="track" id="tripTimeLineOverAll">
+
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="mb-3 row">
@@ -287,12 +354,15 @@ include 'check_cookie.php';
                                                             <input type="date" class="form-control" id="job_date" name="job_date" disabled>
                                                         </div>
                                                     </div>
+
                                                 </form>
                                             </div>
 
                                         </div>
                                     </div>
                                 </div>
+
+
                                 <!-- เริ่มต้น Card -->
                                 <div class="card">
                                     <div class="card-body">
@@ -1784,7 +1854,7 @@ include 'check_cookie.php';
                         document.querySelectorAll('#jobHeaderForm input').forEach(input => {
                             input.disabled = true;
                         });
-                        console.log(data_arr);
+                        //console.log(data_arr);
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
 
@@ -2059,7 +2129,7 @@ include 'check_cookie.php';
                         //console.log(data);
                         var data_arr = JSON.parse(data);
                         MAIN_TIMELINE_DATA = data_arr;
-                        console.log(data_arr);
+                        //console.log(data_arr);
 
 
                         // ==================================================
@@ -2231,7 +2301,7 @@ include 'check_cookie.php';
                         if (data != "[]") {
                             //console.log(data);
                             var data_arr = JSON.parse(data);
-                            console.log(data_arr);
+                            //console.log(data_arr);
                             if (data_arr[0].stage != "รอเจ้าหน้าที่ยืนยัน") {
 
                                 // ดึงข้อมูล step_desc และ button_name จาก Object
@@ -3507,6 +3577,116 @@ include 'check_cookie.php';
                 window.open("tripDetail.php?r=" + MAIN_TRIP_RANDOMCODE);
             });
 
+            function loadTripTimeLineOverAll() {
+                var ajaxData = {};
+                ajaxData['f'] = '18';
+                ajaxData['trip_id'] = MAIN_trip_id;
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        //console.log(data);
+                        var data_arr = JSON.parse(data);
+                        console.log(data_arr);
+
+
+
+
+
+
+                        // สร้างตัวแปรสำหรับเก็บ HTML ของ Div tripTimeLineOverAll
+                        var tripTimelineHTML = '';
+
+                        // วนลูปผ่านรายการข้อมูลใน data_arr
+                        for (var i = 0; i < data_arr.length; i++) {
+                            var step = data_arr[i];
+                            var stepDesc = step.step_desc;
+                            var locationCode = step.location_code;
+                            var locationName = step.location_name;
+                            var completeFlag = step.complete_flag;
+
+                            // ตรวจสอบสถานะการเสร็จสิ้นของขั้นตอน
+                            var isActiveStep = completeFlag === "1";
+
+                            var stepHTML = '<div class="step' + (isActiveStep ? ' active' : '') + '">';
+                            stepHTML += '<span class="icon">';
+                            stepHTML += getStepIcon(stepDesc, isActiveStep);
+                            stepHTML += '</span>';
+                            stepHTML += '<span class="text"><B>' + stepDesc + '<BR>' + locationCode + '</B></span>';
+                            stepHTML += '</div>';
+
+                            tripTimelineHTML += stepHTML;
+                        }
+
+                        $('#tripTimeLineOverAll').html(tripTimelineHTML);
+
+
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+            // ฟังก์ชันสำหรับรับไอคอนของขั้นตอน
+            function getStepIcon(stepDesc, isActiveStep) {
+                var iconClass = '';
+                if (isActiveStep) {
+                    switch (stepDesc) {
+                        case 'รับตู้หนัก':
+                            iconClass = 'fas fa-truck text-white';
+                            break;
+                        case 'รับตู้เปล่า':
+                            iconClass = 'fas fa-truck text-white';
+                            break;
+                        case 'คืนตู้หนัก':
+                            iconClass = 'fas fa-truck text-white';
+                            break;
+                        case 'คืนตู้เปล่า':
+                            iconClass = 'fas fa-truck text-white';
+                            break;
+                        case 'ส่งสินค้า':
+                            iconClass = 'fas fa-shipping-fast text-white';
+                            break;
+                        case 'รับสินค้า':
+                            iconClass = 'fas fa-box-open text-white';
+                            break;
+                        default:
+                            iconClass = 'fas fa-question-circle text-white';
+                            break;
+                    }
+                } else {
+                    switch (stepDesc) {
+                        case 'รับตู้หนัก':
+                            iconClass = 'fas fa-truck text-black';
+                            break;
+                        case 'รับตู้เปล่า':
+                            iconClass = 'fas fa-truck text-black';
+                            break;
+                        case 'คืนตู้หนัก':
+                            iconClass = 'fas fa-truck text-black';
+                            break;
+                        case 'คืนตู้เปล่า':
+                            iconClass = 'fas fa-truck text-black';
+                            break;
+                        case 'ส่งสินค้า':
+                            iconClass = 'fas fa-shipping-fast text-black';
+                            break;
+                        case 'รับสินค้า':
+                            iconClass = 'fas fa-box-open text-black';
+                            break;
+                        default:
+                            iconClass = 'fas fa-question-circle text-black';
+                            break;
+                    }
+                }
+                return '<i class="' + iconClass + '"></i>';
+            }
+
 
 
 
@@ -3515,6 +3695,7 @@ include 'check_cookie.php';
             loadJobdata();
             get_status_and_button();
             loadAttachedData();
+            loadTripTimeLineOverAll();
 
 
         });

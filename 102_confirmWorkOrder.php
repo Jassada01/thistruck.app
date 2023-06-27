@@ -259,7 +259,10 @@ include 'check_cookie.php';
                                                         <label id="jobStatusText" class="col-sm-3 col-form-label text-left fs-1"></label>
                                                         <label class="col-sm-3 col-form-label text-end-pc"></label>
                                                         <div class="col-sm-3  d-flex justify-content-between">
-                                                            <button type="button" class="btn btn-primary d-none" id="confirmJob">
+                                                            <button type="button" class="btn  btn-sm  btn-success d-none me-1" id="confirmClient">
+                                                                <i class="fas  fa-check-circle"></i> ยืนยันให้ผู้ว่าจ้างก่อน
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-primary d-none " id="confirmJob">
                                                                 <i class="fas fa-check"></i> ยืนยันใบงาน
                                                             </button>
 
@@ -980,7 +983,7 @@ include 'check_cookie.php';
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
-                        //console.log(data_arr);
+                        console.log(data_arr);
 
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
@@ -1129,6 +1132,26 @@ include 'check_cookie.php';
                         if (jobHeader.status === 'Draft') {
                             $('#confirmJob').removeClass('d-none');
                             $('#cancelJob').removeClass('d-none');
+                            if (jobHeader.client_confirmed != "1") {
+                                $('#confirmClient').removeClass('d-none');
+                                // เลือกปุ่ม confirmClient จาก ID
+                                var confirmClientBtn = $("#confirmClient");
+
+                                // ตรวจสอบค่าตัวแปร MAIN_LINE_CLI และ MAIN_LINE_CUS
+                                if (MAIN_LINE_CLI === "" || MAIN_LINE_CUS === "") {
+                                    // ปิดใช้งานปุ่ม confirmClient
+                                    confirmClientBtn.prop("disabled", true);
+
+                                    // เพิ่ม Tooltip และเมื่อนำเมาส์ไปชี้ที่ปุ่ม ให้แสดงข้อความ
+                                    confirmClientBtn.attr("data-bs-toggle", "tooltip");
+                                    confirmClientBtn.attr("data-bs-placement", "top");
+                                    confirmClientBtn.attr("title", "ยังไม่มีข้อมูลของ Line ของลูกค้าและผู้ว่าจ้าง");
+
+                                    // ให้กำหนด Tooltip ให้ทำงาน
+                                    confirmClientBtn.tooltip();
+                                }
+                            }
+
 
                         }
 
@@ -1280,6 +1303,61 @@ include 'check_cookie.php';
                         Swal.fire({
                             icon: 'success',
                             title: 'ยืนยันแผนการดำเนินการ',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                            //null
+                        });
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+
+            $('#confirmClient').on('click', function() {
+                Swal.fire({
+                    title: 'ยืนยันใบงานให้ผู้ว่าจ้าง/ลูกค้าก่อน',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'ยืนยัน',
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // ทำงานเมื่อ user กด "ยืนยัน"
+                        confirm_dataOnlyClient();
+                    }
+                });
+            });
+
+
+            function confirm_dataOnlyClient() {
+                $('#confirmClient').prop('disabled', true);
+                var ajaxData = {};
+                ajaxData['f'] = '19';
+                ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
+                ajaxData['update_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData),
+                        beforeSend: function() {
+                            // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                            $('#loading-spinner').show();
+                        },
+                    })
+                    .done(function(data) {
+                        //console.log(data);
+                        $('#loading-spinner').hide();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ยืนยันใบงานให้กับผู้จ้าง/ลูกค้า',
                             showConfirmButton: false,
                             timer: 1500
                         }).then(() => {
