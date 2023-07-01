@@ -157,7 +157,7 @@ include 'check_cookie.php';
             border-top-style: dashed;
             padding-top: 10px;
         }
-
+        /* ----------track */
         .track {
             position: relative;
             background-color: #ddd;

@@ -1921,7 +1921,7 @@ include 'check_cookie.php';
                         data: (ajaxData)
                     })
                     .done(function(data) {
-                        console.log(data);
+                        //console.log(data);
                         toastr.success(completeType);
 
                     })

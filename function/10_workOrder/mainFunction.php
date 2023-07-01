@@ -567,7 +567,7 @@ function insertNewJobData()
 
 	$sql = "DELETE FROM job_order_detail_trip_action_log WHERE id IN (SELECT a.id FROM job_order_detail_trip_action_log a
 	Inner Join job_order_detail_trip_list b ON a.trip_id = b.trip_id AND a.plan_order = b.plan_order
-	WHERE a.trip_id = $trip_id AND a.main_order = 3 AND a.minor_order NOT IN (1, 9) AND (b.location_type like '%ลาน%' OR b.location_type like '%ท่าเรือ%'))"; // Add ท่าเรือ
+	WHERE a.trip_id = $trip_id AND a.main_order = 3 AND a.minor_order NOT IN (1, 9) AND (b.location_type like '%ลาน%' OR b.location_type like 'ท่าเรือ'))"; // Add ท่าเรือ
 
 	if (!$conn->query($sql)) {
 		echo  $conn->errno;
@@ -1945,13 +1945,12 @@ $hdRemark";
 		//echo $messagefor_lineNotification ;
 
 		// Process after finished each trip =======================================
-		if ($client_confirmed <> '1')
-		{
+		if ($client_confirmed <> '1') {
 			$prefix = "NOTIFY_";
 			if (trim($client_line_token != "")) {
-	
+
 				//SendNoticeJobConfirmforCustomerClient($client_line_token, $Line_Token, 'คอนเฟิร์มงาน', $messageforClientandCustomer);
-	
+
 				if (substr($client_line_token, 0, strlen($prefix)) == $prefix) {
 					$client_line_token = substr($client_line_token, strlen($prefix));
 					sendLineNotify($client_line_token, $messagefor_lineNotification);
@@ -1959,9 +1958,9 @@ $hdRemark";
 					SendNoticeJobConfirm($client_line_token, $Line_Token, $main_msgforCustomer);
 				}
 			}
-	
+
 			if (trim($customer_line_token != "")) {
-	
+
 				//SendNoticeJobConfirmforCustomerClient($customer_line_token, $Line_Token, 'คอนเฟิร์มงาน', $messageforClientandCustomer);
 				if (substr($customer_line_token, 0, strlen($prefix)) == $prefix) {
 					$customer_line_token = substr($customer_line_token, strlen($prefix));
@@ -1971,7 +1970,6 @@ $hdRemark";
 				}
 			}
 		}
-		
 	}
 
 	mysqli_close($conn);
@@ -2501,7 +2499,7 @@ function loadTripTimeLineOverAll()
 	include "../connectionDb.php";
 
 	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
-	$sql = "SELECT b.step_desc, a.map_url, c.location_code, c.location_name, b.complete_flag FROM job_order_detail_trip_list a 
+	$sql = "SELECT b.step_desc, a.map_url, c.location_code, c.location_name, b.complete_flag, b.plan_order FROM job_order_detail_trip_list a 
 	Inner Join job_order_detail_trip_action_log b ON a.job_id = b.job_id AND a.trip_id = b.trip_id AND a.plan_order = b.plan_order
 	AND b.main_order = 3 AND b.minor_order = 9
 	Inner Join locations c ON a.location_id = c.location_id
@@ -2692,8 +2690,6 @@ function confirmJobOnlyClient()
 					// แสดงผลลัพธ์ในรูปแบบ JSON
 					//echo json_encode($row2);
 					*/
-
-
 				}
 			} else {
 				echo "0 results";
@@ -3448,6 +3444,81 @@ $hdRemark";
 	mysqli_close($conn);
 }
 
+// F=20
+function update_trip_status_set()
+{
+	// รับค่า MAIN_JOB_ID จาก Ajax
+	$MAIN_JOB_ID = $_POST['MAIN_JOB_ID'];
+	$MAIN_trip_id = $_POST['MAIN_trip_id'];
+	$planOrder = $_POST['planOrder'];
+	$update_user = $_POST['update_user'];
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// ค้นหา job_order_detail_trip_action_log.id ที่มีค่าน้อยที่สุดที่มี complete_flag == NULL
+	//$sql = "SELECT id, progress FROM job_order_detail_trip_action_log WHERE trip_id = $MAIN_trip_id AND complete_flag IS NULL ORDER BY id ASC LIMIT 1";
+	$sql = "SELECT id, progress FROM job_order_detail_trip_action_log WHERE trip_id = $MAIN_trip_id AND minor_order = 9 AND plan_order = $planOrder  ORDER BY id ASC LIMIT 1";
+	$result2 = $conn->query($sql);
+
+	// ตรวจสอบผลลัพธ์การค้นหา
+	if ($result2->num_rows > 0) {
+		// แสดงผลลัพธ์และอัพเดทค่าในฐานข้อมูล
+		while ($row2 = $result2->fetch_assoc()) {
+			$progress = $row2['progress'];
+			$id2 = $row2['id'];
+
+			// อัพเดทค่าใน job_order_detail_trip_info
+			if ($progress == "จบงาน") {
+				$sql = "UPDATE job_order_detail_trip_info SET status = '$progress', complete_flag = 1, update_user = '$update_user' WHERE id = $MAIN_trip_id";
+			} else {
+				$sql = "UPDATE job_order_detail_trip_info SET status = '$progress', update_user = '$update_user' WHERE id = $MAIN_trip_id";
+			}
+			// ทำการ Update ข้อมูล 
+			if (!$conn->query($sql)) {
+				echo $conn->errno;
+				exit();
+			}
+
+			// อัพเดทค่าใน job_order_detail_trip_action_log
+			
+			
+			//$sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = 1, timestamp = CURRENT_TIMESTAMP(), complete_user = '$update_user' WHERE id = $id2";
+			
+			$sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = 1, timestamp = CURRENT_TIMESTAMP(), complete_user = '$update_user' WHERE id <= $id2 AND trip_id = $MAIN_trip_id and main_order = 3";
+			// ทำการ Update ข้อมูล 
+			if (!$conn->query($sql)) {
+				echo  $conn->errno;
+				exit();
+			}
+
+			if ($progress == "จบงาน") {
+				// ค้นหา job_order_detail_trip_info ที่มี job_id เหมือนกันและมี status เป็น NULL
+				$sql = "SELECT * FROM job_order_detail_trip_info WHERE job_id = $MAIN_JOB_ID AND complete_flag IS NULL";
+				$result = $conn->query($sql);
+
+				// เช็คจำนวน record ที่พบ
+				if ($result->num_rows == 0) {
+					// อัปเดต status ใน job_order_header เป็น 'เสร็จสิ้น'
+					$sql = "UPDATE job_order_header SET status = 'เสร็จสิ้น' WHERE id = $MAIN_JOB_ID";
+					if (!$conn->query($sql)) {
+						echo $conn->errno;
+						exit();
+					}
+				}
+			}
+
+
+
+			// แสดงผลลัพธ์ในรูปแบบ JSON
+			echo json_encode($row2);
+		}
+	} else {
+		echo "0 results";
+	}
+	mysqli_close($conn);
+}
+
 
 //============================ MAIN =========================================================
 switch ($f) {
@@ -3525,6 +3596,10 @@ switch ($f) {
 		}
 	case 19: {
 			confirmJobOnlyClient();
+			break;
+		}
+	case 20: {
+			update_trip_status_set();
 			break;
 		}
 }

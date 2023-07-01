@@ -163,6 +163,248 @@ License: For each use you must have a valid license purchased only from above li
             border-top-style: dashed;
             padding-top: 10px;
         }
+
+        /* Floating BTN */
+        * {
+            box-sizing: border-box;
+        }
+
+        .fab-wrapper {
+            position: fixed;
+            bottom: 3rem;
+            right: 3rem;
+        }
+
+        .fab-checkbox {
+            display: none;
+        }
+
+        .fab {
+            position: absolute;
+            bottom: -1rem;
+            right: -1rem;
+            width: 4rem;
+            height: 4rem;
+            background: blue;
+            border-radius: 50%;
+            background: #126ee2;
+            box-shadow: 0px 5px 20px #81a4f1;
+            transition: all 0.3s ease;
+            z-index: 1;
+            border-bottom-right-radius: 6px;
+            border: 1px solid #0c50a7;
+        }
+
+        .fab:before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .fab-checkbox:checked~.fab:before {
+            width: 90%;
+            height: 90%;
+            left: 5%;
+            top: 5%;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .fab:hover {
+            background: #2c87e8;
+            box-shadow: 0px 5px 20px 5px #81a4f1;
+        }
+
+        .fab-dots {
+            position: absolute;
+            height: 8px;
+            width: 8px;
+            background-color: white;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateX(0%) translateY(-50%) rotate(0deg);
+            opacity: 1;
+            animation: blink 3s ease infinite;
+            transition: all 0.3s ease;
+        }
+
+        .fab-dots-1 {
+            left: 15px;
+            animation-delay: 0s;
+        }
+
+        .fab-dots-2 {
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            animation-delay: 0.4s;
+        }
+
+        .fab-dots-3 {
+            right: 15px;
+            animation-delay: 0.8s;
+        }
+
+        .fab-checkbox:checked~.fab .fab-dots {
+            height: 6px;
+        }
+
+        .fab .fab-dots-2 {
+            transform: translateX(-50%) translateY(-50%) rotate(0deg);
+        }
+
+        .fab-checkbox:checked~.fab .fab-dots-1 {
+            width: 32px;
+            border-radius: 10px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%) rotate(45deg);
+        }
+
+        .fab-checkbox:checked~.fab .fab-dots-3 {
+            width: 32px;
+            border-radius: 10px;
+            right: 50%;
+            transform: translateX(50%) translateY(-50%) rotate(-45deg);
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0.25;
+            }
+        }
+
+        .fab-checkbox:checked~.fab .fab-dots {
+            animation: none;
+        }
+
+        .fab-wheel {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            border: 0px solid;
+            width: 10rem;
+            height: 10rem;
+            transition: all 0.3s ease;
+            transform-origin: bottom right;
+            transform: scale(0);
+        }
+
+        .fab-checkbox:checked~.fab-wheel {
+            transform: scale(1);
+        }
+
+        .fab-action {
+            position: absolute;
+            background: #0f1941;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: White;
+            box-shadow: 0 0.1rem 1rem rgba(24, 66, 154, 0.82);
+            transition: all 1s ease;
+
+            opacity: 0;
+        }
+
+        .fab-checkbox:checked~.fab-wheel .fab-action {
+            opacity: 1;
+        }
+
+        .fab-action:hover {
+            background-color: #e7e9fd;
+        }
+
+        .fab-wheel .fab-action-1 {
+            right: -1rem;
+            top: 0;
+        }
+
+        .fab-wheel .fab-action-2 {
+            right: 3.4rem;
+            top: 0.5rem;
+        }
+
+        .fab-wheel .fab-action-3 {
+            left: 0.5rem;
+            bottom: 3.4rem;
+        }
+
+        .fab-wheel .fab-action-4 {
+            left: 0;
+            bottom: -1rem;
+        }
+
+        .fab-wheel .fab-action-5 {
+            right: 0;
+            top: 0;
+        }
+
+        /* ---------- track ----------*/
+        .track {
+            position: relative;
+            background-color: #ddd;
+            height: 7px;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            margin-bottom: 70px;
+            margin-top: 10px
+        }
+
+        .track .step {
+            -webkit-box-flex: 1;
+            -ms-flex-positive: 1;
+            flex-grow: 1;
+            width: 25%;
+            margin-top: -18px;
+            text-align: center;
+            position: relative
+        }
+
+        .track .step.active:before {
+            background: #4CAF50
+        }
+
+        .track .step::before {
+            height: 7px;
+            position: absolute;
+            content: "";
+            width: 100%;
+            left: 0;
+            top: 18px
+        }
+
+        .track .step.active .icon {
+            background: #4CAF50;
+            color: #000
+        }
+
+        .track .icon {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            position: relative;
+            border-radius: 100%;
+            background: #ddd
+        }
+
+        .track .step.active .text {
+            font-weight: 400;
+            color: #000
+        }
+
+        .track .text {
+            display: block;
+            margin-top: 7px;
+            color: #AAA
+        }
     </style>
 </head>
 <!--end::Head-->
@@ -181,21 +423,29 @@ License: For each use you must have a valid license purchased only from above li
                         <!--begin::Container-->
                         <div id="kt_content_container" class="container-xxl">
                             <!--begin::Row-->
+
                             <div class="row gy-5 g-xl-8">
                                 <!-- เริ่มต้น Card -->
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="col-sm-9 mt-3 d-flex align-items-center px-3">
-                                            <h1><i class="bi bi-file-text fs-3"></i></i> เลขที่เอกสาร</h1>
+                                            <h1><i class="bi bi-file-text fs-3"></i></i> <span id="MAIN_TRIP_ID_TITLE">เลขที่เอกสาร</span></h1>
                                         </div>
                                         <div class="card-toolbar">
                                             <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="printJob"><i class="fas fa-file-pdf fs-3"></i>ใบงาน</button>
                                         </div>
                                     </div>
                                     <div class="card-body">
+                                        <div class="row mt-5">
+                                            <div class="col-12">
+                                                <div class="track" id="tripTimeLineOverAll">
+
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="row">
                                             <div class="container">
-                                                <div class="row mb-5">
+                                                <div class="row mb-1">
                                                     <div class="col-sm-12 text-end-pc">
                                                         <label class=" fs-1">สถานะปัจจุบัน: </label> <label id="jobStatusText" class=" fs-1"></label>
                                                     </div>
@@ -220,7 +470,7 @@ License: For each use you must have a valid license purchased only from above li
                                                 </div>
                                             </div>
 
-                                            <form id="jobHeaderMainForm">
+                                            <form id="jobHeaderMainForm" class='d-none'>
                                                 <div class="row d-none">
                                                     <label for="main_book_no" class="col-3 col-form-label text-end-pc">เล่มที่</label>
                                                     <div class="col-3">
@@ -231,7 +481,7 @@ License: For each use you must have a valid license purchased only from above li
                                                         <input type="text" class="form-control" id="main_no" name="main_no" placeholder="เลขอัตโนมัติ" disabled>
                                                     </div>
                                                 </div>
-                                                <div class=" row">
+                                                <div class="row">
                                                     <label for="job_no" class="col-sm-1 col-form-label text-end-pc">Job No.</label>
                                                     <div class="col-sm-3">
                                                         <input type="text" class="form-control" id="job_no" name="job_no" placeholder="เลขอัตโนมัติ" disabled>
@@ -240,65 +490,76 @@ License: For each use you must have a valid license purchased only from above li
                                                     <div class="col-sm-3">
                                                         <input type="text" class="form-control" id="tripNo" name="tripNo" placeholder="เลขอัตโนมัติ" disabled>
                                                     </div>
-                                                    <label for="job_date" class="col-sm-1 col-form-label text-end-pc  d-none">วันที่</label>
-                                                    <div class="col-sm-3  d-none">
+                                                    <label for="job_date" class="col-sm-1 col-form-label text-end-pc d-none">วันที่</label>
+                                                    <div class="col-sm-3 d-none">
                                                         <input type="date" class="form-control" id="job_date" name="job_date" disabled>
                                                     </div>
                                                 </div>
                                             </form>
-                                            <div class="row  mt-3 mh-5">
-                                                <div class="col-md-4">
-                                                    <h5>ชื่องาน</h5>
-                                                    <p id="HD_job_name"></p>
-
-                                                    <h5>ประเภทงาน</h5>
-                                                    <p id="HD_job_type"></p>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <h5>ลูกค้า </h5>
-                                                    <p id="HD_customer_name"></p>
-
-                                                    <h5>ผู้ว่าจ้าง</h5>
-                                                    <p id="HD_client_name"></p>
-
-                                                </div>
-                                            </div>
-                                            <div class="row  mt-3 mh-5">
-                                                <div class="col-md-6">
-                                                    <h5 class="d-none">Job NO ของลูกค้า</h5>
-                                                    <p id="HD_customerJobNo"></p>
-
-                                                    <h5 class="d-none">Booking (บุ๊กกิ้ง)</h5>
-                                                    <p id="HD_booking"></p>
-
-                                                    <h5 class="d-none">PO No.</h5>
-                                                    <p id="HD_poNo"></p>
-
-                                                    <h5 class="d-none">B/L(ใบขน)</h5>
-                                                    <p id="HD_bl"></p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <h5 class="d-none">Invoice No.</h5>
-                                                    <p id="HD_invoiceNo"></p>
-
-                                                    <h5 class="d-none">Agent(เอเย่นต์)</h5>
-                                                    <p id="HD_agent"></p>
-
-                                                    <h5 class="d-none">ชื่อสินค้า</h5>
-                                                    <p id="HD_goods"></p>
-
-                                                    <h5 class="d-none">QTY/No. of Package</h5>
-                                                    <p id="HD_quantity"></p>
-                                                </div>
-                                            </div>
                                         </div>
+
+
+
 
                                     </div>
                                 </div>
                             </div>
+
                             <!-- เริ่มต้น Card -->
+                            <div class="row" id="JobInfo1">
+                                <div class="card">
+                                    <div class="card-body pt-5">
+                                        <div class="row mt-3 mh-5">
+                                            <div class="col-md-4">
+                                                <h5>ชื่องาน</h5>
+                                                <p id="HD_job_name"></p>
+
+                                                <h5>ประเภทงาน</h5>
+                                                <p id="HD_job_type"></p>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h5>ลูกค้า</h5>
+                                                <p id="HD_customer_name"></p>
+
+                                                <h5>ผู้ว่าจ้าง</h5>
+                                                <p id="HD_client_name"></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3 mh-5">
+                                            <div class="col-md-6">
+                                                <h5 class="d-none">Job NO ของลูกค้า</h5>
+                                                <p id="HD_customerJobNo"></p>
+
+                                                <h5 class="d-none">Booking (บุ๊กกิ้ง)</h5>
+                                                <p id="HD_booking"></p>
+
+                                                <h5 class="d-none">PO No.</h5>
+                                                <p id="HD_poNo"></p>
+
+                                                <h5 class="d-none">B/L(ใบขน)</h5>
+                                                <p id="HD_bl"></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h5 class="d-none">Invoice No.</h5>
+                                                <p id="HD_invoiceNo"></p>
+
+                                                <h5 class="d-none">Agent(เอเย่นต์)</h5>
+                                                <p id="HD_agent"></p>
+
+                                                <h5 class="d-none">ชื่อสินค้า</h5>
+                                                <p id="HD_goods"></p>
+
+                                                <h5 class="d-none">QTY/No. of Package</h5>
+                                                <p id="HD_quantity"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
                             <div class="row mt-2">
-                                <div class="col-sm-6">
+                                <div class="col-sm-6  d-none" id="JobLog">
                                     <div class="card">
                                         <div class="card-header">
                                             <div class="col-sm-6 mt-3 d-flex align-items-center px-3">
@@ -356,7 +617,7 @@ License: For each use you must have a valid license purchased only from above li
                                     </div>
                                 </div>
 
-                                <div class="col-sm-6 mt-5">
+                                <div class="col-sm-6 mt-5 d-none" id="JobCost">
                                     <div class="card card-bordered">
                                         <!--begin::Card header-->
                                         <div class="card-header">
@@ -509,7 +770,7 @@ License: For each use you must have a valid license purchased only from above li
 
 
                             <!-- เริ่มต้น Card -->
-                            <div class="card">
+                            <div class="card" id="JobInfo2">
                                 <div class="card-body">
                                     <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
                                         <li class="nav-item">
@@ -911,7 +1172,7 @@ License: For each use you must have a valid license purchased only from above li
                             <div class="row  mt-3">
                                 <div class=" col-sm-6 mt-3">
                                 </div>
-                                <div class="col-sm-6 mt-3 text-end">
+                                <div class="col-sm-6 mt-3 text-start">
                                     <button type="button" class="btn btn-secondary" style="margin-right: 10px;" onclick="location.reload();">
                                         <i class="fas fa-undo"></i> Reset
                                     </button>
@@ -1124,6 +1385,30 @@ License: For each use you must have a valid license purchased only from above li
             </div>
         </div>
     </div>
+    <!--begin::FloatingAction Button-->
+    <div class="fab-wrapper">
+        <input id="fabCheckbox" type="checkbox" class="fab-checkbox" />
+        <label class="fab" for="fabCheckbox">
+            <span class="fab-dots fab-dots-1"></span>
+            <span class="fab-dots fab-dots-2"></span>
+            <span class="fab-dots fab-dots-3"></span>
+        </label>
+        <div class="fab-wheel">
+            <a class="fab-action fab-action-1" value="1">
+                <i class="fas fa-info"></i>
+            </a>
+            <a class="fab-action fab-action-2" value="2">
+                <i class="fas fa-route"></i>
+            </a>
+            <a class="fab-action fab-action-3" value="3">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </a>
+            <a class="fab-action fab-action-4" value="4">
+                คชจ
+            </a>
+        </div>
+    </div>
+    <!--End ::FloatingAction Button-->
     <!--begin::Javascript-->
     <script>
         var hostUrl = "assets/";
@@ -1333,6 +1618,7 @@ License: For each use you must have a valid license purchased only from above li
             let MAIN_DATA = [];
             var TEMP_MAIN_DATA = {};
             let MAIN_TIMELINE_DATA = {};
+            let TIMELINE_MAIN_ORDER = "";
             let swappable = null;
             let JobCodeTEXT = "";
             let generateJobCodeFlg = false;
@@ -1376,6 +1662,7 @@ License: For each use you must have a valid license purchased only from above li
                         loadtripTimeLine();
                         get_status_and_button();
                         loadAttachedData();
+                        loadTripTimeLineOverAll(MAIN_trip_id);
 
                     })
                     .fail(function() {
@@ -1658,6 +1945,7 @@ License: For each use you must have a valid license purchased only from above li
                         $("#jobOrderbreadcrumb").text(jobHeaderForm.job_no);
                         $("#tripbreadcrumb").text(data_arr.JobDetailTrip[0].tripNo);
                         $('#tripNo').val(data_arr.JobDetailTrip[0].tripNo);
+                        $("#MAIN_TRIP_ID_TITLE").html(data_arr.JobDetailTrip[0].tripNo);
 
                         MAIN_TRIP_STATUS = data_arr.JobDetailTrip[0].status;
                         // Set job status text and apply styles
@@ -2090,6 +2378,8 @@ License: For each use you must have a valid license purchased only from above li
                                 $('#status_update').hide();
                             }
 
+                            TIMELINE_MAIN_ORDER = data_arr[0].main_order;
+
                         } else {
 
                             $('#jobStatusNext').hide();
@@ -2458,6 +2748,7 @@ License: For each use you must have a valid license purchased only from above li
                         //location.reload();
                         //$("#addAttachedFileModal").modal.hide();
                         $('#addAttachedFileModal').modal('hide');
+                        toastr.success("Upload เสร็จแล้ว");
                         loadtripTimeLine();
                     })
                     .fail(function() {
@@ -2757,6 +3048,244 @@ License: For each use you must have a valid license purchased only from above li
             $('#printJob').click(function() {
                 window.open(`PDF_jobCard.php?job_id=${MAIN_job_id}&trip_id=${MAIN_trip_id}`, '_blank');
             });
+
+            //fab-action
+            $(".fab-action").click(function() {
+                var target = $(this).attr("value");
+                //var isChecked = $('#fabCheckbox').is(":checked");
+                $('#fabCheckbox').click();
+
+                //console.log(isChecked);
+                $("#JobInfo1").addClass('d-none');
+                $("#JobLog").addClass('d-none');
+                $("#JobCost").addClass('d-none');
+                $("#JobInfo2").addClass('d-none');
+
+                switch (target) {
+                    case "1":
+                        $("#JobInfo1").removeClass('d-none');
+                        $("#JobInfo2").removeClass('d-none');
+                        break;
+                    case "2":
+                        $("#JobLog").removeClass('d-none');
+                        break;
+                    case "3":
+                        $('#addAttachedFileModal').modal('show');
+                        $("#JobLog").removeClass('d-none');
+                        break;
+                    case "4":
+                        //console.log("asjkjaksjkas");
+                        // addAttachedFileModal
+                        $("#JobCost").removeClass('d-none');
+                        break;
+                    default:
+                        break;
+                        // code block
+                }
+
+
+            });
+
+            function loadTripTimeLineOverAll() {
+                var ajaxData = {};
+                ajaxData['f'] = '18';
+                ajaxData['trip_id'] = MAIN_trip_id;
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        //console.log(data);
+                        var data_arr = JSON.parse(data);
+                        console.log(data_arr);
+                        // สร้างตัวแปรสำหรับเก็บ HTML ของ Div tripTimeLineOverAll
+                        var tripTimelineHTML = '';
+
+                        // วนลูปผ่านรายการข้อมูลใน data_arr
+                        for (var i = 0; i < data_arr.length; i++) {
+                            var step = data_arr[i];
+                            var stepDesc = step.step_desc;
+                            var locationCode = step.location_code;
+                            var locationName = step.location_name;
+                            var completeFlag = step.complete_flag;
+                            var plan_order = step.plan_order;
+
+                            // ตรวจสอบสถานะการเสร็จสิ้นของขั้นตอน
+                            var isActiveStep = completeFlag === "1";
+
+                            var stepHTML = '<div class="step' + (isActiveStep ? ' active' : ' completeplan_order') + '" value="' + plan_order + '"  stepDesc="' + stepDesc + '" locationCode="' + locationCode + '" >';
+                            stepHTML += '<span class="icon">';
+                            stepHTML += getStepIcon(stepDesc, isActiveStep);
+                            stepHTML += '</span>';
+                            stepHTML += '<span class="text"><B>' + stepDesc + '<BR>' + locationCode + '</B></span>';
+                            stepHTML += '</div>';
+
+                            tripTimelineHTML += stepHTML;
+                        }
+
+                        $('#tripTimeLineOverAll').html(tripTimelineHTML);
+
+
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+            // ฟังก์ชันสำหรับรับไอคอนของขั้นตอน
+            function getStepIcon(stepDesc, isActiveStep) {
+                var iconClass = '';
+                if (isActiveStep) {
+                    switch (stepDesc) {
+                        case 'รับตู้หนัก':
+                            iconClass = 'fas fa-truck text-white';
+                            break;
+                        case 'รับตู้เปล่า':
+                            iconClass = 'fas fa-truck text-white';
+                            break;
+                        case 'คืนตู้หนัก':
+                            iconClass = 'fas fa-truck text-white';
+                            break;
+                        case 'คืนตู้เปล่า':
+                            iconClass = 'fas fa-truck text-white';
+                            break;
+                        case 'ส่งสินค้า':
+                            iconClass = 'fas fa-shipping-fast text-white';
+                            break;
+                        case 'รับสินค้า':
+                            iconClass = 'fas fa-box-open text-white';
+                            break;
+                        default:
+                            iconClass = 'fas fa-question-circle text-white';
+                            break;
+                    }
+                } else {
+                    switch (stepDesc) {
+                        case 'รับตู้หนัก':
+                            iconClass = 'fas fa-truck text-black';
+                            break;
+                        case 'รับตู้เปล่า':
+                            iconClass = 'fas fa-truck text-black';
+                            break;
+                        case 'คืนตู้หนัก':
+                            iconClass = 'fas fa-truck text-black';
+                            break;
+                        case 'คืนตู้เปล่า':
+                            iconClass = 'fas fa-truck text-black';
+                            break;
+                        case 'ส่งสินค้า':
+                            iconClass = 'fas fa-shipping-fast text-black';
+                            break;
+                        case 'รับสินค้า':
+                            iconClass = 'fas fa-box-open text-black';
+                            break;
+                        default:
+                            iconClass = 'fas fa-question-circle text-black';
+                            break;
+                    }
+                }
+                return '<i class="' + iconClass + '"></i>';
+            }
+
+            var pressTimer;
+
+            /*
+            $('body').on('click', '.step', function() {
+                //var target = ($(this).attr('value'));
+                console.log("alsklakslkalsklasks");
+            });
+            */
+
+            $('body').on('mousedown touchstart', '.completeplan_order', function(event) {
+                var planOrder_target = ($(this).attr('value'));
+                var stepDesc = $(this).attr("stepDesc");
+                var locationCode = ($(this).attr('locationCode'));
+
+
+                if (event.type === 'mousedown' || event.type === 'touchstart') {
+                    // Set timeout
+                    pressTimer = window.setTimeout(function() {
+                        //console.log(planOrder_target);
+
+
+                        if (TIMELINE_MAIN_ORDER != '3') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'กรุณายืนยันและกดเริ่มงานก่อน',
+                            })
+                        } else {
+                            Swal.fire({
+                                title: "ยืนยัน" + stepDesc + "เสร็จแล้ว?",
+                                text: "สถานที่ :" + locationCode,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: "ยืนยัน",
+                                cancelButtonText: 'ยกเลิก'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    var ajaxData = {};
+                                    ajaxData['f'] = '20';
+                                    ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
+                                    ajaxData['MAIN_trip_id'] = MAIN_trip_id;
+                                    ajaxData['update_user'] = MAIN_DriverName;
+                                    ajaxData['planOrder'] = planOrder_target;
+                                    //console.log(ajaxData);
+                                    $.ajax({
+                                            type: 'POST',
+                                            dataType: "text",
+                                            url: 'function/10_workOrder/mainFunction.php',
+                                            data: (ajaxData),
+                                            beforeSend: function() {
+                                                // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                                                $('#loading-spinner').show();
+                                            },
+                                        })
+                                        .done(function(data) {
+                                            //console.log(data);
+                                            $('#loading-spinner').hide();
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'บันทึกข้อมูลสำเร็จ',
+                                                showConfirmButton: false,
+                                                timer: 1500
+                                            }).then(() => {
+                                                location.reload();
+                                                //null
+                                            });
+                                        })
+                                        .fail(function() {
+                                            // just in case posting your form failed
+                                            alert("Posting failed.");
+                                        });
+                                }
+                            });
+                        }
+
+
+
+
+                    }, 500);
+
+                    return false;
+                }
+            }).on('mouseup touchend', '.completeplan_order', function(event) {
+                if (event.type === 'mouseup' || event.type === 'touchend') {
+                    // โค้ดที่ต้องการทำเมื่อปล่อยมือหลังจากคลิกและกดค้างหรือสัมผัสหน้าจอ
+                    clearTimeout(pressTimer);
+                }
+            });
+
+
+
+
+
+
 
 
             // Run When Initail Setting ===========================================
