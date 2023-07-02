@@ -429,7 +429,7 @@ License: For each use you must have a valid license purchased only from above li
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="col-sm-9 mt-3 d-flex align-items-center px-3">
-                                            <h1><i class="bi bi-file-text fs-3"></i></i> <span id="MAIN_TRIP_ID_TITLE">เลขที่เอกสาร</span></h1>
+                                            <h1><i class="bi bi-file-text fs-3"></i></i> <a id="MAIN_TRIP_ID_TITLE">เลขที่เอกสาร</a></h1>
                                         </div>
                                         <div class="card-toolbar">
                                             <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="printJob"><i class="fas fa-file-pdf fs-3"></i>ใบงาน</button>
@@ -3099,7 +3099,7 @@ License: For each use you must have a valid license purchased only from above li
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
-                        console.log(data_arr);
+                        //console.log(data_arr);
                         // สร้างตัวแปรสำหรับเก็บ HTML ของ Div tripTimeLineOverAll
                         var tripTimelineHTML = '';
 
@@ -3210,8 +3210,6 @@ License: For each use you must have a valid license purchased only from above li
                     // Set timeout
                     pressTimer = window.setTimeout(function() {
                         //console.log(planOrder_target);
-
-
                         if (TIMELINE_MAIN_ORDER != '3') {
                             Swal.fire({
                                 icon: 'warning',
@@ -3267,9 +3265,6 @@ License: For each use you must have a valid license purchased only from above li
                             });
                         }
 
-
-
-
                     }, 500);
 
                     return false;
@@ -3280,6 +3275,45 @@ License: For each use you must have a valid license purchased only from above li
                     clearTimeout(pressTimer);
                 }
             });
+
+            // MAIN_TRIP_ID_TITLE
+            $('body').on('click', '#MAIN_TRIP_ID_TITLE', function() {
+                var ajaxData = {};
+                ajaxData['f'] = '12';
+                ajaxData['trip_id'] = MAIN_trip_id; // Convert the object to a JSON string
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(retunrdata) {
+                        var data_arr = JSON.parse(retunrdata);
+
+                        var formattedData = data_arr.map(function(item, index) {
+                            var name = (index + 1) + ". " + item.location_code + " [" + item.job_characteristic + "]";
+                            var lat = parseFloat(item.latitude);
+                            var lng = parseFloat(item.longitude);
+
+                            return {
+                                "name": name,
+                                "lat": lat,
+                                "lng": lng
+                            };
+                        });
+
+                        $('#showGoogleMapModal').modal('show');
+                        tempGooglrMapRoute = formattedData;
+                        initMap(formattedData);
+                        //console.log(formattedData);
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            });
+
 
 
 

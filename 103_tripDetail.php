@@ -157,6 +157,7 @@ include 'check_cookie.php';
             border-top-style: dashed;
             padding-top: 10px;
         }
+
         /* ----------track */
         .track {
             position: relative;
@@ -312,11 +313,20 @@ include 'check_cookie.php';
                                 <!-- เริ่มต้น Card -->
                                 <div class="card">
                                     <div class="card-header">
-                                        <div class="col-sm-9 mt-3 d-flex align-items-center px-3">
-                                        </div>
-                                        <div class="card-toolbar">
-                                            <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="driverLink">ลิ้งของคนขับ</button>
-                                            <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="printJob">Export ใบงานเป็น PDF</button>
+                                        <div class="card-toolbar text-end">
+                                            <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="driverLink">
+                                                <i class="fas fa-link fs-4"></i> ลิ้งของคนขับ
+                                            </button>
+
+                                            <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="printJob">
+                                                <i class="fas fa-file-pdf fs-3"></i> ใบงาน
+                                            </button>
+
+                                            <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="closeJob">
+                                                <i class="fas fa-check-circle fs-4"></i> จบงาน
+                                            </button>
+
+
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -1660,6 +1670,7 @@ include 'check_cookie.php';
             let updatePlan_no = "";
             let MAIN_TRIP_RANDOMCODE = "";
             let MAINRANDOMCODE = "";
+            let TIMELINE_MAIN_ORDER = "";
             //var LOAD_PROCESS_COUNT = 0;
 
             //alert(MAIN_job_id);
@@ -2342,6 +2353,7 @@ include 'check_cookie.php';
                                 $('#jobStatusNext').hide();
                                 $('#status_update').hide();
                             }
+                            TIMELINE_MAIN_ORDER = data_arr[0].main_order;
                         } else {
 
                             $('#jobStatusNext').hide();
@@ -3319,7 +3331,7 @@ include 'check_cookie.php';
                         //console.log(data_arr);
                         var location_select = $('#location_select');
                         location_select.empty();
-                        location_select.append($('<option>', {
+                        location_select.append($('< >', {
                             value: "null",
                             text: "เลือกสถานที่",
                             disabled: true, // ตั้งค่า disabled เพื่อให้ไม่สามารถเลือ
@@ -3590,13 +3602,7 @@ include 'check_cookie.php';
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
-                        console.log(data_arr);
-
-
-
-
-
-
+                        //console.log(data_arr);
                         // สร้างตัวแปรสำหรับเก็บ HTML ของ Div tripTimeLineOverAll
                         var tripTimelineHTML = '';
 
@@ -3607,11 +3613,12 @@ include 'check_cookie.php';
                             var locationCode = step.location_code;
                             var locationName = step.location_name;
                             var completeFlag = step.complete_flag;
+                            var plan_order = step.plan_order;
 
                             // ตรวจสอบสถานะการเสร็จสิ้นของขั้นตอน
                             var isActiveStep = completeFlag === "1";
 
-                            var stepHTML = '<div class="step' + (isActiveStep ? ' active' : '') + '">';
+                            var stepHTML = '<div class="step' + (isActiveStep ? ' active' : ' completeplan_order') + '" value="' + plan_order + '"  stepDesc="' + stepDesc + '" locationCode="' + locationCode + '" >';
                             stepHTML += '<span class="icon">';
                             stepHTML += getStepIcon(stepDesc, isActiveStep);
                             stepHTML += '</span>';
@@ -3686,6 +3693,130 @@ include 'check_cookie.php';
                 }
                 return '<i class="' + iconClass + '"></i>';
             }
+
+            $('body').on('mousedown touchstart', '.completeplan_order', function(event) {
+                var planOrder_target = ($(this).attr('value'));
+                var stepDesc = $(this).attr("stepDesc");
+                var locationCode = ($(this).attr('locationCode'));
+
+
+                if (event.type === 'mousedown' || event.type === 'touchstart') {
+                    // Set timeout
+                    pressTimer = window.setTimeout(function() {
+                        //console.log(planOrder_target);
+                        if (TIMELINE_MAIN_ORDER != '3') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'กรุณายืนยันและกดเริ่มงานก่อน',
+                            })
+                        } else {
+                            Swal.fire({
+                                title: "ยืนยัน" + stepDesc + "เสร็จแล้ว?",
+                                text: "สถานที่ :" + locationCode,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: "ยืนยัน",
+                                cancelButtonText: 'ยกเลิก'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    var ajaxData = {};
+                                    ajaxData['f'] = '20';
+                                    ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
+                                    ajaxData['MAIN_trip_id'] = MAIN_trip_id;
+                                    ajaxData['update_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
+                                    ajaxData['planOrder'] = planOrder_target;
+                                    //console.log(ajaxData);
+                                    $.ajax({
+                                            type: 'POST',
+                                            dataType: "text",
+                                            url: 'function/10_workOrder/mainFunction.php',
+                                            data: (ajaxData),
+                                            beforeSend: function() {
+                                                // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                                                $('#loading-spinner').show();
+                                            },
+                                        })
+                                        .done(function(data) {
+                                            //console.log(data);
+                                            $('#loading-spinner').hide();
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'บันทึกข้อมูลสำเร็จ',
+                                                showConfirmButton: false,
+                                                timer: 1500
+                                            }).then(() => {
+                                                location.reload();
+                                                //null
+                                            });
+                                        })
+                                        .fail(function() {
+                                            // just in case posting your form failed
+                                            alert("Posting failed.");
+                                        });
+                                }
+                            });
+                        }
+
+                    }, 500);
+
+                    return false;
+                }
+            }).on('mouseup touchend', '.completeplan_order', function(event) {
+                if (event.type === 'mouseup' || event.type === 'touchend') {
+                    // โค้ดที่ต้องการทำเมื่อปล่อยมือหลังจากคลิกและกดค้างหรือสัมผัสหน้าจอ
+                    clearTimeout(pressTimer);
+                }
+            });
+
+            $('#closeJob').click(function() {
+                Swal.fire({
+                    title: "ยืนยันจบงาน",
+                    text: "ต้องการยืนยันจบงานให้คนขับ?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: "ยืนยัน",
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var ajaxData = {};
+                        ajaxData['f'] = '21';
+                        ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
+                        ajaxData['MAIN_trip_id'] = MAIN_trip_id;
+                        ajaxData['update_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
+                        $.ajax({
+                                type: 'POST',
+                                dataType: "text",
+                                url: 'function/10_workOrder/mainFunction.php',
+                                data: (ajaxData),
+                                beforeSend: function() {
+                                    // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                                    $('#loading-spinner').show();
+                                },
+                            })
+                            .done(function(data) {
+                                //console.log(data);
+                                $('#loading-spinner').hide();
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'บันทึกข้อมูลสำเร็จ',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => {
+                                    location.reload();
+                                    //null
+                                });
+                            })
+                            .fail(function() {
+                                // just in case posting your form failed
+                                alert("Posting failed.");
+                            });
+                    }
+                });
+            });
 
 
 

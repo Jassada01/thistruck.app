@@ -1204,6 +1204,34 @@ include 'check_cookie.php';
                                 tripText += "น้ำหนักตู้ " + containerWeight + "\n";
                             }
 
+                            if (trip.CURRENT_MAIN_ORDER == '3') {
+                                switch (trip.CURRENT_MINOR_ORDER) {
+                                    case '1':
+                                        status = 'ถึง'+ trip.CURRENT_LOCATION_NAME+' แล้ว'+'รอ'+trip.NEXT_ACTION
+                                        break;
+                                    case '3':
+                                        status = 'กำลัง'+ trip.CURRENT_ACTION+'ที่'+trip.CURRENT_LOCATION_NAME
+                                        break;
+                                    case '7':
+                                        status = trip.CURRENT_ACTION + 'เสร็จแล้วรอออกจาก' + trip.CURRENT_LOCATION_NAME
+                                        break;
+                                    case '9':
+                                        if (trip.NEXT_MAIN_ORDER == '3')
+                                        {
+                                            status = 'กำลังเดินทางไป'+ trip.NEXT_ACTION+'ที่ '+trip.NEXT_LOCATION_NAME
+                                        }
+                                        else
+                                        {
+                                            status = trip.CURRENT_ACTION + "เสร็จแล้ว";
+                                        }
+                                        break;
+
+                                }
+                            }
+                            if ((trip.CURRENT_MAIN_ORDER == '1') && (trip.CURRENT_MINOR_ORDER == '5')) {
+                                status = 'กำลังเดินทางไป'+ trip.NEXT_ACTION+'ที่ '+trip.NEXT_LOCATION_NAME
+                            }
+
                             tripText += "สถานะ " + status + "\n";
 
                             //console.log(tripText); // แสดงข้อความในคอนโซล

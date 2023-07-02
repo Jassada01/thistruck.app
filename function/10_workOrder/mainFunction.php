@@ -660,10 +660,75 @@ function loadJobdatabyJobID()
 	// Step 2 Load data from job_order_template_detail_cost
 	//$sql = "SELECT * FROM job_order_detail_trip_info where job_id = $MAIN_JOB_ID";
 	//$sql = "SELECT a.*, CONCAT(a.containerID, ' ', a.containerID2) AS container_code FROM job_order_detail_trip_info a where job_id = $MAIN_JOB_ID";
-	$sql = "SELECT a.*, b.contact_number AS Driver_Phone_no FROM job_order_detail_trip_info a 
-	Left join truck_driver_info b ON a.driver_id = b.driver_id
-	where a.job_id = $MAIN_JOB_ID";
+	//$sql = "SELECT a.*, b.contact_number AS Driver_Phone_no FROM job_order_detail_trip_info a 
+	//Left join truck_driver_info b ON a.driver_id = b.driver_id
+	//where a.job_id = $MAIN_JOB_ID";
 
+
+	$sql = "SELECT 
+	a.*, 
+	b.contact_number AS Driver_Phone_no, 
+	c.*, 
+	d.* 
+  FROM 
+	job_order_detail_trip_info a 
+	Left join truck_driver_info b ON a.driver_id = b.driver_id 
+	LEFT JOIN (
+	  SELECT 
+		a.job_id, 
+		a.trip_id, 
+		a.stage AS NEXT_STAGE, 
+		a.main_order AS NEXT_MAIN_ORDER, 
+		a.minor_order AS NEXT_MINOR_ORDER, 
+		b.location_name AS NEXT_LOCATION_NAME, 
+		c.attr1 AS NEXT_ACTION 
+	  FROM 
+		job_order_detail_trip_action_log a 
+		Left Join job_order_detail_trip_list b ON a.trip_list_id = b.id 
+		Left Join master_data c ON c.type = 'job_characteristic' 
+		AND b.job_characteristic_id = c.id 
+	  Where 
+		a.id IN (
+		  SELECT 
+			MIN(a.id) AS target_log_id 
+		  FROM 
+			job_order_detail_trip_action_log a 
+		  Where 
+			a.job_id = $MAIN_JOB_ID 
+			AND a.complete_flag IS NULL 
+		  Group By 
+			a.trip_id
+		)
+	) c ON a.id = c.trip_id 
+	LEFT JOIN (
+	  SELECT 
+		a.job_id, 
+		a.trip_id, 
+		a.stage AS CURRENT_STAGE, 
+		a.main_order AS CURRENT_MAIN_ORDER, 
+		a.minor_order AS CURRENT_MINOR_ORDER, 
+		b.location_name AS CURRENT_LOCATION_NAME, 
+		c.attr1 AS CURRENT_ACTION 
+	  FROM 
+		job_order_detail_trip_action_log a 
+		Left Join job_order_detail_trip_list b ON a.trip_list_id = b.id 
+		Left Join master_data c ON c.type = 'job_characteristic' 
+		AND b.job_characteristic_id = c.id 
+	  Where 
+		a.id IN (
+		  SELECT 
+			MAX(a.id) AS target_log_id 
+		  FROM 
+			job_order_detail_trip_action_log a 
+		  Where 
+			a.job_id = $MAIN_JOB_ID 
+			AND a.complete_flag IS NOT NULL 
+		  Group By 
+			a.trip_id
+		)
+	) d ON a.id = d.trip_id 
+  where 
+	a.job_id = $MAIN_JOB_ID";
 
 	$res = $conn->query(trim($sql));
 	$firstTrip_id = "";
@@ -3481,10 +3546,10 @@ function update_trip_status_set()
 			}
 
 			// อัพเดทค่าใน job_order_detail_trip_action_log
-			
-			
+
+
 			//$sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = 1, timestamp = CURRENT_TIMESTAMP(), complete_user = '$update_user' WHERE id = $id2";
-			
+
 			$sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = 1, timestamp = CURRENT_TIMESTAMP(), complete_user = '$update_user' WHERE id <= $id2 AND trip_id = $MAIN_trip_id and main_order = 3";
 			// ทำการ Update ข้อมูล 
 			if (!$conn->query($sql)) {
@@ -3507,9 +3572,6 @@ function update_trip_status_set()
 					}
 				}
 			}
-
-
-
 			// แสดงผลลัพธ์ในรูปแบบ JSON
 			echo json_encode($row2);
 		}
@@ -3518,6 +3580,79 @@ function update_trip_status_set()
 	}
 	mysqli_close($conn);
 }
+
+// F=21
+function update_trip_status_CloseJob()
+{
+	// รับค่า MAIN_JOB_ID จาก Ajax
+	$MAIN_JOB_ID = $_POST['MAIN_JOB_ID'];
+	$MAIN_trip_id = $_POST['MAIN_trip_id'];
+	$planOrder = $_POST['planOrder'];
+	$update_user = $_POST['update_user'];
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// ค้นหา job_order_detail_trip_action_log.id ที่มีค่าน้อยที่สุดที่มี complete_flag == NULL
+	//$sql = "SELECT id, progress FROM job_order_detail_trip_action_log WHERE trip_id = $MAIN_trip_id AND complete_flag IS NULL ORDER BY id ASC LIMIT 1";
+	$sql = "SELECT id, progress FROM job_order_detail_trip_action_log WHERE trip_id = $MAIN_trip_id AND minor_order = 1 AND main_order = 7  ORDER BY id ASC LIMIT 1";
+	$result2 = $conn->query($sql);
+
+	// ตรวจสอบผลลัพธ์การค้นหา
+	if ($result2->num_rows > 0) {
+		// แสดงผลลัพธ์และอัพเดทค่าในฐานข้อมูล
+		while ($row2 = $result2->fetch_assoc()) {
+			$progress = $row2['progress'];
+			$id2 = $row2['id'];
+
+			// อัพเดทค่าใน job_order_detail_trip_info
+			if ($progress == "จบงาน") {
+				$sql = "UPDATE job_order_detail_trip_info SET status = '$progress', complete_flag = 1, update_user = '$update_user' WHERE id = $MAIN_trip_id";
+			} else {
+				$sql = "UPDATE job_order_detail_trip_info SET status = '$progress', update_user = '$update_user' WHERE id = $MAIN_trip_id";
+			}
+			// ทำการ Update ข้อมูล 
+			if (!$conn->query($sql)) {
+				echo $conn->errno;
+				exit();
+			}
+
+			// อัพเดทค่าใน job_order_detail_trip_action_log
+
+
+			//$sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = 1, timestamp = CURRENT_TIMESTAMP(), complete_user = '$update_user' WHERE id = $id2";
+
+			$sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = 1, timestamp = CURRENT_TIMESTAMP(), complete_user = '$update_user' WHERE id <= $id2 AND trip_id = $MAIN_trip_id";
+			// ทำการ Update ข้อมูล 
+			if (!$conn->query($sql)) {
+				echo  $conn->errno;
+				exit();
+			}
+
+			if ($progress == "จบงาน") {
+				// ค้นหา job_order_detail_trip_info ที่มี job_id เหมือนกันและมี status เป็น NULL
+				$sql = "SELECT * FROM job_order_detail_trip_info WHERE job_id = $MAIN_JOB_ID AND complete_flag IS NULL";
+				$result = $conn->query($sql);
+
+				// เช็คจำนวน record ที่พบ
+				if ($result->num_rows == 0) {
+					// อัปเดต status ใน job_order_header เป็น 'เสร็จสิ้น'
+					$sql = "UPDATE job_order_header SET status = 'เสร็จสิ้น' WHERE id = $MAIN_JOB_ID";
+					if (!$conn->query($sql)) {
+						echo $conn->errno;
+						exit();
+					}
+				}
+			}
+			// แสดงผลลัพธ์ในรูปแบบ JSON
+			echo json_encode($row2);
+		}
+	} else {
+		echo "0 results";
+	}
+	mysqli_close($conn);
+}
+
 
 
 //============================ MAIN =========================================================
@@ -3600,6 +3735,10 @@ switch ($f) {
 		}
 	case 20: {
 			update_trip_status_set();
+			break;
+		}
+	case 21: {
+			update_trip_status_CloseJob();
 			break;
 		}
 }
