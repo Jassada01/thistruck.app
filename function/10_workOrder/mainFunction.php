@@ -3655,6 +3655,163 @@ function update_trip_status_CloseJob()
 	mysqli_close($conn);
 }
 
+//load_jobDescforSelectCgangeLocation
+// F=22
+function load_jobDescforSelectCgangeLocation()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
+	$sql = "SELECT 
+		b.attr1 AS JobDESC, 
+		a.location_id ,  a.plan_order, a.job_note
+	FROM 
+		job_order_detail_trip_list a 
+		Inner Join master_data b ON a.job_characteristic_id = b.id 
+		AND b.type = 'job_characteristic' 
+	Where 
+		a.job_id = $job_id 
+		AND a.trip_id = (
+		SELECT 
+			MIN(a.trip_id) 
+		FROM 
+			job_order_detail_trip_list a 
+		Where 
+			a.job_id = $job_id 
+		Group By 
+			a.job_id
+		)";
+
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	echo json_encode($data_Array);
+}
+
+// F=23
+function updateTripRoute_onlyLocationAllTrip()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+
+
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL UPDATE
+	$sql = "UPDATE job_order_detail_trip_list SET 
+		location_id = '$location_id',
+		branch = '$branch',
+		showName = '$showName',
+		job_note = '$job_note',
+		unique_key = '$unique_key',
+		location_code = '$location_code',
+		location_name = '$location_name',
+		customer_id = '$customer_id',
+		address = '$address',
+		map_url = '$map_url',
+		latitude = '$latitude',
+		longitude = '$longitude',
+		location_type = '$location_type',
+		active = '$active',
+		customer_name = '$customer_name'
+		WHERE job_id = '$job_id' AND plan_order = '$plan_order'";
+
+
+	//echo $sql;
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+	mysqli_close($conn);
+}
+
+
+// F=24
+function cancelTrip()
+{
+	// รับค่า MAIN_JOB_ID จาก Ajax
+	$MAIN_JOB_ID = $_POST['MAIN_JOB_ID'];
+	$MAIN_TRIP_ID = $_POST['MAIN_TRIP_ID'];
+	$update_user = $_POST['update_user'];
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// คำสั่ง SQL สำหรับหา job_order_detail_trip_info.id ที่มี job_id = MAIN_JOB_ID
+	$sql = "SELECT id FROM job_order_detail_trip_info WHERE job_id = $MAIN_JOB_ID and id = $MAIN_TRIP_ID and complete_flag IS NULL";
+
+	// ส่งคำสั่ง SQL ไปยังฐานข้อมูล
+	$result = $conn->query($sql);
+	$progress = "";
+	// ตรวจสอบผลลัพธ์การค้นหา
+	if ($result->num_rows > 0) {
+		// วนลูปแสดงผลลัพธ์
+		while ($row = $result->fetch_assoc()) {
+			// ค้นหา job_order_detail_trip_action_log.id ที่มีค่าน้อยที่สุดที่มี complete_flag == NULL
+			$id = $row['id'];
+			$sql = "SELECT id, progress FROM job_order_detail_trip_action_log WHERE trip_id = $id AND complete_flag IS NULL ORDER BY id ASC LIMIT 1";
+			$result2 = $conn->query($sql);
+
+			// ตรวจสอบผลลัพธ์การค้นหา
+			if ($result2->num_rows > 0) {
+				// แสดงผลลัพธ์และอัพเดทค่าในฐานข้อมูล
+				while ($row2 = $result2->fetch_assoc()) {
+					$progress = $row2['progress'];
+					$id2 = $row2['id'];
+
+					// อัพเดทค่าใน job_order_detail_trip_info
+					$sql = "UPDATE job_order_detail_trip_info SET status = 'ยกเลิก', update_user = '$update_user', complete_flag = -1 WHERE id = $id";
+					// ทำการ Update ข้อมูล 
+					if (!$conn->query($sql)) {
+						echo  $conn->errno;
+						exit();
+					}
+
+					// อัพเดทค่าใน job_order_detail_trip_action_log
+					$sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = -1, timestamp = CURRENT_TIMESTAMP(), complete_user = '$update_user' WHERE id = $id2";
+					// ทำการ Update ข้อมูล 
+					if (!$conn->query($sql)) {
+						echo  $conn->errno;
+						exit();
+					}
+
+					// แสดงผลลัพธ์ในรูปแบบ JSON
+					echo json_encode($row2);
+				}
+			} else {
+				echo "0 results";
+			}
+		}
+		// Update Job Status 
+		//$sql = "UPDATE job_order_header set status = 'ยกเลิก', update_by = '$update_user' WHERE id = $MAIN_JOB_ID";
+		//echo $sql;
+		//if (!$conn->query($sql)) {
+		//	echo  $conn->errno;
+		//	exit();
+		//}
+	}
+	mysqli_close($conn);
+}
+
 
 
 //============================ MAIN =========================================================
@@ -3741,6 +3898,18 @@ switch ($f) {
 		}
 	case 21: {
 			update_trip_status_CloseJob();
+			break;
+		}
+	case 22: {
+			load_jobDescforSelectCgangeLocation();
+			break;
+		}
+	case 23: {
+			updateTripRoute_onlyLocationAllTrip();
+			break;
+		}
+	case 24: {
+			cancelTrip();
 			break;
 		}
 }

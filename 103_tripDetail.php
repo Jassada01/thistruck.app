@@ -784,7 +784,7 @@ include 'check_cookie.php';
                                                     <button type="button" class="btn btn-lg btn-success px-3  me-3" data-bs-toggle="modal" data-bs-target="#addAttachedFileModal">
                                                         แนบไฟล์/รูปภาพ
                                                     </button>
-                                                    <button type="button" class="btn btn-icon btn-color-primary btn-active-light-primary" id="cancelJob" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                    <button type="button" class="btn btn-icon btn-color-primary btn-active-light-primary"  data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                                         <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
                                                         <span class="svg-icon svg-icon-2">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
@@ -820,6 +820,12 @@ include 'check_cookie.php';
                                                             <a class="menu-link flex-stack px-3" id="attachedFileBtn" data-bs-toggle="modal" data-bs-target="#addAttachedFileModal">แนบไฟล์/รูป
                                                             </a>
                                                         </div>
+                                                        <!--begin::Menu item-->
+                                                        <div class="menu-item px-3">
+                                                            <a class="menu-link flex-stack px-3" id="cancelJobBtn">ยกเลิกทริป
+                                                                <i class="fas fa-exclamation-circle ms-2 fs-7" data-bs-toggle="tooltip" title="กรณียกเลิกใบงาน จะไม่สามารถย้อนกระบวนการ"></i></a>
+                                                        </div>
+                                                        <!--end::Menu item-->
                                                         <!--end::Menu item-->
                                                     </div>
                                                 </div>
@@ -3817,6 +3823,63 @@ include 'check_cookie.php';
                     }
                 });
             });
+
+
+            $('#cancelJobBtn').click(function() {
+                Swal.fire({
+                    title: "ยืนยันการยกเลิกทริป",
+                    text: "คุณต้องการยกเลิกทรืปนี้จริงหรือไม่?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "ยืนยันยกเลิกทริป",
+                    cancelButtonText: "ปิดหน้าต่างนี้",
+                    confirmButtonColor: '#d33',
+                    reverseButtons: true
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        cancelJob();
+                    }
+                });
+            });
+
+
+            function cancelJob() {
+                var ajaxData = {};
+                ajaxData['f'] = '24';
+                ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
+                ajaxData['MAIN_TRIP_ID'] = MAIN_trip_id;
+                ajaxData['update_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData),
+                        beforeSend: function() {
+                            // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                            $('#loading-spinner').show();
+                        },
+                    })
+                    .done(function(data) {
+                        //console.log(data);
+                        $('#loading-spinner').hide();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ยกเลิกใบงานสำเร็จ',
+                            text: "ทริปถูกยกเลิกแล้ว",
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                            //null
+                        });
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
 
 
 
