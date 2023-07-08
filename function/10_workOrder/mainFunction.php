@@ -2541,13 +2541,30 @@ function loadTrip_DetailforViewIndex()
 	$sql = "SELECT * FROM job_order_detail_trip_info Where job_id = $job_id Order By tripSeq";
 
 	$res = $conn->query(trim($sql));
-	mysqli_close($conn);
+
 	$data_Array = array();
 
 	while ($row = $res->fetch_assoc()) {
+		// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
+		$sql2 = "SELECT b.step_desc, a.map_url, c.location_code, c.location_name, b.complete_flag, b.plan_order FROM job_order_detail_trip_list a 
+		Inner Join job_order_detail_trip_action_log b ON a.job_id = b.job_id AND a.trip_id = b.trip_id AND a.plan_order = b.plan_order
+		AND b.main_order = 3 AND b.minor_order = 9
+		Inner Join locations c ON a.location_id = c.location_id
+		Where a.trip_id = " . $row['id'] . "
+		Order By a.plan_order";
+
+		$res2 = $conn->query(trim($sql2));
+		$data_Array2 = array();
+		while ($row2 = $res2->fetch_assoc()) {
+			$data_Array2[] = $row2;
+		}
+
+
+
+		$row['trip_data'] =  $data_Array2;
 		$data_Array[] = $row;
 	}
-
+	mysqli_close($conn);
 	echo json_encode($data_Array);
 }
 
@@ -3813,6 +3830,32 @@ function cancelTrip()
 }
 
 
+// F=25
+function confirmedChangeJobName()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL UPDATE
+	$sql = "UPDATE job_order_header 
+		SET job_name = '$MAIN_JobName'
+		, job_type = '$MAIN_jobType'
+		, job_template_id = '$MAIN_JobselectID'
+		WHERE id = $job_id";
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+	mysqli_close($conn);
+}
+
+
 
 //============================ MAIN =========================================================
 switch ($f) {
@@ -3910,6 +3953,10 @@ switch ($f) {
 		}
 	case 24: {
 			cancelTrip();
+			break;
+		}
+	case 25: {
+			confirmedChangeJobName();
 			break;
 		}
 }

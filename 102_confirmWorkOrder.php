@@ -105,6 +105,64 @@ include 'check_cookie.php';
             cursor: pointer;
             text-decoration: underline;
         }
+        /* ----------track------------ */
+        .track {
+  position: relative;
+  background-color: #ddd;
+  height: 4px; /* ปรับสูงตามต้องการ */
+  display: flex;
+  margin-bottom: 60px; /* ปรับตามต้องการ */
+  margin-top: 10px;
+}
+
+.track .step {
+  flex-grow: 1;
+  width: 20%; /* ปรับความกว้างตามต้องการ */
+  margin-top: -12px; /* ปรับตำแหน่งบนตามต้องการ */
+  text-align: center;
+  position: relative;
+}
+
+.track .step.active:before {
+  background: #4CAF50;
+}
+
+.track .step::before {
+  height: 4px; /* ปรับสูงตามต้องการ */
+  position: absolute;
+  content: "";
+  width: 100%;
+  left: 0;
+  top: 12px; /* ปรับตำแหน่งบนตามต้องการ */
+}
+
+.track .step.active .icon {
+  background: #4CAF50;
+  color: #000;
+}
+
+.track .icon {
+  display: inline-block;
+  width: 30px; /* ปรับขนาดตามต้องการ */
+  height: 30px; /* ปรับขนาดตามต้องการ */
+  line-height: 30px; /* ปรับตำแหน่งกลางตามต้องการ */
+  position: relative;
+  border-radius: 100%;
+  background: #ddd;
+}
+
+.track .step.active .text {
+  font-weight: 400;
+  color: #000;
+}
+
+.track .text {
+  display: block;
+  margin-top: 4px; /* ปรับตำแหน่งบนตามต้องการ */
+  font-size: 12px; /* ปรับขนาดตามต้องการ */
+  color: #AAA;
+}
+
     </style>
 
 </head>
@@ -296,12 +354,15 @@ include 'check_cookie.php';
                                                                 include "function/connectionDb.php";
 
                                                                 // Query data from master_data where type = 'Job_Type'
-                                                                $sql = "SELECT * FROM job_order_template_header WHERE active = 1";
+                                                                //$sql = "SELECT * FROM job_order_template_header WHERE active = 1";
+                                                                $sql = "SELECT a.* FROM job_order_template_header a 
+                                                                INNER JOIN job_order_header b ON a.ClientID = b.ClientID AND a.customer_id = b.customer_id AND b.id = " . $_GET["job_id"];
+
                                                                 $result = mysqli_query($conn, $sql);
 
                                                                 // Loop through data and create dropdown options
                                                                 while ($row = mysqli_fetch_assoc($result)) {
-                                                                    echo "<option value='" . $row['job_name']  . "' selectID='" . $row['id'] . "'>" . $row['job_name'] . "</option>";
+                                                                    echo "<option value='" . $row['job_name']  . "' selectID='" . $row['id'] . "' jobType='" . $row['job_type'] . "' >" . $row['job_name'] . "</option>";
                                                                 }
 
                                                                 // Close database connection
@@ -309,6 +370,10 @@ include 'check_cookie.php';
                                                                 ?>
                                                             </select>
                                                         </div>
+                                                        <div class="col-sm-2">
+                                                            <button type="button" class="btn  btn-light-danger" id="btnChangeJobName" data-bs-toggle="tooltip" data-bs-placement="top" title="เปลี่ยนเฉพาะชื่องานและประเภทงานเท่านั้น">เปลี่ยนชื่องาน</button>
+                                                        </div>
+
                                                     </div>
                                                     <div class="mb-3 row">
                                                         <label for="ClientID" class="col-sm-3 col-form-label text-end-pc"> ผู้ว่าจ้าง <span class="text-danger">*</span></label>
@@ -1098,6 +1163,11 @@ include 'check_cookie.php';
             let EDITjob_characteristic = "";
             let EDITjob_SEQ = "";
 
+            let MAIN_JobName = "";
+            let MAIN_JobselectID = "";
+            let MAIN_jobType = "";
+            let trigerChangeJobName = false;
+
 
             // Set Initial Select 2
             //ClientID
@@ -1192,7 +1262,7 @@ include 'check_cookie.php';
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
-                        console.log(data_arr);
+                        //console.log(data_arr);
 
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
@@ -1234,6 +1304,7 @@ include 'check_cookie.php';
                         //console.log(jobDetailTrips);
                         targetTrip_id = jobDetailTrips[0].id;
                         // สร้างตาราง
+                        /*
                         var tripTable = $('#tripTable').DataTable({
                             data: jobDetailTrips,
                             columns: [{
@@ -1311,6 +1382,7 @@ include 'check_cookie.php';
                             searching: false,
                             info: false
                         });
+
                         // ดักเหตุการณ์คลิกที่ตาราง
                         $('#tripTable tbody').on('click', '.trip-link', function() {
                             // ดึงข้อมูลของแถวนั้น ๆ จากตาราง DataTable
@@ -1320,7 +1392,7 @@ include 'check_cookie.php';
                             // เปิดหน้าต่างใหม่
                             window.open(url);
                         });
-
+                        */
                         //jobStatusText
                         var jobHeader = data_arr.jobHeader[0];
                         var statusText = jobHeader.status === 'Draft' ? 'รอการยืนยัน' : jobHeader.status;
@@ -2050,7 +2122,7 @@ include 'check_cookie.php';
                 var ajaxData = {};
                 ajaxData['f'] = '12';
                 ajaxData['trip_id'] = targetTrip_id; // targetTrip_id
-                console.log(ajaxData);
+                //console.log(ajaxData);
                 $.ajax({
                         type: 'POST',
                         dataType: "text",
@@ -2238,7 +2310,7 @@ include 'check_cookie.php';
             $('body').on('click', '.changeLocationbtn', function() {
                 EditLocation_ID = $(this).attr('location_id');
                 EDITjob_characteristic = $(this).attr('JobDESC');
-                EDITjob_SEQ =  $(this).attr('Job_SEQ');
+                EDITjob_SEQ = $(this).attr('Job_SEQ');
                 loadLocationForSelect();
                 $('#changlocationModal').modal('show');
                 $('#locationForm').trigger('reset');
@@ -2322,7 +2394,7 @@ include 'check_cookie.php';
                 var ajaxData = {};
                 ajaxData['f'] = '22';
                 ajaxData['job_id'] = MAIN_job_id; // targetTrip_id
-                console.log(ajaxData);
+                //console.log(ajaxData);
                 $.ajax({
                         type: 'POST',
                         dataType: "text",
@@ -2331,7 +2403,7 @@ include 'check_cookie.php';
                     })
                     .done(function(retunrdata) {
                         var data_arr = JSON.parse(retunrdata);
-                        console.log(data_arr);
+                        //console.log(data_arr);
                         //changeLocationMenuList
                         // สร้างตัวแปรเก็บ HTML ของเมนู
                         var menuHTML = '';
@@ -2345,7 +2417,7 @@ include 'check_cookie.php';
 
                             // เพิ่ม HTML สำหรับเมนูแต่ละรายการ
                             menuHTML += '<div class="menu-item px-3">';
-                            menuHTML += '<a  class="menu-link px-3 changeLocationbtn" JobDESC="' + jobDesc + '" location_id="' + locationId + '" Job_SEQ="'+plan_order+'">';
+                            menuHTML += '<a  class="menu-link px-3 changeLocationbtn" JobDESC="' + jobDesc + '" location_id="' + locationId + '" Job_SEQ="' + plan_order + '">';
                             menuHTML += jobDesc;
                             menuHTML += '</a>';
                             menuHTML += '</div>';
@@ -2387,7 +2459,7 @@ include 'check_cookie.php';
                 ajaxData['job_no'] = MAIN_job_no;
                 ajaxData['plan_order'] = EDITjob_SEQ;
                 //console.log(ajaxData);
-                
+
                 $.ajax({
                         type: 'POST',
                         dataType: "text",
@@ -2411,14 +2483,321 @@ include 'check_cookie.php';
                         // just in case posting your form failed
                         alert("Posting failed.");
                     });
-                    
+
 
             });
+
+
+
+            $('body').on('change', '#job_name', function() {
+                if (trigerChangeJobName) {
+                    MAIN_JobName = $(this).val();
+                    MAIN_JobselectID = $("#job_name").find(":selected").attr("selectID");
+                    MAIN_jobType = $("#job_name").find(":selected").attr("jobType");
+                    $('#job_type').val(MAIN_jobType);
+
+
+                    Swal.fire({
+                        title: 'ยืนยันเปลี่ยนชื่อ Job เป็น <BR>' + MAIN_JobName,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'ยืนยัน',
+                        cancelButtonText: 'ยกเลิก'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // ทำงานเมื่อ user กด "ยืนยัน"
+                            confirmedChangeJobName();
+                        } else {
+                            location.reload();
+                        }
+                    });
+                }
+            });
+
+            //btnChangeJobName
+            $('body').on('click', '#btnChangeJobName', function() {
+                toastr.success("ปลดล๊อคเปลี่ยนชื่องานแล้ว");
+                $("#job_name").prop("disabled", false);
+                trigerChangeJobName = true;
+            });
+
+
+            function confirmedChangeJobName() {
+                var ajaxData = {};
+                ajaxData['f'] = '25';
+                ajaxData['job_id'] = MAIN_job_id; // targetTrip_id
+                ajaxData['MAIN_JobName'] = MAIN_JobName;
+                ajaxData['MAIN_JobselectID'] = MAIN_JobselectID;
+                ajaxData['MAIN_jobType'] = MAIN_jobType;
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(retunrdata) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'บันทึกข้อมูลสำเร็จ',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                            //null
+                        });
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+            function loadTrip_DetailforViewIndex() {
+                var ajaxData = {};
+                ajaxData['f'] = '17';
+                ajaxData['job_id'] = MAIN_job_id;
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        //console.log(data);
+                        var data_arr = JSON.parse(data);
+                        console.log(data_arr);
+
+                        // สร้าง div สำหรับการแสดงผลตาราง
+                        var tableContainer = $('<div class="table-responsive"></div>');
+
+                        // สร้างตาราง
+                        var table = $('<table class="table table-rounded table-striped gy-4 gs-4"></table>');
+
+                        // สร้าง thead
+                        var thead = $('<thead class="bg-success text-white"></thead>');
+
+                        // สร้างแถวของส่วนหัวของตาราง
+                        var headerRow = $('<tr class="fw-semibold fs-6 border-bottom border-gray-200"></tr>');
+
+                        // สร้างคอลัมน์ของส่วนหัวตาราง
+                        var headers = ['หมายเลขทริป', 'ทะเบียนรถบรรทุก', 'ชื่อคนขับ', 'หมายเลขตู้สินค้า', 'สถานะ'];
+                        for (var i = 0; i < headers.length; i++) {
+                            var th = $('<th></th>').text(headers[i]);
+                            th.css('font-weight', 'bold'); // เพิ่มการกำหนดคุณสมบัติ font-weight
+                            headerRow.append(th);
+                        }
+
+                        // เพิ่มแถวของส่วนหัวใน thead
+                        thead.append(headerRow);
+
+                        // สร้าง tbody
+                        var tbody = $('<tbody></tbody>');
+
+                        // สร้างแถวและเพิ่มข้อมูลในตาราง
+                        for (var j = 0; j < data_arr.length; j++) {
+                            var rowData = data_arr[j];
+                            var statusBadgeClass = "";
+                            var statusText = "";
+
+                            switch (rowData.status) {
+                                case "รับตู้หนัก : เข้าสถานที่แล้ว":
+                                case "รับตู้เปล่า : เข้าสถานที่แล้ว":
+                                case "คืนตู้หนัก : เข้าสถานที่แล้ว":
+                                case "คืนตู้เปล่า : เข้าสถานที่แล้ว":
+                                case "ส่งสินค้า : เข้าสถานที่แล้ว":
+                                case "รับสินค้า : เข้าสถานที่แล้ว":
+                                case "อื่นๆ : เข้าสถานที่แล้ว":
+                                    statusBadgeClass = "badge badge-primary";
+                                    break;
+                                case "รับตู้หนัก : กำลังดำเนินการ":
+                                case "รับตู้เปล่า : กำลังดำเนินการ":
+                                case "คืนตู้หนัก : กำลังดำเนินการ":
+                                case "คืนตู้เปล่า : เริ่มดำเนินการ":
+                                case "ส่งสินค้า : กำลังดำเนินการ":
+                                case "รับสินค้า : กำลังดำเนินการ":
+                                case "อื่นๆ : เริ่มดำเนินการ":
+                                    statusBadgeClass = "badge badge-warning";
+                                    break;
+                                case "รับตู้หนัก : ดำเนินการเสร็จ":
+                                case "รับตู้เปล่า : ดำเนินการเสร็จ":
+                                case "คืนตู้หนัก : ดำเนินการเสร็จ":
+                                case "คืนตู้เปล่า : ดำเนินการเสร็จ":
+                                case "ส่งสินค้า : ดำเนินการเสร็จแล้ว":
+                                case "รับสินค้า : ดำเนินการเสร็จ":
+                                case "อื่นๆ : ดำเนินการเสร็จ":
+                                    statusBadgeClass = "badge badge-info";
+                                    break;
+                                case "รับตู้หนัก : ออกจากสถานที่แล้ว":
+                                case "รับตู้เปล่า : ออกจากสถานที่แล้ว":
+                                case "คืนตู้หนัก : ออกจากสถานที่แล้ว":
+                                case "คืนตู้เปล่า : ออกจากสถานที่แล้ว":
+                                case "ส่งสินค้า : ออกจากสถานที่แล้ว":
+                                case "รับสินค้า : ออกจากสถานที่แล้ว":
+                                case "อื่นๆ : ออกจากสถานที่แล้ว":
+                                    statusBadgeClass = "badge badge-secondary";
+                                    break;
+                                case "เจ้าหน้าที่ยืนยันแล้ว":
+                                case "คนขับยืนยันแล้ว":
+                                case "ยืนยันเริ่มงานแล้ว":
+                                case "คนขับยืนยันจบงานแล้ว":
+                                case "จบงาน":
+                                    statusBadgeClass = "badge badge-success";
+                                    break;
+                                default:
+                                    statusBadgeClass = "badge badge-danger";
+                                    break;
+                            }
+                            statusText = '<span class="' + statusBadgeClass + '">' + rowData.status + '</span>'
+
+                            var row = $('<tr></tr>');
+
+                            // เพิ่มข้อมูลลงในแถว
+                            var tripNo = $('<td></td>').html('<a href="103_tripDetail.php?job_id=' + rowData.job_id + '&trip_id=' + rowData.id + '">' + rowData.tripNo + '</a>');
+                            row.append(tripNo);
+
+
+                            var truck_licenseNo = $('<td></td>').text(rowData.truck_licenseNo);
+                            row.append(truck_licenseNo);
+
+                            var driver_name = $('<td></td>').text(rowData.driver_name);
+                            row.append(driver_name);
+
+                            var containerID = $('<td></td>').text(rowData.containerID);
+                            row.append(containerID);
+
+                            var status = $('<td></td>').html(statusText);
+                            row.append(status);
+
+                            // เพิ่มแถวลงใน tbody
+                            tbody.append(row);
+
+
+
+                            // Trip Detail ============================================================
+                            var tripTimelineHTML = '<div class="track">';
+
+                            // วนลูปผ่านรายการข้อมูลใน data_arr
+                            var trip_data_arr = data_arr[j].trip_data;
+                            //console.log(trip_data_arr)
+                            for (var i = 0; i < trip_data_arr.length; i++) {
+                                var step = trip_data_arr[i];
+                                var stepDesc = step.step_desc;
+                                var locationCode = step.location_code;
+                                var locationName = step.location_name;
+                                var completeFlag = step.complete_flag;
+                                var plan_order = step.plan_order;
+
+                                // ตรวจสอบสถานะการเสร็จสิ้นของขั้นตอน
+                                var isActiveStep = completeFlag === "1";
+
+                                var stepHTML = '<div class="step' + (isActiveStep ? ' active' : ' completeplan_order') + '" value="' + plan_order + '"  stepDesc="' + stepDesc + '" locationCode="' + locationCode + '" >';
+                                stepHTML += '<span class="icon">';
+                                stepHTML += getStepIcon(stepDesc, isActiveStep);
+                                stepHTML += '</span>';
+                                stepHTML += '<span class="text"><B>' + stepDesc + '<BR>' + locationCode + '</B></span>';
+                                stepHTML += '</div>';
+
+                                tripTimelineHTML += stepHTML;
+                                
+                            }
+                            
+                            tripTimelineHTML += '</div>';
+
+                            //console.log(tripTimelineHTML);
+                            row2 = $('<tr></tr>');
+                            tripDetail = $('<td colspan="5"></td>').html(tripTimelineHTML);
+                            row2.append(tripDetail);
+                            // เพิ่มแถวลงใน tbody
+                            tbody.append(row2);
+
+
+                        }
+
+                        // เพิ่ม thead และ tbody ลงในตาราง
+                        table.append(thead);
+                        table.append(tbody);
+
+                        // เพิ่มตารางลงใน div สำหรับการแสดงผล
+                        tableContainer.append(table);
+
+                        // เพิ่ม div ที่มีตารางลงในหน้าเอกสาร
+                        //$("#" + target_div).html(tableContainer);
+                        $("#tripTable").html(tableContainer);
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+            // ฟังก์ชันสำหรับรับไอคอนของขั้นตอน
+            function getStepIcon(stepDesc, isActiveStep) {
+                var iconClass = '';
+                if (isActiveStep) {
+                    switch (stepDesc) {
+                        case 'รับตู้หนัก':
+                            iconClass = 'fas fa-truck text-white';
+                            break;
+                        case 'รับตู้เปล่า':
+                            iconClass = 'fas fa-truck text-white';
+                            break;
+                        case 'คืนตู้หนัก':
+                            iconClass = 'fas fa-truck text-white';
+                            break;
+                        case 'คืนตู้เปล่า':
+                            iconClass = 'fas fa-truck text-white';
+                            break;
+                        case 'ส่งสินค้า':
+                            iconClass = 'fas fa-shipping-fast text-white';
+                            break;
+                        case 'รับสินค้า':
+                            iconClass = 'fas fa-box-open text-white';
+                            break;
+                        default:
+                            iconClass = 'fas fa-question-circle text-white';
+                            break;
+                    }
+                } else {
+                    switch (stepDesc) {
+                        case 'รับตู้หนัก':
+                            iconClass = 'fas fa-truck text-black';
+                            break;
+                        case 'รับตู้เปล่า':
+                            iconClass = 'fas fa-truck text-black';
+                            break;
+                        case 'คืนตู้หนัก':
+                            iconClass = 'fas fa-truck text-black';
+                            break;
+                        case 'คืนตู้เปล่า':
+                            iconClass = 'fas fa-truck text-black';
+                            break;
+                        case 'ส่งสินค้า':
+                            iconClass = 'fas fa-shipping-fast text-black';
+                            break;
+                        case 'รับสินค้า':
+                            iconClass = 'fas fa-box-open text-black';
+                            break;
+                        default:
+                            iconClass = 'fas fa-question-circle text-black';
+                            break;
+                    }
+                }
+                return '<i class="' + iconClass + '"></i>';
+            }
+
+
 
 
             // Load Data from Initail page load =======
             //loadJobTemplateDatafromJobTemplateID();
             loadJobdata();
+            loadTrip_DetailforViewIndex();
             loadAttachedData();
             load_jobDescforSelectCgangeLocation();
 
