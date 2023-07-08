@@ -64,6 +64,13 @@
                                         <span class="menu-title">รายงานประจำเดือน(รายทริป)</span>
                                     </a>
 
+                                    <a class="menu-link py-3" href="202_monthlyReportDetailEdit.php">
+                                        <span class="menu-icon">
+                                            <i class="fas fa-file-alt fs-3"></i>
+                                        </span>
+                                        <span class="menu-title">แก้ไขรายงานรายทริป</span>
+                                    </a>
+
                                 </div>
                             </div>
                         </div>

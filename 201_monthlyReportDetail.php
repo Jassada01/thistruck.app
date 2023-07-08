@@ -364,7 +364,7 @@ if (isset($_GET['selectMonth'])) {
                 var selectedValue = $(this).val();
 
                 // เปลี่ยนหน้าเพจไปที่ 200_monthlyReport.php พร้อมกับส่งพารามิเตอร์ selectMonth
-                window.location.href = "200_monthlyReport.php?selectMonth=" + selectedValue;
+                window.location.href = "201_monthlyReportDetail.php?selectMonth=" + selectedValue;
             });
 
 
