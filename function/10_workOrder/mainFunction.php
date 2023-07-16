@@ -1788,7 +1788,7 @@ function confirmJob()
 								'align' => 'start',
 							],
 						],
-						'backgroundColor' => '#0367D3',
+						'backgroundColor' => '#F6358A',
 						'paddingTop' => '10px',
 					],
 					'body' => [
@@ -3276,7 +3276,7 @@ function confirmJobOnlyClient()
 								'align' => 'start',
 							],
 						],
-						'backgroundColor' => '#0367D3',
+						'backgroundColor' => '#F6358A',
 						'paddingTop' => '10px',
 					],
 					'body' => [
