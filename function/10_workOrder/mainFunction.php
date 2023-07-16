@@ -3856,6 +3856,70 @@ function confirmedChangeJobName()
 }
 
 
+// F=26
+function loadImageforSelect()
+{
+	//sleep(1);
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
+	$sql = "Select 
+				* 
+			From 
+				(
+				SELECT 
+					c.job_no, 
+					c.tripNo, 
+					c.driver_name, 
+					b.thumbnail_path, 
+					b.file_path, 
+					a.date_time as create_date 
+				FROM 
+					jobattachedlog a 
+					Inner Join attached_files b ON a.random_code = b.random_code 
+					Inner Join job_order_detail_trip_info c ON a.trip_id = c.id 
+				Where 
+					c.job_id = $job_id 
+				UNION ALL 
+				SELECT 
+					'Line' as job_no, 
+					'Line' as tripNo, 
+					IFNULL(
+					b.driver_name, 'ไม่ระบุ'
+					) AS driver_name, 
+					a.path as thumbnail_path, 
+					a.path as file_path, 
+					a.create_date 
+				FROM 
+					line_attached_file a 
+					Left Join truck_driver_info b ON a.user_id = b.line_id 
+				WHERE 
+					path IS NOT NULL 
+					AND deleted_date IS NULL
+				) z 
+			Order By 
+				z.create_date DESC
+			";
+
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	echo json_encode($data_Array);
+}
+
+
 
 //============================ MAIN =========================================================
 switch ($f) {
@@ -3957,6 +4021,10 @@ switch ($f) {
 		}
 	case 25: {
 			confirmedChangeJobName();
+			break;
+		}
+	case 26: {
+			loadImageforSelect();
 			break;
 		}
 }

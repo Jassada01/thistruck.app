@@ -105,64 +105,98 @@ include 'check_cookie.php';
             cursor: pointer;
             text-decoration: underline;
         }
+
+
+        /* ----------timelineAttachedFile------------ */
+        .timelineAttachedFile {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+
+        }
+
+        .timelineAttachedFile img {
+            width: 75px;
+            height: 75px;
+            max-width: 100%;
+            object-fit: cover;
+            margin-right: 6px;
+        }
+
+        .selected {
+            outline: 4px solid #42bd41;
+        }
+
+
+
         /* ----------track------------ */
         .track {
-  position: relative;
-  background-color: #ddd;
-  height: 4px; /* ปรับสูงตามต้องการ */
-  display: flex;
-  margin-bottom: 60px; /* ปรับตามต้องการ */
-  margin-top: 10px;
-}
+            position: relative;
+            background-color: #ddd;
+            height: 4px;
+            /* ปรับสูงตามต้องการ */
+            display: flex;
+            margin-bottom: 60px;
+            /* ปรับตามต้องการ */
+            margin-top: 10px;
+        }
 
-.track .step {
-  flex-grow: 1;
-  width: 20%; /* ปรับความกว้างตามต้องการ */
-  margin-top: -12px; /* ปรับตำแหน่งบนตามต้องการ */
-  text-align: center;
-  position: relative;
-}
+        .track .step {
+            flex-grow: 1;
+            width: 20%;
+            /* ปรับความกว้างตามต้องการ */
+            margin-top: -12px;
+            /* ปรับตำแหน่งบนตามต้องการ */
+            text-align: center;
+            position: relative;
+        }
 
-.track .step.active:before {
-  background: #4CAF50;
-}
+        .track .step.active:before {
+            background: #4CAF50;
+        }
 
-.track .step::before {
-  height: 4px; /* ปรับสูงตามต้องการ */
-  position: absolute;
-  content: "";
-  width: 100%;
-  left: 0;
-  top: 12px; /* ปรับตำแหน่งบนตามต้องการ */
-}
+        .track .step::before {
+            height: 4px;
+            /* ปรับสูงตามต้องการ */
+            position: absolute;
+            content: "";
+            width: 100%;
+            left: 0;
+            top: 12px;
+            /* ปรับตำแหน่งบนตามต้องการ */
+        }
 
-.track .step.active .icon {
-  background: #4CAF50;
-  color: #000;
-}
+        .track .step.active .icon {
+            background: #4CAF50;
+            color: #000;
+        }
 
-.track .icon {
-  display: inline-block;
-  width: 30px; /* ปรับขนาดตามต้องการ */
-  height: 30px; /* ปรับขนาดตามต้องการ */
-  line-height: 30px; /* ปรับตำแหน่งกลางตามต้องการ */
-  position: relative;
-  border-radius: 100%;
-  background: #ddd;
-}
+        .track .icon {
+            display: inline-block;
+            width: 30px;
+            /* ปรับขนาดตามต้องการ */
+            height: 30px;
+            /* ปรับขนาดตามต้องการ */
+            line-height: 30px;
+            /* ปรับตำแหน่งกลางตามต้องการ */
+            position: relative;
+            border-radius: 100%;
+            background: #ddd;
+        }
 
-.track .step.active .text {
-  font-weight: 400;
-  color: #000;
-}
+        .track .step.active .text {
+            font-weight: 400;
+            color: #000;
+        }
 
-.track .text {
-  display: block;
-  margin-top: 4px; /* ปรับตำแหน่งบนตามต้องการ */
-  font-size: 12px; /* ปรับขนาดตามต้องการ */
-  color: #AAA;
-}
-
+        .track .text {
+            display: block;
+            margin-top: 4px;
+            /* ปรับตำแหน่งบนตามต้องการ */
+            font-size: 12px;
+            /* ปรับขนาดตามต้องการ */
+            color: #AAA;
+        }
     </style>
 
 </head>
@@ -525,6 +559,8 @@ include 'check_cookie.php';
                                         </div>
                                     </div>
                                 </div>
+
+
                                 <!-- จบ Card -->
                                 <!-- เริ่มต้น Card -->
                                 <div class="card">
@@ -740,9 +776,14 @@ include 'check_cookie.php';
                                 <textarea class="form-control" id="line_message" rows="10"></textarea>
                             </div>
                         </form>
+                        <br>
+                        <h6 class="mb-3">ส่งรูป</h6>
+                        <div id="sekectImageforSendLine">
 
+                        </div>
 
                     </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
@@ -1167,6 +1208,8 @@ include 'check_cookie.php';
             let MAIN_JobselectID = "";
             let MAIN_jobType = "";
             let trigerChangeJobName = false;
+
+            let selectImageforSendArray = [];
 
 
             // Set Initial Select 2
@@ -2168,6 +2211,8 @@ include 'check_cookie.php';
             });
 
             $('#LineUpdateStatus').click(function() {
+                selectImageforSendArray = [];
+                loadImageForSelect();
                 $("#LineNotificationMSG").modal('show');
                 // Disabling the checkboxes if the values are empty
                 if (!MAIN_LINE_CUS) {
@@ -2182,6 +2227,8 @@ include 'check_cookie.php';
                 }
 
                 $("#line_message").val(MAIN_LINE_MSG);
+
+
                 /*
                 Swal.fire({
                     title: "ส่งไลน์หาลูกค้า/ผู้จ้าง",
@@ -2221,6 +2268,9 @@ include 'check_cookie.php';
                 ajaxData['f'] = '9';
                 ajaxData['line_id'] = LineToken;
                 ajaxData['message'] = Message;
+                ajaxData['attachedImage'] = selectImageforSendArray.join();
+                //console.log(ajaxData);
+
                 $.ajax({
                         type: 'POST',
                         dataType: "text",
@@ -2237,6 +2287,7 @@ include 'check_cookie.php';
                         // just in case posting your form failed
                         alert("Posting failed.");
                     });
+
             }
 
 
@@ -2570,7 +2621,7 @@ include 'check_cookie.php';
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
-                        console.log(data_arr);
+                        //console.log(data_arr);
 
                         // สร้าง div สำหรับการแสดงผลตาราง
                         var tableContainer = $('<div class="table-responsive"></div>');
@@ -2703,9 +2754,9 @@ include 'check_cookie.php';
                                 stepHTML += '</div>';
 
                                 tripTimelineHTML += stepHTML;
-                                
+
                             }
-                            
+
                             tripTimelineHTML += '</div>';
 
                             //console.log(tripTimelineHTML);
@@ -2790,6 +2841,89 @@ include 'check_cookie.php';
                 }
                 return '<i class="' + iconClass + '"></i>';
             }
+
+
+            function loadImageForSelect() {
+                var ajaxData = {};
+                ajaxData['f'] = '26';
+                ajaxData['job_id'] = MAIN_job_id; // targetJobID
+
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: ajaxData,
+                    })
+                    .done(function(data) {
+                        var data_arr = JSON.parse(data);
+                        //var divTimelineAttachedFile = $("<div>").addClass("timelineAttachedFile");
+                        var currentDriverName = "";
+                        var currentTripNo = "";
+
+                        imageforSelectHTML = "<div>";
+
+                        $.each(data_arr, function(index, val) {
+                            var thumbnailPath = val.thumbnail_path;
+                            var filePath = val.file_path;
+                            var driverName = val.driver_name;
+                            var tripNo = val.tripNo;
+                            var create_date = val.create_date;
+
+                            // ตรวจสอบเมื่อ driver_name หรือ tripNo เปลี่ยนแปลง
+                            if (driverName !== currentDriverName || tripNo !== currentTripNo) {
+                                if (currentDriverName != "") {
+                                    imageforSelectHTML += "</div>";
+                                }
+
+                                imageforSelectHTML += "<span><h6>" + driverName + ": " + tripNo + " ส่งรูปเมื่อ " + moment(create_date).fromNow(); + "</h6></span>";
+                                imageforSelectHTML += "<div class='timelineAttachedFile mb-5'>";
+                                imageforSelectHTML += "<img src='" + thumbnailPath + "' class='imageforsendLine' filepath='" + filePath + "'></img>";
+                                currentDriverName = driverName;
+                                currentTripNo = tripNo;
+                            } else {
+                                imageforSelectHTML += "<img src='" + thumbnailPath + "' class='imageforsendLine' filepath='" + filePath + "'></img>";
+                            }
+
+                        });
+                        imageforSelectHTML += "</div>";
+                        imageforSelectHTML += "</div>";
+                        $("#sekectImageforSendLine").html(imageforSelectHTML);
+                    })
+                    .fail(function() {
+                        alert("Posting failed.");
+                    });
+            }
+
+
+            $('body').on('click', '.imageforsendLine', function() {
+                filepath = $(this).attr('filepath');
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                    selectImageforSendArray = selectImageforSendArray.filter(function(item) {
+                        return item !== filepath;
+                    });
+
+                } else {
+                    if (selectImageforSendArray.length >= 4) {
+                        toastr.warning("ส่งรูปได้สูงสุดครั้งละ 4 รูป");
+                    } else {
+                        $(this).addClass('selected');
+                        selectImageforSendArray.push(filepath);
+                    }
+
+                }
+
+                //console.log(selectImageforSendArray);
+            });
+
+
+
+
+
+
+
+
+
 
 
 

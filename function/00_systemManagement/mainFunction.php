@@ -81,7 +81,7 @@ function gen_rnd_str($length = 10)
 // Send Line Notify ==================
 function sendLineNotify($LINE_TOKEN, $message)
 {
-	$message = "\n".$message;
+	$message = "\n" . $message;
 	$headers = [
 		'Authorization: Bearer ' . $LINE_TOKEN,
 		'Content-Type: application/x-www-form-urlencoded'
@@ -99,6 +99,43 @@ function sendLineNotify($LINE_TOKEN, $message)
 
 	return $result;
 }
+
+// Send Line Notify Image ==================
+function sendImageToLineNotify($imageUrl, $lineNotifyToken)
+{
+	// อ่านรูปภาพจาก URL
+	$imageContent = file_get_contents($imageUrl);
+
+	// สร้าง multipart/form-data สำหรับส่งไปยัง Line Notify
+	$postData = array(
+		'message' => 'ส่งรูปภาพ',
+		'imageFile' => new CURLFile($imageUrl, 'image/jpeg', 'image.jpg')
+	);
+
+	// กำหนด HTTP header สำหรับการส่ง multipart/form-data
+	$header = array(
+		'Authorization: Bearer ' . $lineNotifyToken
+	);
+
+	// ส่งรูปภาพไปยัง Line Notify
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, 'https://notify-api.line.me/api/notify');
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	$result = curl_exec($ch);
+	curl_close($ch);
+
+	// ตรวจสอบผลลัพธ์
+	if ($result === false) {
+		echo 'เกิดข้อผิดพลาดในการส่งรูปภาพผ่าน Line Notify: ' . curl_error($ch);
+	} else {
+		echo 'ส่งรูปภาพผ่าน Line Notify เรียบร้อยแล้ว';
+	}
+}
+
 
 
 
@@ -445,6 +482,12 @@ function sendLineMSG()
 	//}
 }
 
+
+
+
+
+
+
 // F=9
 function sendLineMSGtoCliandCus()
 {
@@ -454,28 +497,61 @@ function sendLineMSGtoCliandCus()
 		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
 	}
 
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// Line_Token
+	$sql = "SELECT * FROM master_data WHERE type = 'system_value' AND name = 'Line Token'";
+	$result = $conn->query($sql);
+	$row = $result->fetch_assoc();
+	$Line_Token = $row['value'];
+
+	// Server Name 
+	$sql = "SELECT * FROM master_data WHERE type = 'server_name'";
+	$result = $conn->query($sql);
+	$row = $result->fetch_assoc();
+	$server_name = $row['value'];
+
+	mysqli_close($conn);
+
+
+
+	$imageUrls = [];
+	$imageMessages = [];
+	$imageMessagesforNotify = [];
+	if (trim($attachedImage) != "") {
+		$imageUrls = explode(",", $attachedImage);
+	}
+
+	if (!empty($imageUrls)) {
+		foreach ($imageUrls as $imageUrl) {
+			$imageMessages[] = [
+				'type' => 'image',
+				'originalContentUrl' => $server_name . $imageUrl,
+				'previewImageUrl' => $server_name . $imageUrl
+			];
+			$imageMessagesforNotify[] = $server_name . $imageUrl;
+		}
+	}
+
+
 	$prefix = "NOTIFY_";
 	if (substr($line_id, 0, strlen($prefix)) == $prefix) {
 		$line_id = substr($line_id, strlen($prefix));
 		sendLineNotify($line_id, $message);
+
+		foreach ($imageMessagesforNotify as $value) {
+			//echo "$value <br>";
+			sendImageToLineNotify($value, $line_id);
+		}
 	} else {
-		// เชื่อมต่อฐานข้อมูล MySQL
-		include "../connectionDb.php";
-
-		// Line_Token
-		$sql = "SELECT * FROM master_data WHERE type = 'system_value' AND name = 'Line Token'";
-		$result = $conn->query($sql);
-		$row = $result->fetch_assoc();
-		$Line_Token = $row['value'];
-
-		// Server Name 
-
-
-		mysqli_close($conn);
 
 
 		$accessToken = $Line_Token;
 		$userId = $line_id; // เปลี่ยนเป็น User ID ของผู้รับข้อความ
+
+
+
 
 
 		$data = [
@@ -487,6 +563,11 @@ function sendLineMSGtoCliandCus()
 				]
 			]
 		];
+
+		if (!empty($imageUrls)) {
+			$data['messages'] = array_merge($data['messages'], $imageMessages);
+		}
+
 
 		$url = 'https://api.line.me/v2/bot/message/push';
 
