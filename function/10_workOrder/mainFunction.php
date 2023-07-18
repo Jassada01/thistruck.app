@@ -1319,9 +1319,39 @@ function confirmJob()
 				// URL encode the place name
 				$placeName = urlencode($location_name);
 
+
+
 				// Generate the Google Maps link
 				$googleMapsLink = "https://www.google.com/maps/search/?api=1&query={$latitude},{$longitude}&query_place_id={$placeName}";
 
+
+				// สร้างคำสั่ง SQL สำหรับการค้นหา URL
+				$sql4 = "SELECT rnd FROM shot_url WHERE url = '$map_url'";
+				$result4 = $conn->query($sql4);
+				// ตรวจสอบว่าพบ URL หรือไม่
+				$rnd = "";
+				if ($result4->num_rows > 0) {
+					// พบ URL ในฐานข้อมูล
+					$row = $result4->fetch_assoc();
+					$rnd = $row["rnd"];
+					echo "พบ URL และรหัส rnd: " . $rnd;
+				} else {
+					// ไม่พบ URL ในฐานข้อมูล
+					// สร้างรหัส rnd แบบสุ่ม
+					$rnd = bin2hex(random_bytes(16));
+
+					// สร้างคำสั่ง SQL สำหรับการเพิ่มข้อมูล URL และ rnd
+					$insert_sql = "INSERT INTO shot_url (rnd, url) VALUES ('$rnd', '$map_url')";
+
+					if ($conn->query($insert_sql) === TRUE) {
+						echo "เพิ่มข้อมูล URL และรหัส rnd สำเร็จ";
+					} else {
+						echo "การเพิ่มข้อมูลล้มเหลว: " . $conn->error;
+					}
+				}
+
+
+				$map_msg_url = $SERVER_NAME . "sht.php?r=" . $rnd;
 
 				/*
 
@@ -1332,11 +1362,18 @@ function confirmJob()
 				echo "\n" . $row3['Color'];
 				*/
 
+				//$jobActionLog[] = array(
+				//	"action" => $JSC,
+				//	"color" => $Color,
+				//	"code" => $location_code,
+				//	"link" => $googleMapsLink
+				//);
+
 				$jobActionLog[] = array(
 					"action" => $JSC,
 					"color" => $Color,
 					"code" => $location_code,
-					"link" => $googleMapsLink
+					"link" => $map_msg_url
 				);
 				$jobActionLogtext = $jobActionLogtext . "\n" . $JSC . " : " . $location_code;
 			}
@@ -2810,6 +2847,33 @@ function confirmJobOnlyClient()
 				// Generate the Google Maps link
 				$googleMapsLink = "https://www.google.com/maps/search/?api=1&query={$latitude},{$longitude}&query_place_id={$placeName}";
 
+				// สร้างคำสั่ง SQL สำหรับการค้นหา URL
+				$sql4 = "SELECT rnd FROM shot_url WHERE url = '$map_url'";
+				$result4 = $conn->query($sql4);
+				// ตรวจสอบว่าพบ URL หรือไม่
+				$rnd = "";
+				if ($result4->num_rows > 0) {
+					// พบ URL ในฐานข้อมูล
+					$row = $result4->fetch_assoc();
+					$rnd = $row["rnd"];
+					echo "พบ URL และรหัส rnd: " . $rnd;
+				} else {
+					// ไม่พบ URL ในฐานข้อมูล
+					// สร้างรหัส rnd แบบสุ่ม
+					$rnd = bin2hex(random_bytes(16));
+
+					// สร้างคำสั่ง SQL สำหรับการเพิ่มข้อมูล URL และ rnd
+					$insert_sql = "INSERT INTO shot_url (rnd, url) VALUES ('$rnd', '$map_url')";
+
+					if ($conn->query($insert_sql) === TRUE) {
+						echo "เพิ่มข้อมูล URL และรหัส rnd สำเร็จ";
+					} else {
+						echo "การเพิ่มข้อมูลล้มเหลว: " . $conn->error;
+					}
+				}
+
+
+				$map_msg_url = $SERVER_NAME . "sht.php?r=" . $rnd;
 
 				/*
 
@@ -2820,11 +2884,18 @@ function confirmJobOnlyClient()
 				echo "\n" . $row3['Color'];
 				*/
 
+				//$jobActionLog[] = array(
+				//	"action" => $JSC,
+				//	"color" => $Color,
+				//	"code" => $location_code,
+				//	"link" => $googleMapsLink
+				//);
+
 				$jobActionLog[] = array(
 					"action" => $JSC,
 					"color" => $Color,
 					"code" => $location_code,
-					"link" => $googleMapsLink
+					"link" => $map_msg_url
 				);
 				$jobActionLogtext = $jobActionLogtext . "\n" . $JSC . " : " . $location_code;
 			}

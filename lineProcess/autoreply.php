@@ -1,7 +1,7 @@
 <?php
 
 $channelAccessToken = '69Wn4DFUg+BnsFmiDlC/LNar3NarEaHIAOvQIKqKIeseUjTbcnpI0e3hhstuydCG2Jr/kAv5ce9io0eXXC7zqx8NFDV12jbNcgtF/gW1NF4HtkyPNYOJo3QuNmS/ZZUFfaSq2i9OeiqXMOSg6U7Y0QdB04t89/1O/w1cDnyilFU=';
-$companyGroupID = "Ca820e972e675bf390f6cb51b271f8ef5";
+$companyGroupID = array("Ca820e972e675bf390f6cb51b271f8ef5", "C6ab5ea08288c56727d0287f72cb1c975", "Cb08a5ce1479af3c3195b15404cf47893", "C4de6b687342c9e3d94983cf9ae4ef7a2"); // COMPANY Group Code ['S ONE'. 'S1 CHORTIP', 'จองงาน HSS', '']
 $request = file_get_contents('php://input');
 $events = json_decode($request, true);
 
@@ -31,7 +31,7 @@ foreach ($events['events'] as $event) {
         }
         else if ($messageType == 'image') {
             $groupId = $event['source']['groupId'];
-            if ($groupId == $companyGroupID) {
+            if (in_array($groupId, $companyGroupID)) {
                 $userId = $event['source']['userId'];
                 $messageId = $event['message']['id'];
                 $createDate = date('Y-m-d H:i:s');
