@@ -778,7 +778,7 @@ include 'check_cookie.php';
                         </form>
                         <br>
                         <h6 class="mb-3">ส่งรูป</h6>
-                        <div id="sekectImageforSendLine">
+                        <div id="sekectImageforSendLine"  style="max-height: 400px; overflow-y: auto;">
 
                         </div>
 

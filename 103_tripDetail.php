@@ -3563,7 +3563,7 @@ include 'check_cookie.php';
                             var ajaxData = {};
                             ajaxData['f'] = '8';
                             ajaxData['line_id'] = line_id_target;
-                            ajaxData['message'] = "ข้อความจากเจ้าหน้าที่ : " + Message;
+                            ajaxData['message'] = Message;
                             ajaxData['link'] = "tripDetail.php?r=" + MAIN_TRIP_RANDOMCODE; //MAIN_TRIP_RANDOMCODE
                             $.ajax({
                                     type: 'POST',
