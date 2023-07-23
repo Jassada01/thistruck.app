@@ -137,6 +137,79 @@ function sendImageToLineNotify($imageUrl, $lineNotifyToken)
 }
 
 
+function sendLineMessageAPIImage($userId, $accessToken, $imageData, $server_name)
+{
+	// สร้าง Object ตาม Structure ของ JSON
+	$carouselObject = array(
+		"type" => "carousel",
+		"contents" => array()
+	);
+	$imageDataArray = array();
+	// นำข้อมูลจาก $imageData มาเพิ่มใน Object เป็น bubble
+	foreach ($imageData as $imageUrl) {
+		//echo $imageUrl;
+		$bubble = array(
+			"type" => "bubble",
+			"hero" => array(
+				"type" => "image",
+				"size" => "full",
+				"aspectRatio" => "16:21",
+				"aspectMode" => "cover",
+				"url" => $server_name.$imageUrl,
+				"animated" => true,
+				"action" => array(
+					"type" => "uri",
+					"uri" => $server_name.$imageUrl
+				)
+			)
+		);
+		array_push($carouselObject["contents"], $bubble);
+		array_push($imageDataArray, $bubble);
+	}
+
+
+
+	$data = [
+		'to' => $userId,
+		'messages' => [
+			[
+				'type' => 'flex',
+				'altText' => 'รูปภาพ',
+				'contents' => [
+					'type' => 'carousel',
+					'contents' => $imageDataArray
+				]
+			]
+		]
+	];
+
+	$url = 'https://api.line.me/v2/bot/message/push';
+
+	$headers = [
+		'Content-Type: application/json',
+		'Authorization: Bearer ' . $accessToken
+	];
+
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$result = curl_exec($ch);
+	curl_close($ch);
+	//echo $result;
+	/*
+	if ($result === false) {
+		echo 'เกิดข้อผิดพลาดในการส่งข้อความ: ' . curl_error($ch);
+	} else {
+		echo 'ส่งข้อความและลิงก์ Line Message API สำเร็จ!';
+	}
+	*/
+}
+
+
+
 
 
 // ======== Function ========
@@ -564,9 +637,7 @@ function sendLineMSGtoCliandCus()
 			]
 		];
 
-		if (!empty($imageUrls)) {
-			$data['messages'] = array_merge($data['messages'], $imageMessages);
-		}
+		
 
 
 		$url = 'https://api.line.me/v2/bot/message/push';
@@ -589,6 +660,13 @@ function sendLineMSGtoCliandCus()
 		//} else {
 		//	echo 'ส่งข้อความและลิงก์ Line Message API สำเร็จ!';
 		//}
+		
+		if (!empty($imageUrls)) {
+			//$data['messages'] = array_merge($data['messages'], $imageMessages);
+			sleep(1);
+			sendLineMessageAPIImage($userId, $accessToken, $imageUrls, $server_name);
+
+		}
 	}
 }
 

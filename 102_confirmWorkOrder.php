@@ -2904,8 +2904,8 @@ include 'check_cookie.php';
                     });
 
                 } else {
-                    if (selectImageforSendArray.length >= 4) {
-                        toastr.warning("ส่งรูปได้สูงสุดครั้งละ 4 รูป");
+                    if (selectImageforSendArray.length >= 10) {
+                        toastr.warning("ส่งรูปได้สูงสุดครั้งละ 10 รูป");
                     } else {
                         $(this).addClass('selected');
                         selectImageforSendArray.push(filepath);
