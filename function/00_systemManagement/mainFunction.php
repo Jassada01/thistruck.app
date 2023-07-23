@@ -155,11 +155,11 @@ function sendLineMessageAPIImage($userId, $accessToken, $imageData, $server_name
 				"size" => "full",
 				"aspectRatio" => "16:21",
 				"aspectMode" => "cover",
-				"url" => $server_name.$imageUrl,
+				"url" => $server_name . $imageUrl,
 				"animated" => true,
 				"action" => array(
 					"type" => "uri",
-					"uri" => $server_name.$imageUrl
+					"uri" => $server_name . $imageUrl
 				)
 			)
 		);
@@ -637,7 +637,7 @@ function sendLineMSGtoCliandCus()
 			]
 		];
 
-		
+
 
 
 		$url = 'https://api.line.me/v2/bot/message/push';
@@ -660,14 +660,81 @@ function sendLineMSGtoCliandCus()
 		//} else {
 		//	echo 'ส่งข้อความและลิงก์ Line Message API สำเร็จ!';
 		//}
-		
+
 		if (!empty($imageUrls)) {
 			//$data['messages'] = array_merge($data['messages'], $imageMessages);
 			sleep(1);
 			sendLineMessageAPIImage($userId, $accessToken, $imageUrls, $server_name);
-
 		}
 	}
+}
+
+
+// F=6
+function updateValueSystem()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// ข้อมูลที่ต้องการ Insert หรือ Update
+	$name = $lineGroupID;
+	$value = $lineGroupID;
+	$type = "companyGroupLine";
+
+	// ตรวจสอบว่ามีข้อมูลในฐานข้อมูลแล้วหรือไม่
+	$sql_check = "SELECT id FROM master_data WHERE type = '$type'";
+	$result = $conn->query($sql_check);
+
+	if ($result->num_rows > 0) {
+		// ถ้ามีข้อมูลแล้ว ให้ทำการ Update
+		$sql = "UPDATE master_data SET name = '$name', value = '$value' WHERE type = '$type'";
+
+	} else {
+		// ถ้ายังไม่มีข้อมูล ให้ทำการ Insert
+		$sql = "INSERT INTO master_data (id, name, value, type) VALUES (3001, '$name', '$value', '$type')";
+		
+	}
+
+	//echo $sql;
+	//$result = $conn->query($sql);
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	// Close connection
+	mysqli_close($conn);
+}
+
+// F=6
+function loadInitialDataSystem()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
+	$sql = "Select * From master_data a Where a.type = 'companyGroupLine'";
+	
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+	echo json_encode($data_Array);
 }
 
 
@@ -707,6 +774,14 @@ switch ($f) {
 		}
 	case 9: {
 			sendLineMSGtoCliandCus();
+			break;
+		}
+	case 10: {
+			updateValueSystem();
+			break;
+		}
+		case 11: {
+			loadInitialDataSystem();
 			break;
 		}
 }

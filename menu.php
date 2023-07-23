@@ -169,6 +169,14 @@
                                         <span class="menu-title">ผู้ใช้งาน</span>
                                     </a>
                                 </div>
+                                <div class="menu-item">
+                                    <a class="menu-link py-3" href="005_lineInstruction.php">
+                                        <span class="menu-icon">
+                                            <i class="fa fa-cogs fs-3"></i>
+                                        </span>
+                                        <span class="menu-title">แก้ไขข้อมูลระบบ</span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
 

@@ -563,7 +563,7 @@ function insertNewJobData()
 		//$sql = "DELETE FROM job_order_detail_trip_action_log WHERE id IN (SELECT a.id FROM job_order_detail_trip_action_log a
 		//Inner Join job_order_detail_trip_list b ON a.trip_id = b.trip_id AND a.plan_order = b.plan_order
 		//WHERE a.trip_id = $trip_id AND a.main_order = 3 AND a.minor_order NOT IN (1, 9) AND b.location_type like '%ลาน%')";
-
+		/*
 		$sql = "DELETE FROM job_order_detail_trip_action_log WHERE id IN (SELECT a.id FROM job_order_detail_trip_action_log a
 		Inner Join job_order_detail_trip_list b ON a.trip_id = b.trip_id AND a.plan_order = b.plan_order
 		WHERE a.trip_id = $trip_id AND a.main_order = 3 AND a.minor_order NOT IN (1, 9) AND (b.location_type like '%ลาน%' OR b.location_type like '%ท่าเรือ%'))"; // Add ท่าเรือ
@@ -572,8 +572,18 @@ function insertNewJobData()
 			echo  $conn->errno;
 			exit();
 		}
+		*/
 	}
 
+	// Delete Action for ลานตู้ and ท่าเรือ 
+	$sql = "DELETE FROM job_order_detail_trip_action_log WHERE id IN (SELECT a.id FROM job_order_detail_trip_action_log a
+	Inner Join job_order_detail_trip_list b ON a.trip_id = b.trip_id AND a.plan_order = b.plan_order
+	WHERE a.job_id = $job_id AND a.main_order = 3 AND a.minor_order NOT IN (1, 9) AND (b.location_type like '%ลาน%' OR b.location_type like '%ท่าเรือ%'))"; // Add ท่าเรือ
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
 
 
 
@@ -1082,6 +1092,16 @@ function confirmJob()
 	$result = $conn->query($sql);
 	$row = $result->fetch_assoc();
 	$SERVER_NAME = $row['value'];
+
+	// Delete for ลานตู้ and ท่าเรือ
+	$sql = "DELETE FROM job_order_detail_trip_action_log WHERE id IN (SELECT a.id FROM job_order_detail_trip_action_log a
+	Inner Join job_order_detail_trip_list b ON a.trip_id = b.trip_id AND a.plan_order = b.plan_order
+	WHERE a.job_id = $MAIN_JOB_ID AND a.main_order = 3 AND a.minor_order NOT IN (1, 9) AND (b.location_type like '%ลาน%' OR b.location_type like '%ท่าเรือ%'))"; // Add ท่าเรือ
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
 
 
 	// คำสั่ง SQL สำหรับหา job_order_detail_trip_info.id ที่มี job_id = MAIN_JOB_ID
@@ -2661,6 +2681,15 @@ function confirmJobOnlyClient()
 	$SERVER_NAME = $row['value'];
 
 
+	// Delete for ลานตู้ and ท่าเรือ
+	$sql = "DELETE FROM job_order_detail_trip_action_log WHERE id IN (SELECT a.id FROM job_order_detail_trip_action_log a
+	Inner Join job_order_detail_trip_list b ON a.trip_id = b.trip_id AND a.plan_order = b.plan_order
+	WHERE a.job_id = $MAIN_JOB_ID AND a.main_order = 3 AND a.minor_order NOT IN (1, 9) AND (b.location_type like '%ลาน%' OR b.location_type like '%ท่าเรือ%'))"; // Add ท่าเรือ
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
 
 
 	// สร้างคำสั่ง SQL สำหรับดึงข้อมูล refDoc_Data
