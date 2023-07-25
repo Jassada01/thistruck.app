@@ -24,6 +24,16 @@ foreach ($events['events'] as $event) {
                 $groupID = $event['source']['groupId'];
                 replyTextMessage($replyToken, $groupID);
             }
+            else if($text == "ขอข้อมูลงานของวันนี้"){
+                $userId = $event['source']['userId'];
+                getreplyfromRichMenu($userId, '1');
+                // Do nothing
+            }
+            else if($text == "ขอข้อมูลงานค้าง"){
+                $userId = $event['source']['userId'];
+                getreplyfromRichMenu($userId, '2');
+                // Do nothing
+            }
             else {
                 // Do nothing
                 //replyTextMessage($replyToken, "นี่เป็นช่องทางสำหรับการส่งข้อมูลแจ้งเตือนเท่านั้น ถ้าคุณมีคำถามหรือต้องการข้อมูลเพิ่มเติม, กรุณาติดต่อเราที่หมายเลข 063-914-4536 นะคะ");
@@ -104,5 +114,13 @@ function insertLineAttachedFile($groupId, $userId, $messageId, $createDate, $fil
 
     // Call PythonScript
     $pythonCommand = ' python3 /var/www/thistruck.app/lineProcess/loadfile.py '.$messageId;
+    shell_exec($pythonCommand);
+}
+
+function getreplyfromRichMenu($userId, $menuID)
+{
+
+    // Call PythonScript
+    $pythonCommand = ' python3 /var/www/thistruck.app/lineProcess/reply_job_pending_list.py '.$userId.' '.$menuID;
     shell_exec($pythonCommand);
 }
