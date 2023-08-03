@@ -476,8 +476,6 @@ include 'check_cookie.php';
     <!--Amchart -->
     <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
     <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
-    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
-    <script src="https://cdn.amcharts.com/lib/4/themes/material.js"></script>
 
 
 
@@ -488,10 +486,26 @@ include 'check_cookie.php';
             // Set Moment 
             moment.locale('th');
 
+            function am4themes_myTheme(target) {
+                if (target instanceof am4core.ColorSet) {
+                    target.list = [
+                        am4core.color("#9EC3E6"),
+                        am4core.color("#A8E6CF"),
+                        am4core.color("#FFCC80"),
+                        am4core.color("#FFABAB"),
+                        am4core.color("#BAABD0"),
+                        am4core.color("#D0F0C0"),
+                        am4core.color("#F4C2C2"),
+                        am4core.color("#CBD5E8"),
+                        am4core.color("#FEDCD2")
+                    ];
+                }
+            }
+
 
 
             // Initial Setting =======================
-            am4core.useTheme(am4themes_animated);
+            am4core.useTheme(am4themes_myTheme);
 
 
             // Global Var 
@@ -1015,7 +1029,7 @@ include 'check_cookie.php';
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
-                        console.log(data_arr);
+                        //console.log(data_arr);
 
                         var DriverLoadchart = am4core.create("DriverCountChart", am4charts.XYChart);
                         DriverLoadchart.data = data_arr;
@@ -1033,7 +1047,7 @@ include 'check_cookie.php';
                         series.tooltipText = "{valueX.value}";
                         series.columns.template.strokeOpacity = 0;
                         series.columns.template.column.cornerRadiusTopRight = 10;
-                        series.columns.template.column.cornerRadiusBottomRight  = 10;
+                        series.columns.template.column.cornerRadiusBottomRight = 10;
 
                         var labelBullet = series.bullets.push(new am4charts.LabelBullet());
                         labelBullet.label.horizontalCenter = "left";
