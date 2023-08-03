@@ -1461,9 +1461,10 @@ include 'check_cookie.php';
                                 $('#confirmClient').removeClass('d-none');
                                 // เลือกปุ่ม confirmClient จาก ID
                                 var confirmClientBtn = $("#confirmClient");
-
+                                console.log(MAIN_LINE_CUS);
                                 // ตรวจสอบค่าตัวแปร MAIN_LINE_CLI และ MAIN_LINE_CUS
-                                if (MAIN_LINE_CLI === "" || MAIN_LINE_CUS === "") {
+                                //cousole.log(MAIN_LINE_CLI === "" || MAIN_LINE_CUS === "")
+                                if (MAIN_LINE_CLI === "" && MAIN_LINE_CUS === "") {
                                     // ปิดใช้งานปุ่ม confirmClient
                                     confirmClientBtn.prop("disabled", true);
 
