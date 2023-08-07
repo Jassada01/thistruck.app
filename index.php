@@ -414,6 +414,26 @@ include 'check_cookie.php';
                                     </div>
                                 </div>
                             </div>
+                            <!--begin::Row-->
+                            <div class="row gy-5 g-xl-8">
+                                <div class="col-sm-12">
+                                    <div class="card card-xl-stretch mb-5 mb-xl-8">
+                                        <!--begin::Header-->
+                                        <div class="card-header border-0 pt-5">
+                                            <h3 class="card-title align-items-start flex-column">
+                                                <span class="card-label fw-bolder fs-3 mb-1">ค่าจ้าง พขร.ในเดือนนี้</span>
+                                                <span class="text-muted mt-1 fw-bold fs-7"></span>
+                                            </h3>
+                                        </div>
+                                        <!--end::Header-->
+                                        <!--begin::Body-->
+                                        <div class="card-body py-3">
+                                            <div id="graphworkpayment" style="width: 100%; height: 500px;"></div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
 
                             <!--begin::Row-->
@@ -476,6 +496,8 @@ include 'check_cookie.php';
     <!--Amchart -->
     <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
     <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
 
 
 
@@ -635,7 +657,11 @@ include 'check_cookie.php';
                         var tbody = $('#jobProgressTable');
                         var initial_tripNo = "";
                         data_arr.forEach(function(data) {
-                            initial_tripNo = data.tripNo;
+                            if (initial_tripNo == "")
+                            {
+                                initial_tripNo = data.tripNo;
+                            }
+                            
 
                             var row = $('<tr></tr>');
 
@@ -723,8 +749,8 @@ include 'check_cookie.php';
 
             // ฟังก์ชันสำหรับเรียกคืนสีของ progress-bar ตามเปอร์เซ็นต์
             function getColorByPercentage(percentage) {
-                var startColor = [255, 110, 127]; // #ff6e7f (สีแดง)
-                var endColor = [191, 233, 255]; // #2948ff
+                var startColor = [255, 110, 127]; // #FFABAB (สีแดง)
+                var endColor = [191, 233, 255]; // #A8E6CF
 
                 var r = Math.round(startColor[0] + (endColor[0] - startColor[0]) * percentage);
                 var g = Math.round(startColor[1] + (endColor[1] - startColor[1]) * percentage);
@@ -918,11 +944,11 @@ include 'check_cookie.php';
                             };
 
                             if (completeFlag === null) {
-                                event.color = "#4287f5"; // กำหนดสีน้ำเงินเข้ม หาก complete_flag เป็น null
+                                event.color = "#9EC3E6"; // กำหนดสีน้ำเงินเข้ม หาก complete_flag เป็น null
                             } else if (completeFlag === -1) {
-                                event.color = "#f54242"; // กำหนดสีแดงเข้ม หาก complete_flag เป็น -1
+                                event.color = "#F4C2C2"; // กำหนดสีแดงเข้ม หาก complete_flag เป็น -1
                             } else {
-                                event.color = "#5ac25a"; // กำหนดสีเขียวเข้ม หาก complete_flag ไม่ใช่ null และไม่ใช่ -1
+                                event.color = "#2ECC71"; // กำหนดสีเขียวเข้ม หาก complete_flag ไม่ใช่ null และไม่ใช่ -1
                             }
 
                             events.push(event);
@@ -1072,12 +1098,139 @@ include 'check_cookie.php';
                         alert("Posting failed.");
                     });
             }
+
+
+            function getThisMonthPaymenteachDriver() {
+                var ajaxData = {};
+                ajaxData['f'] = '5';
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/index/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        var data_arr = JSON.parse(data);
+                        //console.log(data_arr);
+                        am4core.useTheme(am4themes_animated);
+                        var chart = am4core.create("graphworkpayment", am4charts.XYChart);
+                        am4core.useTheme(am4themes_myTheme);
+                        chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+                        chart.paddingBottom = 30;
+
+                        chart.data = data_arr;
+
+                        var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+                        categoryAxis.dataFields.category = "driver_name";
+                        categoryAxis.renderer.grid.template.strokeOpacity = 0;
+                        categoryAxis.renderer.minGridDistance = 10;
+                        categoryAxis.renderer.labels.template.dy = 35;
+                        categoryAxis.renderer.tooltip.dy = 35;
+
+                        var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                        valueAxis.renderer.inside = true;
+                        valueAxis.renderer.labels.template.fillOpacity = 0.3;
+                        valueAxis.renderer.grid.template.strokeOpacity = 0;
+                        valueAxis.min = 0;
+                        valueAxis.cursorTooltipEnabled = false;
+                        valueAxis.renderer.baseGrid.strokeOpacity = 0;
+
+                        var series = chart.series.push(new am4charts.ColumnSeries());
+                        series.dataFields.valueY = "hire_price";
+                        series.dataFields.categoryX = "driver_name";
+                        series.tooltipText = "{valueY.value}";
+                        series.tooltip.pointerOrientation = "vertical";
+                        series.tooltip.dy = -6;
+                        series.columnsContainer.zIndex = 100;
+
+                        var columnTemplate = series.columns.template;
+                        columnTemplate.width = am4core.percent(35);
+                        columnTemplate.maxWidth = 66;
+                        columnTemplate.column.cornerRadius(60, 60, 60, 60);
+                        columnTemplate.strokeOpacity = 0;
+                        columnTemplate.height = 30; // กำหนดความสูงของแท่งให้น้อยลงเหลือ 30
+
+                        series.heatRules.push({
+                            target: columnTemplate,
+                            property: "fill",
+                            dataField: "valueY",
+                            min: am4core.color("#FEDCD2"),
+                            max: am4core.color("#A8E6CF")
+                        });
+                        series.mainContainer.mask = undefined;
+
+                        var cursor = new am4charts.XYCursor();
+                        chart.cursor = cursor;
+                        cursor.lineX.disabled = true;
+                        cursor.lineY.disabled = true;
+                        cursor.behavior = "none";
+
+                        var bullet = columnTemplate.createChild(am4charts.CircleBullet);
+                        bullet.circle.radius = 20;
+                        bullet.valign = "bottom";
+                        bullet.align = "center";
+                        bullet.isMeasured = true;
+                        bullet.mouseEnabled = false;
+                        bullet.verticalCenter = "bottom";
+                        bullet.interactionsEnabled = false;
+
+                        var hoverState = bullet.states.create("hover");
+                        var outlineCircle = bullet.createChild(am4core.Circle);
+                        outlineCircle.adapter.add("radius", function(radius, target) {
+                            var circleBullet = target.parent;
+                            return circleBullet.circle.pixelRadius + 10;
+                        })
+
+                        var image = bullet.createChild(am4core.Image);
+                        image.width = 60;
+                        image.height = 60;
+                        image.horizontalCenter = "middle";
+                        image.verticalCenter = "middle";
+                        image.propertyFields.href = "image_path";
+
+                        image.adapter.add("mask", function(mask, target) {
+                            var circleBullet = target.parent;
+                            return circleBullet.circle;
+                        })
+
+                        var previousBullet;
+                        chart.cursor.events.on("cursorpositionchanged", function(event) {
+                            var dataItem = series.tooltipDataItem;
+
+                            if (dataItem.column) {
+                                var bullet = dataItem.column.children.getIndex(1);
+
+                                if (previousBullet && previousBullet != bullet) {
+                                    previousBullet.isHover = false;
+                                }
+
+                                if (previousBullet != bullet) {
+
+                                    var hs = bullet.states.getKey("hover");
+                                    hs.properties.dy = -bullet.parent.pixelHeight + 30;
+                                    bullet.isHover = true;
+
+                                    previousBullet = bullet;
+                                }
+                            }
+                        });
+
+
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
             // Initial Run When start ===============================================================
             //Initialcalendar();
             loadProgress();
             loadCalendar();
             LoadMonthlyByClient();
             LoadJobWorkLoad();
+            getThisMonthPaymenteachDriver();
 
 
         });

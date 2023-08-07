@@ -208,7 +208,10 @@ if (isset($_GET['selectMonth'])) {
                                                         job_id
                                                     ) c ON a.id = c.job_id 
                                                   Where 
-                                                    DATE_FORMAT(a.job_date, '%m%Y') = '$selectMonth' 
+                                                    a.id in (SELECT za.job_id FROM job_order_detail_trip_info za
+                                                        WHERE DATE_FORMAT(za.jobStartDateTime, '%m%Y') = '$selectMonth'
+                                                        AND za.status <> 'ยกเลิก'
+                                                        GROUP BY za.job_id)
                                                     AND a.status <> 'ยกเลิก' 
                                                   Order By 
                                                     a.id ";
@@ -218,7 +221,7 @@ if (isset($_GET['selectMonth'])) {
                                                 echo "0 results";
                                             }
 
-
+                                            // echo $sql;
                                             // ส่งคำสั่ง SQL ไปยังฐานข้อมูล
                                             $result = mysqli_query($conn, $sql);
 

@@ -218,11 +218,29 @@ function getWorkBymonth()
 		Group By b.ClientName";
 	} else {
 
-		$sql = "SELECT c.ClientName AS 'Category', COUNT(b.tripNo) AS count FROM job_order_header a 
-		Inner Join job_order_detail_trip_info b ON a.id = b.job_id
-		Inner Join client_info c ON a.ClientID = c.ClientID
-		Where a.status <> 'ยกเลิก' AND DATE_FORMAT(a.job_date, '%m%Y') = '$selectMonth'  AND b.status <> 'ยกเลิก'
-		Group By c.ClientName";
+		$sql = "SELECT 
+		clientName AS 'Category', 
+		count(*) as count 
+		FROM 
+		(
+			SELECT 
+			c.ClientName, 
+			b.job_no 
+			FROM 
+			job_order_header a 
+			Inner Join job_order_detail_trip_info b ON a.id = b.job_id 
+			Inner Join client_info c ON a.ClientID = c.ClientID 
+			Where 
+			a.status <> 'ยกเลิก' 
+			AND DATE_FORMAT(b.jobStartDateTime, '%m%Y') = '$selectMonth' 
+			AND b.status <> 'ยกเลิก' 
+			Group By 
+			c.ClientName, 
+			b.job_no
+		) z 
+		Group by 
+		clientName
+		";
 	}
 	$res = $conn->query(trim($sql));
 	mysqli_close($conn);
@@ -250,7 +268,7 @@ function getJobWorkLoad()
 	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
 	$sql = "SELECT b.driver_name AS 'Category', COUNT(b.tripNo) AS count FROM job_order_header a 
 	Inner Join job_order_detail_trip_info b ON a.id = b.job_id
-	Where a.status <> 'ยกเลิก' AND DATE_FORMAT(a.job_date, '%m%Y') = DATE_FORMAT(current_timestamp, '%m%Y')  AND b.status <> 'ยกเลิก'
+	Where a.status <> 'ยกเลิก' AND DATE_FORMAT(b.jobStartDateTime, '%m%Y') = DATE_FORMAT(current_timestamp, '%m%Y')  AND b.status <> 'ยกเลิก'
 	Group By b.driver_name ";
 
 	$res = $conn->query(trim($sql));
@@ -264,6 +282,55 @@ function getJobWorkLoad()
 	echo json_encode($data_Array);
 }
 
+// F=4
+function getThisMonthPaymenteachDriver()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
+	$sql = "SELECT 
+		z.driver_name, 
+		z.hire_price, 
+		concat('assets/media/uploadfile/', z.image_path) as image_path
+	FROM 
+		(
+		SELECT 
+			a.driver_id, 
+			a.driver_name, 
+			SUM(b.hire_price) AS hire_price, 
+			c.image_path 
+		FROM 
+			job_order_detail_trip_info a 
+			Inner JOIN job_order_detail_trip_cost b ON a.id = b.trip_id 
+			Inner Join truck_driver_info c ON a.driver_id = c.driver_id 
+		Where 
+			DATE_FORMAT(a.jobStartDateTime, '%m%Y') = DATE_FORMAT(current_timestamp, '%m%Y') 
+			AND a.status <> 'ยกเลิก' 
+		GROUP BY 
+			a.driver_id, 
+			a.driver_name, 
+			c.image_path
+		) z 
+	Order By 
+		z.hire_price DESC LIMIT 10";
+
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	echo json_encode($data_Array);
+}
 
 
 
@@ -283,6 +350,10 @@ switch ($f) {
 		}
 	case 4: {
 			getJobWorkLoad();
+			break;
+		}
+	case 5: {
+			getThisMonthPaymenteachDriver();
 			break;
 		}
 }

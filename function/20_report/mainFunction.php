@@ -123,7 +123,10 @@ function MonthlyReportDetail()
 		INNER JOIN job_order_detail_trip_info b ON a.id = b.job_id
 		INNER JOIN job_order_detail_trip_cost c ON a.id = c.job_id AND b.id = c.trip_id
 	WHERE
-	DATE_FORMAT(a.job_date, '%m%Y') = '$selectMonth'";
+	a.id in (SELECT za.job_id FROM job_order_detail_trip_info za
+                                                        WHERE DATE_FORMAT(za.jobStartDateTime, '%m%Y') = '$selectMonth'
+                                                        AND za.status <> 'ยกเลิก'
+                                                        GROUP BY za.job_id)";
 
 	$res = $conn->query(trim($sql));
 	mysqli_close($conn);
