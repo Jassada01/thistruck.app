@@ -3741,7 +3741,7 @@ function update_trip_status_CloseJob()
 
 			//$sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = 1, timestamp = CURRENT_TIMESTAMP(), complete_user = '$update_user' WHERE id = $id2";
 
-			$sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = 1, timestamp = CURRENT_TIMESTAMP(), complete_user = '$update_user' WHERE id <= $id2 AND trip_id = $MAIN_trip_id";
+			$sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = 1, timestamp = CURRENT_TIMESTAMP(), complete_user = '$update_user' WHERE id <= $id2 AND trip_id = $MAIN_trip_id AND timestamp IS NULL";
 			// ทำการ Update ข้อมูล 
 			if (!$conn->query($sql)) {
 				echo  $conn->errno;
