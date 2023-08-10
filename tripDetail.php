@@ -554,6 +554,13 @@ License: For each use you must have a valid license purchased only from above li
                                                 <p id="HD_quantity"></p>
                                             </div>
                                         </div>
+
+                                        <div class="row mt-3 mh-5">
+                                            <div class="col-md-4">
+                                            <h5>หมายเหตุ</h5>
+                                                <p id="HD_remark"></p>
+                                            </div>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -1135,7 +1142,7 @@ License: For each use you must have a valid license purchased only from above li
                                                                 <div class="mb-3 row">
                                                                     <label for="remark" class="col-sm-3 col-form-label text-end-pc">หมายเหตุ</label>
                                                                     <div class="col-sm-6">
-                                                                        <textarea class="form-control" id="remark" name="remark" disabled></textarea>
+                                                                        <textarea class="form-control" id="remark_header" name="remark_header" disabled></textarea>
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -1838,7 +1845,7 @@ License: For each use you must have a valid license purchased only from above li
                         document.querySelectorAll('#jobHeaderForm input').forEach(input => {
                             input.disabled = true;
                         });
-                        //console.log(data_arr);
+                        console.log(data_arr);
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
 
@@ -1870,7 +1877,8 @@ License: For each use you must have a valid license purchased only from above li
                         $("#agent").val(jobHeaderForm.agent);
                         $("#goods").val(jobHeaderForm.goods);
                         $("#quantity").val(jobHeaderForm.quantity);
-                        $("#remark").val(jobHeaderForm.remark);
+                        $("#remark_header").val(jobHeaderForm.remark);
+                        $("#HD_remark").html(jobHeaderForm.remark);
 
 
 

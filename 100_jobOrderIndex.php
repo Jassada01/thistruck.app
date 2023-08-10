@@ -475,7 +475,7 @@ include 'check_cookie.php';
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
-
+                        //console.log(data_arr);
                         // สร้าง div สำหรับการแสดงผลตาราง
                         var tableContainer = $('<div class="table-responsive"></div>');
 
@@ -489,7 +489,7 @@ include 'check_cookie.php';
                         var headerRow = $('<tr class="fw-semibold fs-6 border-bottom border-gray-200"></tr>');
 
                         // สร้างคอลัมน์ของส่วนหัวตาราง
-                        var headers = ['หมายเลขทริป', 'ทะเบียนรถบรรทุก', 'ชื่อคนขับ', 'หมายเลขตู้สินค้า', 'สถานะ'];
+                        var headers = ['หมายเลขทริป', 'ทะเบียนรถบรรทุก', 'ชื่อคนขับ', 'เวลาเริ่มงาน', 'หมายเลขตู้สินค้า', 'สถานะ'];
                         for (var i = 0; i < headers.length; i++) {
                             var th = $('<th></th>').text(headers[i]);
                             th.css('font-weight', 'bold'); // เพิ่มการกำหนดคุณสมบัติ font-weight
@@ -570,6 +570,9 @@ include 'check_cookie.php';
 
                             var driver_name = $('<td></td>').text(rowData.driver_name);
                             row.append(driver_name);
+
+                            var jobStartDate = $('<td></td>').text(moment(rowData.jobStartDateTime).format("Do MMM H:mm น."));
+                            row.append(jobStartDate);
 
                             var containerID = $('<td></td>').text(rowData.containerID);
                             row.append(containerID);

@@ -2637,7 +2637,7 @@ include 'check_cookie.php';
                         var headerRow = $('<tr class="fw-semibold fs-6 border-bottom border-gray-200"></tr>');
 
                         // สร้างคอลัมน์ของส่วนหัวตาราง
-                        var headers = ['หมายเลขทริป', 'ทะเบียนรถบรรทุก', 'ชื่อคนขับ', 'หมายเลขตู้สินค้า', 'สถานะ'];
+                        var headers = ['หมายเลขทริป', 'ทะเบียนรถบรรทุก', 'ชื่อคนขับ', 'เวลาเริ่มงาน', 'หมายเลขตู้สินค้า', 'สถานะ'];
                         for (var i = 0; i < headers.length; i++) {
                             var th = $('<th></th>').text(headers[i]);
                             th.css('font-weight', 'bold'); // เพิ่มการกำหนดคุณสมบัติ font-weight
@@ -2719,6 +2719,9 @@ include 'check_cookie.php';
                             var driver_name = $('<td></td>').text(rowData.driver_name);
                             row.append(driver_name);
 
+                            var jobStartDate = $('<td></td>').text(moment(rowData.jobStartDateTime).format("Do MMM H:mm น."));
+                            row.append(jobStartDate);
+
                             var containerID = $('<td></td>').text(rowData.containerID);
                             row.append(containerID);
 
@@ -2762,7 +2765,7 @@ include 'check_cookie.php';
 
                             //console.log(tripTimelineHTML);
                             row2 = $('<tr></tr>');
-                            tripDetail = $('<td colspan="5"></td>').html(tripTimelineHTML);
+                            tripDetail = $('<td colspan="6"></td>').html(tripTimelineHTML);
                             row2.append(tripDetail);
                             // เพิ่มแถวลงใน tbody
                             tbody.append(row2);
