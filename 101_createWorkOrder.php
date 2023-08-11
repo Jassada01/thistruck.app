@@ -1289,7 +1289,7 @@ include 'check_cookie.php';
             });
 
             // job_date
-            $("#job_date").flatpickr({
+            let  workOrder_Jobdate =  $("#job_date").flatpickr({
                 dateFormat: "Y-m-d",
                 locale: "th",
                 altInput: true,
@@ -2064,6 +2064,12 @@ include 'check_cookie.php';
                 //var truck_type = $(this).find(':selected').data('truck_type');
                 $(this).closest('[data-repeater-item]').find('.truckDriver').val(driver_id).trigger('change');
                 //$(this).closest('[data-repeater-item]').find('.truckType').val(truck_type);
+
+            });
+
+            $('body').on('change', '.jobStartDateTime', function() {
+                var firstDate_time = $('#DriverList').find('.jobStartDateTime:first').val();
+                workOrder_Jobdate.setDate(firstDate_time);
 
             });
 
