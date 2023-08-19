@@ -326,6 +326,13 @@ include 'check_cookie.php';
                                         <div class="row">
                                             <div class="container">
                                                 <form id="jobHeaderMainForm">
+
+                                                    <div class="mb-3 row">
+                                                        <label class="col-sm-3 col-form-label text-end-pc"></label>
+                                                        <label id="jobStatusText" class="col-sm-3 col-form-label text-left fs-1"></label>
+                                                        <label class="col-sm-3 col-form-label text-end-pc"></label>
+
+                                                    </div>
                                                     <div class="mb-3 row">
                                                         <label for="main_book_no" class="col-sm-3 col-form-label text-end-pc">เล่มที่</label>
                                                         <div class="col-sm-3">
@@ -346,21 +353,29 @@ include 'check_cookie.php';
                                                             <input type="date" class="form-control" id="job_date" name="job_date" disabled>
                                                         </div>
                                                     </div>
-                                                    <div class="mb-3 row">
-                                                        <label class="col-sm-3 col-form-label text-end-pc">สถานะ</label>
-                                                        <label id="jobStatusText" class="col-sm-3 col-form-label text-left fs-1"></label>
-                                                        <label class="col-sm-3 col-form-label text-end-pc"></label>
-                                                        <div class="col-sm-3  d-flex justify-content-between">
+
+                                                    <div class="mb-3 row text-end">
+                                                        <div class="col-sm-12">
                                                             <button type="button" class="btn  btn-sm  btn-success d-none me-1" id="confirmClient">
                                                                 <i class="fas  fa-check-circle"></i> ยืนยันให้ผู้ว่าจ้างก่อน
                                                             </button>
-                                                            <button type="button" class="btn btn-sm btn-primary d-none " id="confirmJob">
-                                                                <i class="fas fa-check"></i> ยืนยันใบงาน
-                                                            </button>
+                                                            <div class="btn-group btn-group-sm d-none" role="group" id="confirmJobGroup">
+                                                                <button type="button" class="btn btn-sm btn-primary d-none " id="confirmJob">
+                                                                    <i class="fas fa-check"></i> ยืนยันใบงาน
+                                                                </button>
+                                                                <div class="btn-group" role="group">
+                                                                    <button id="btnGroupDrop1" type="button" class="btn  btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    </button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                                        <li><a class="dropdown-item" id="confirmJobbyTrip">เลือกยืนยันรายทริป</a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
 
                                                             <!--end::Menu 3-->
                                                         </div>
                                                     </div>
+
                                                 </form>
                                             </div>
 
@@ -778,7 +793,7 @@ include 'check_cookie.php';
                         </form>
                         <br>
                         <h6 class="mb-3">ส่งรูป</h6>
-                        <div id="sekectImageforSendLine"  style="max-height: 400px; overflow-y: auto;">
+                        <div id="sekectImageforSendLine" style="max-height: 400px; overflow-y: auto;">
 
                         </div>
 
@@ -1015,6 +1030,38 @@ include 'check_cookie.php';
         </div>
     </div>
 
+    <!-- Modal แผนที่ -->
+    <div class="modal fade" id="selectTripforconfirm" tabindex="-1" aria-labelledby="selectTripforconfirmLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="selectTripforconfirmLabel">เลือกทริปเพื่อคอนเฟิร์ม</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped table-hover">
+                        <thead class="bg-success text-white">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">หมายเลขทริป</th>
+                                <th scope="col">ชื่อคนขับ</th>
+                                <th scope="col">เวลาเริ่มงาน</th>
+                                <th scope="col">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tripTableBody">
+                            <!-- เราจะแทรกข้อมูลตารางตรงนี้โดยใช้ JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary" id="btnConfirmbyTrip">ยืนยันงาน</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         var hostUrl = "assets/";
     </script>
@@ -1210,6 +1257,7 @@ include 'check_cookie.php';
             let trigerChangeJobName = false;
 
             let selectImageforSendArray = [];
+            let allTrip_data = [];
 
 
             // Set Initial Select 2
@@ -1457,11 +1505,12 @@ include 'check_cookie.php';
                         if (jobHeader.status === 'Draft') {
                             $('#confirmJob').removeClass('d-none');
                             $('#cancelJob').removeClass('d-none');
+                            $('#confirmJobGroup').removeClass('d-none');
+
                             if (jobHeader.client_confirmed != "1") {
                                 $('#confirmClient').removeClass('d-none');
                                 // เลือกปุ่ม confirmClient จาก ID
                                 var confirmClientBtn = $("#confirmClient");
-                                console.log(MAIN_LINE_CUS);
                                 // ตรวจสอบค่าตัวแปร MAIN_LINE_CLI และ MAIN_LINE_CUS
                                 //cousole.log(MAIN_LINE_CLI === "" || MAIN_LINE_CUS === "")
                                 if (MAIN_LINE_CLI === "" && MAIN_LINE_CUS === "") {
@@ -2623,6 +2672,7 @@ include 'check_cookie.php';
                         //console.log(data);
                         var data_arr = JSON.parse(data);
                         //console.log(data_arr);
+                        allTrip_data = data_arr;
 
                         // สร้าง div สำหรับการแสดงผลตาราง
                         var tableContainer = $('<div class="table-responsive"></div>');
@@ -2921,6 +2971,124 @@ include 'check_cookie.php';
             });
 
 
+
+            // confirmJobbyTrip
+            $('body').on('click', '#confirmJobbyTrip', function() {
+                //selectTripforconfirm
+                $('#selectTripforconfirm').modal('show');
+                //console.log(allTrip_data);
+                let tableRows = allTrip_data.map(generateTableRow).join("");
+                $('#tripTableBody').html(tableRows);
+            });
+
+            // สร้างแถวตารางจากข้อมูลใน Object
+            // สร้างแถวตารางจากข้อมูลใน Object
+            function generateTableRow(tripData) {
+                let checkboxDisabled = tripData.status !== "รอเจ้าหน้าที่ยืนยัน" ? "disabled" : "";
+                if (tripData.status == "รอเจ้าหน้าที่ยืนยัน") {
+                    return `
+            <tr>
+                <td class="text-center"><div class="form-check form-check-custom form-check-solid ms-6 me-4"><input type="checkbox" class="form-check-input" ${checkboxDisabled} value="${tripData.id}"></div></td>
+                <td>${tripData.tripNo}</td>
+                <td>${tripData.driver_name}</td>
+                <td>${moment(tripData.jobStartDateTime).format("Do MMM H:mm น.")}</td>
+                <td>${tripData.status}</td>
+            </tr>
+                `;
+                }
+                else
+                {
+                    return "";
+                }
+
+            }
+
+
+            //btnConfirmbyTrip
+            $('body').on('click', '#btnConfirmbyTrip', function() {
+                let selectedTrips = [];
+
+                // ค้นหา checkbox ที่ถูก check ใน #tripTableBody
+                $('#tripTableBody input[type="checkbox"]:checked').each(function() {
+                    selectedTrips.push($(this).val());
+                });
+                let countStatusPending = allTrip_data.filter(trip => trip.status === "รอเจ้าหน้าที่ยืนยัน").length;
+                if (selectedTrips.length == 0) {
+                    $('#selectTripforconfirm').modal('hide');
+                } else if (countStatusPending == selectedTrips.length) {
+                    $('#btnConfirmbyTrip').prop('disabled', true);
+                    var ajaxData = {};
+                    ajaxData['f'] = '7';
+                    ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
+                    ajaxData['update_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
+                    //console.log(ajaxData);
+                    $.ajax({
+                            type: 'POST',
+                            dataType: "text",
+                            url: 'function/10_workOrder/mainFunction.php',
+                            data: (ajaxData),
+                            beforeSend: function() {
+                                // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                                $('#loading-spinner').show();
+                            },
+                        })
+                        .done(function(data) {
+                            //console.log(data);
+                            $('#loading-spinner').hide();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ยืนยันแผนการดำเนินการ',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                                //null
+                            });
+                        })
+                        .fail(function() {
+                            // just in case posting your form failed
+                            alert("Posting failed.");
+                        });
+                } else {
+                    $('#btnConfirmbyTrip').prop('disabled', true);
+                    var ajaxData = {};
+                    ajaxData['f'] = '27';
+                    ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
+                    ajaxData['update_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
+                    ajaxData['selectTrip'] = selectedTrips.join(", ").toString();
+                    //console.log(ajaxData);
+                    $.ajax({
+                            type: 'POST',
+                            dataType: "text",
+                            url: 'function/10_workOrder/mainFunction.php',
+                            data: (ajaxData),
+                            beforeSend: function() {
+                                // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                                $('#loading-spinner').show();
+                            },
+                        })
+                        .done(function(data) {
+                            //console.log(data);
+                            $('#loading-spinner').hide();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ยืนยันแผนการดำเนินการ',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                                //null
+                            });
+                        })
+                        .fail(function() {
+                            // just in case posting your form failed
+                            alert("Posting failed.");
+                        });
+                }
+
+
+                //alert('Trips ที่ถูกเลือก: ' + selectedTrips.join(", "));
+            });
 
 
 
