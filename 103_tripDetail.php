@@ -784,7 +784,7 @@ include 'check_cookie.php';
                                                     <button type="button" class="btn btn-lg btn-success px-3  me-3" data-bs-toggle="modal" data-bs-target="#addAttachedFileModal">
                                                         แนบไฟล์/รูปภาพ
                                                     </button>
-                                                    <button type="button" class="btn btn-icon btn-color-primary btn-active-light-primary"  data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                    <button type="button" class="btn btn-icon btn-color-primary btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                                         <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
                                                         <span class="svg-icon svg-icon-2">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
@@ -1703,6 +1703,11 @@ include 'check_cookie.php';
             let STC_Text = "";
             let STC_btn = "";
 
+            // Validate Driver
+            // ==========================================
+            let current_diriver_id = "";
+            let current_diriver_name = "";
+
             let initialWordforAttached = "";
 
 
@@ -1871,11 +1876,17 @@ include 'check_cookie.php';
                         document.querySelectorAll('#jobHeaderForm input').forEach(input => {
                             input.disabled = true;
                         });
-                        //console.log(data_arr);
+                        console.log(data_arr);
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
 
                         var jobHeaderForm = data_arr.jobHeader[0];
+                        // Backup Driver Data =============
+                        current_diriver_id = data_arr.JobDetailTrip[0].driver_id;
+                        current_diriver_name = data_arr.JobDetailTrip[0].driver_name;
+
+
+
                         $('#job_name').val(jobHeaderForm.job_name).trigger('change');
                         $('#ClientID').val(jobHeaderForm.ClientID).trigger('change');
                         $('#customerID').val(jobHeaderForm.customer_id).trigger('change');
@@ -1936,6 +1947,8 @@ include 'check_cookie.php';
                         // Set job status text and apply styles
                         var jobStatusText = $('#jobStatusText');
                         jobStatusText.text(MAIN_TRIP_STATUS);
+
+
 
                         if (MAIN_TRIP_STATUS === 'ยกเลิก') {
                             // Disable cancelJob button
@@ -2097,35 +2110,108 @@ include 'check_cookie.php';
                 ajaxData['driver_name'] = $('.truckDriver').find(":selected").text();;
                 ajaxData['truck_licenseNo'] = $('.truckinJob').find(":selected").text();;
                 // data.driver_name = $(this).find('.truckDriver').find(":selected").text(); truckinJob
-                //console.log(ajaxData);
+                console.log(ajaxData);
 
-                $.ajax({
-                        type: 'POST',
-                        dataType: "text",
-                        url: 'function/10_workOrder/mainFunction.php',
-                        data: (ajaxData),
-                        beforeSend: function() {
-                            // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
-                            $('#loading-spinner').show();
-                        },
-                    })
-                    .done(function(data) {
-                        //console.log(data)
-                        $('#loading-spinner').hide();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'บันทึกข้อมูลสำเร็จ',
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            location.reload();
-                            //null
-                        });
-                    })
-                    .fail(function() {
-                        // just in case posting your form failed
-                        alert("Posting failed.");
+                if (ajaxData.DriverListForm.truckDriver != current_diriver_id) {
+                    Swal.fire({
+                        title: 'เปลี่ยนคนขับรถ',
+                        text: "คุณต้องการเปลี่ยนคนขับรถจาก " + current_diriver_name + " เป็น " + ajaxData.driver_name + " ใช่หรือไม่?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'ใช่, เปลี่ยน!',
+                        cancelButtonText: 'ยกเลิก',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                    type: 'POST',
+                                    dataType: "text",
+                                    url: 'function/10_workOrder/mainFunction.php',
+                                    data: (ajaxData),
+                                    beforeSend: function() {
+                                        // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                                        $('#loading-spinner').show();
+                                    },
+                                })
+                                .done(function(data) {
+                                    var ajaxData2 = {};
+                                    ajaxData2['f'] = 28;
+                                    ajaxData2['oldDriverID'] = current_diriver_id;
+                                    ajaxData2['NewDriverID'] = ajaxData.DriverListForm.truckDriver;
+                                    ajaxData2['MAIN_JOB_ID'] = MAIN_job_id;
+                                    ajaxData2['MAIN_trip_id'] = MAIN_trip_id;
+                                    ajaxData2['update_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
+                                    // Send notification to confirm new Driver
+                                    $.ajax({
+                                            type: 'POST',
+                                            dataType: "text",
+                                            url: 'function/10_workOrder/mainFunction.php',
+                                            data: (ajaxData2),
+                                            beforeSend: function() {
+                                                // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                                                $('#loading-spinner').show();
+                                            },
+                                        })
+                                        .done(function(data) {
+                                            //console.log(data)
+                                            $('#loading-spinner').hide();
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'บันทึกข้อมูลสำเร็จ',
+                                                showConfirmButton: false,
+                                                timer: 1500
+                                            }).then(() => {
+                                                location.reload();
+                                                //null
+                                            });
+                                        })
+                                        .fail(function() {
+                                            // just in case posting your form failed
+                                            alert("Posting failed.");
+                                        });
+
+                                })
+                                .fail(function() {
+                                    // just in case posting your form failed
+                                    alert("Posting failed.");
+                                });
+                        } else if (
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            // รหัสสำหรับการยกเลิกการเปลี่ยนคนขับรถ
+                        }
                     });
+
+                } else {
+                    $.ajax({
+                            type: 'POST',
+                            dataType: "text",
+                            url: 'function/10_workOrder/mainFunction.php',
+                            data: (ajaxData),
+                            beforeSend: function() {
+                                // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                                $('#loading-spinner').show();
+                            },
+                        })
+                        .done(function(data) {
+                            //console.log(data)
+                            $('#loading-spinner').hide();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'บันทึกข้อมูลสำเร็จ',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                                //null
+                            });
+                        })
+                        .fail(function() {
+                            // just in case posting your form failed
+                            alert("Posting failed.");
+                        });
+                }
+
 
             });
 
