@@ -2134,41 +2134,57 @@ include 'check_cookie.php';
                                     },
                                 })
                                 .done(function(data) {
-                                    var ajaxData2 = {};
-                                    ajaxData2['f'] = 28;
-                                    ajaxData2['oldDriverID'] = current_diriver_id;
-                                    ajaxData2['NewDriverID'] = ajaxData.DriverListForm.truckDriver;
-                                    ajaxData2['MAIN_JOB_ID'] = MAIN_job_id;
-                                    ajaxData2['MAIN_trip_id'] = MAIN_trip_id;
-                                    ajaxData2['update_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
-                                    // Send notification to confirm new Driver
-                                    $.ajax({
-                                            type: 'POST',
-                                            dataType: "text",
-                                            url: 'function/10_workOrder/mainFunction.php',
-                                            data: (ajaxData2),
-                                            beforeSend: function() {
-                                                // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
-                                                $('#loading-spinner').show();
-                                            },
-                                        })
-                                        .done(function(data) {
-                                            //console.log(data)
-                                            $('#loading-spinner').hide();
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: 'บันทึกข้อมูลสำเร็จ',
-                                                showConfirmButton: false,
-                                                timer: 1500
-                                            }).then(() => {
-                                                location.reload();
-                                                //null
+
+                                    if (MAIN_TRIP_STATUS != "รอเจ้าหน้าที่ยืนยัน") {
+                                        var ajaxData2 = {};
+                                        ajaxData2['f'] = 28;
+                                        ajaxData2['oldDriverID'] = current_diriver_id;
+                                        ajaxData2['NewDriverID'] = ajaxData.DriverListForm.truckDriver;
+                                        ajaxData2['MAIN_JOB_ID'] = MAIN_job_id;
+                                        ajaxData2['MAIN_trip_id'] = MAIN_trip_id;
+                                        ajaxData2['update_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
+                                        // Send notification to confirm new Driver
+                                        $.ajax({
+                                                type: 'POST',
+                                                dataType: "text",
+                                                url: 'function/10_workOrder/mainFunction.php',
+                                                data: (ajaxData2),
+                                                beforeSend: function() {
+                                                    // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                                                    $('#loading-spinner').show();
+                                                },
+                                            })
+                                            .done(function(data) {
+                                                //console.log(data)
+                                                $('#loading-spinner').hide();
+                                                Swal.fire({
+                                                    icon: 'success',
+                                                    title: 'บันทึกข้อมูลสำเร็จ',
+                                                    showConfirmButton: false,
+                                                    timer: 1500
+                                                }).then(() => {
+                                                    location.reload();
+                                                    //null
+                                                });
+                                            })
+                                            .fail(function() {
+                                                // just in case posting your form failed
+                                                alert("Posting failed.");
                                             });
-                                        })
-                                        .fail(function() {
-                                            // just in case posting your form failed
-                                            alert("Posting failed.");
+                                    } else {
+                                        $('#loading-spinner').hide();
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'บันทึกข้อมูลสำเร็จ',
+                                            showConfirmButton: false,
+                                            timer: 1500
+                                        }).then(() => {
+                                            location.reload();
+                                            //null
                                         });
+                                    }
+
+
 
                                 })
                                 .fail(function() {
