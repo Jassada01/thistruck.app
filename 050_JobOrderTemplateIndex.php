@@ -133,6 +133,7 @@ include 'check_cookie.php';
                                                         <th class="font-weight-bold text-center">ประเภทงาน</th>
                                                         <th class="font-weight-bold text-center">ผู้ติดต่อ</th>
                                                         <th class="font-weight-bold text-center">เบอร์โทร</th>
+                                                        <th class="font-weight-bold text-center">ราคางาน</th>
                                                         <th class="font-weight-bold text-center"></th>
                                                     </tr>
                                                 </thead>
@@ -146,9 +147,45 @@ include 'check_cookie.php';
 
                                                     // ส่วนของการดึงข้อมูลจากฐานข้อมูล
                                                     if ($inactive) {
-                                                        $sql = "Select a.id, a.job_name, a.job_type, a.active, b.ClientName, b.Branch, b.ContactPerson, b.Phone From job_order_template_header a Inner Join client_info b ON a.ClientID = b.ClientID Order By a.ClientID";
+                                                        $sql = "Select 
+                                                        a.id, 
+                                                        a.job_name, 
+                                                        a.job_type, 
+                                                        a.active, 
+                                                        b.ClientName, 
+                                                        b.Branch, 
+                                                        b.ContactPerson, 
+                                                        b.Phone, 
+                                                        d.price 
+                                                    From 
+                                                        job_order_template_header a 
+                                                        Inner Join client_info b ON a.ClientID = b.ClientID 
+                                                        Left Join service_items_mapping c ON a.id = c.jobTemplate_ID 
+                                                        Left Join service_items d ON c.service_id = d.id 
+                                                    Order By 
+                                                        a.ClientID;
+                                                    ";
                                                     } else {
-                                                        $sql = "Select a.id, a.job_name, a.job_type, a.active, b.ClientName, b.Branch, b.ContactPerson, b.Phone From job_order_template_header a Inner Join client_info b ON a.ClientID = b.ClientID Where a.active = 1 Order By a.ClientID";
+                                                        $sql = "Select 
+                                                            a.id, 
+                                                            a.job_name, 
+                                                            a.job_type, 
+                                                            a.active, 
+                                                            b.ClientName, 
+                                                            b.Branch, 
+                                                            b.ContactPerson, 
+                                                            b.Phone, 
+                                                            d.price 
+                                                        From 
+                                                            job_order_template_header a 
+                                                            Inner Join client_info b ON a.ClientID = b.ClientID 
+                                                            Left Join service_items_mapping c ON a.id = c.jobTemplate_ID 
+                                                            Left Join service_items d ON c.service_id = d.id 
+                                                        Where 
+                                                            a.active = 1 
+                                                        Order By 
+                                                            a.ClientID;
+                                                        ";
                                                     }
                                                     $result = mysqli_query($conn, $sql);
 
@@ -162,12 +199,13 @@ include 'check_cookie.php';
 
 
                                                         echo "<tr>";
-                                                        echo "<td>  " . $row['job_name'] . $nonActive  . "</td>";
+                                                        echo "<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" . $row['job_name'] . $nonActive  . "</td>";
                                                         echo "<td>" . $row['ClientName'] . "</td>";
                                                         echo "<td>" . $row['Branch'] . "</td>";
                                                         echo "<td  class='text-center' >" . $row['job_type'] . "</td>";
                                                         echo "<td>" . $row['ContactPerson'] . "</td>";
                                                         echo "<td>" . $row['Phone'] . "</td>";
+                                                        echo "<td  class='text-center'>" . $row['price'] . "</td>";
                                                         echo "<td><a href=\"052_jobOrderTemplateDetail.php?jobTemplateID=" . $row['id'] . "\"><button type=\"button\" class=\"btn btn-sm btn-secondary\">ดูรายละเอียด</button></a></td>";
                                                         echo "</tr>";
                                                     }
@@ -486,7 +524,26 @@ include 'check_cookie.php';
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json"
                 },
+                "pageLength": 50,
                 "autoWidth": false,
+                
+                "columnDefs": [
+                    {
+                        "targets":6,
+                        "render": function(data, type, row, meta) {
+                            if ($.isNumeric(data))
+                            {
+                                //return new Intl.NumberFormat().format(data);
+                                return '<a href="#" class="btn btn-link btn-color-primary btn-active-color-primary btn-sm">'+Intl.NumberFormat().format(data)+'</a>';
+                            }
+                            else
+                            {
+                                return '<a href="#" class="btn btn-link btn-color-danger btn-active-color-primary btn-sm">ยังไม่ได้กำหนด</a>';
+                            }
+                            
+                        }
+                    }
+                ]
 
             });
             // Show Table 

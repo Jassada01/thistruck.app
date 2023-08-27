@@ -253,6 +253,7 @@ function loadJobTemplateDatafromJobTemplateID()
 	$data_Array['jobHeaderForm'] = array();
 	$data_Array['jobDetailCostForm'] = array();
 	$data_Array['jobDetailPlan'] = array();
+	$data_Array['jobPrice'] = array();
 
 	// เชื่อมต่อฐานข้อมูล MySQL
 	include "../connectionDb.php";
@@ -298,6 +299,15 @@ function loadJobTemplateDatafromJobTemplateID()
 	while ($row = $res->fetch_assoc()) {
 		$data_Array['jobDetailPlan'][] = $row;
 	}
+
+	//4 Load Job Price =====================================
+	$sql = "SELECT * FROM  service_items_mapping WHERE jobTemplate_ID = $jobTemplateID";
+
+	$res = $conn->query(trim($sql));
+	while ($row = $res->fetch_assoc()) {
+		$data_Array['jobPrice'][] = $row;
+	}
+
 	mysqli_close($conn);
 	echo json_encode($data_Array, JSON_UNESCAPED_UNICODE);
 }
@@ -321,6 +331,7 @@ function updateJobTemplateByID()
 	$remark = $jobHeaderForm['remark'];
 	$active = $jobHeaderForm['active'];
 	$customer_id = $jobHeaderForm['customerID'];
+	$Job_Price = $jobHeaderForm['Job_Price'];
 
 	// สร้าง SQL query ในการอัพเดต
 	$sql = "UPDATE job_order_template_header
@@ -426,6 +437,30 @@ function updateJobTemplateByID()
 	}
 
 	// # Step 3 Finished 
+	
+	// # Step 4 Update Mapping price ==================
+	// Check if setvalue
+	if ($Job_Price != "")
+	{
+		// Job Price Exist 
+		// Delete Exist Data 
+		$sql = "Delete From service_items_mapping Where jobTemplate_ID = $job_order_template_header_id";
+		if (!$conn->query($sql)) {
+			//echo $sql;
+			echo  $conn->errno;
+			exit();
+		}
+
+		// Insert New Data 
+		$sql = "Insert Into service_items_mapping value ($job_order_template_header_id, $Job_Price) ";
+		if (!$conn->query($sql)) {
+			//echo $sql;
+			echo  $conn->errno;
+			exit();
+		}
+	
+	}
+	
 	// Close Connect ===================
 	mysqli_close($conn);
 

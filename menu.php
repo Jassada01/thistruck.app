@@ -144,14 +144,44 @@
                                     <!--end::Menu sub-->
                                 </div>
 
-                                <!--end::Menu item-->
-                                <div class="menu-item">
-                                    <a class="menu-link py-3" href="050_JobOrderTemplateIndex.php">
+                                <div class="menu-item" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+                                    <!--begin::Menu link-->
+                                    <a href="#" class="menu-link">
                                         <span class="menu-icon">
                                             <i class="bi bi-card-checklist fs-3"></i>
                                         </span>
                                         <span class="menu-title">แผนการจัดส่ง</span>
+                                        <span class="menu-arrow"></span>
                                     </a>
+                                    <!--end::Menu link-->
+
+                                    <!--begin::Menu sub-->
+                                    <div class="menu-sub menu-sub-dropdown w-200px py-2">
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item">
+                                            <a href="050_JobOrderTemplateIndex.php" class="menu-link">
+                                                <span class="menu-icon">
+                                                    <i class="bi bi-card-checklist fs-3"></i>
+                                                </span>
+                                                <span class="menu-title">รายการแผนการจัดส่ง</span>
+                                            </a>
+                                        </div>
+                                        <!--end::Menu item-->
+
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item">
+                                            <a href="060_JobOrderTemplatePrice.php" class="menu-link">
+                                                <span class="menu-icon">
+                                                    <i class="bi bi-currency-bitcoin fs-3"></i>
+                                                </span>
+                                                <span class="menu-title">ราคาการจัดส่ง</span>
+                                            </a>
+                                        </div>
+                                        <!--end::Menu item-->
+
+
+                                    </div>
+                                    <!--end::Menu sub-->
                                 </div>
                             </div>
                         </div>

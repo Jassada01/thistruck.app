@@ -203,7 +203,7 @@ include 'check_cookie.php';
                                                         </div>
                                                         <div class="col-sm-3 col-form-label">
                                                             <div class="form-check form-check-custom form-check-solid form-check-lg">
-                                                                <input class="form-check-input" type="checkbox" value="" id="autoGenJobName"  />
+                                                                <input class="form-check-input" type="checkbox" value="" id="autoGenJobName" />
                                                                 <label class="form-check-label" for="autoGenJobName">
                                                                     อัตโนมัติ
                                                                 </label>
@@ -300,12 +300,28 @@ include 'check_cookie.php';
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="mb-3 row">
-                                                        <label for="remark" class="col-sm-3 col-form-label text-end-pc"></label>
-                                                        <div class="col-sm-6">
-                                                            <!-- 
-                                                            <button type="submit" class="btn btn-primary">เพิ่มข้อมูล</button>
-                                                            -->
+                                                    <div class="form-group mt-3 row">
+                                                        <label for="Job_Price" class="col-sm-3 col-form-label text-end-pc">ราคางาน(ออกInvoice)</label>
+                                                        <div class="col-sm-3">
+                                                            <select class="form-control " id="Job_Price" name="Job_Price" required>
+                                                                <option value="">กรุณาเลือกราคางาน</option>
+                                                                <?php
+                                                                // Connect to database
+                                                                include "function/connectionDb.php";
+
+                                                                // Query data from master_data where type = 'Job_Type'
+                                                                $sql = "SELECT * FROM service_items";
+                                                                $result = mysqli_query($conn, $sql);
+
+                                                                // Loop through data and create dropdown options
+                                                                while ($row = mysqli_fetch_assoc($result)) {
+                                                                    echo "<option value='" . $row['id'] . "'>".$row['item_name']. " ราคา :  " . $row['price'] . "</option>";
+                                                                }
+
+                                                                // Close database connection
+                                                                mysqli_close($conn);
+                                                                ?>
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </form>
@@ -399,55 +415,55 @@ include 'check_cookie.php';
                                                                         <div class="row mb-3">
                                                                             <label for="hire_price" class="col-sm-5 col-form-label  text-end-pc">ราคางาน</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="hire_price" name="hire_price" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="hire_price" name="hire_price" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
                                                                             <label for="overtime_fee" class="col-sm-5 col-form-label  text-end-pc">ค่าล่วงเวลา</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="overtime_fee" name="overtime_fee" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="overtime_fee" name="overtime_fee" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
                                                                             <label for="port_charge" class="col-sm-5 col-form-label  text-end-pc">ค่าผ่านท่า</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="port_charge" name="port_charge" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="port_charge" name="port_charge" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
                                                                             <label for="yard_charge" class="col-sm-5 col-form-label  text-end-pc">ค่าผ่านลาน</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="yard_charge" name="yard_charge" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="yard_charge" name="yard_charge" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
                                                                             <label for="container_return" class="col-sm-5 col-form-label  text-end-pc">ค่ารับตู้/คืนตู้</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="container_return" name="container_return" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="container_return" name="container_return" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
                                                                             <label for="container_cleaning_repair" class="col-sm-5 col-form-label  text-end-pc">ค่าซ่อมตู้</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="container_cleaning_repair" name="container_cleaning_repair" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="container_cleaning_repair" name="container_cleaning_repair" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
                                                                             <label for="container_drop_lift" class="col-sm-5 col-form-label  text-end-pc">ค่าล้างตู้</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="container_drop_lift" name="container_drop_lift" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="container_drop_lift" name="container_drop_lift" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
                                                                             <label for="expenses_1" class="col-sm-5 col-form-label  text-end-pc">ค่าชอร์(SHORE)</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="expenses_1" name="expenses_1" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="expenses_1" name="expenses_1" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
                                                                             <label for="other_charge" class="col-sm-5 col-form-label  text-end-pc">ค่าใช้จ่ายอื่นๆ</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="other_charge" name="other_charge" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="other_charge" name="other_charge" required>
                                                                             </div>
 
                                                                         </div>
@@ -460,13 +476,13 @@ include 'check_cookie.php';
                                                                         <div class="row mb-3">
                                                                             <label for="deduction_note" class="col-sm-5 col-form-label  text-end-pc">ใบหัก ณ ที่จ่ายกระทำแทน</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="deduction_note" name="deduction_note" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="deduction_note" name="deduction_note" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3 d-none">
                                                                             <label for="total_expenses" class="col-sm-5 col-form-label  text-end-pc">รวมค่าใช้จ่าย</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="total_expenses" name="total_expenses" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="total_expenses" name="total_expenses" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
@@ -478,13 +494,13 @@ include 'check_cookie.php';
                                                                         <div class="row mb-3">
                                                                             <label for="wage_travel_cost" class="col-sm-5 col-form-label  text-end-pc">ค่าเดินทาง/ค่าเที่ยว</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="wage_travel_cost" name="wage_travel_cost" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="wage_travel_cost" name="wage_travel_cost" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-3">
                                                                             <label for="vehicle_expenses" class="col-sm-5 col-form-label  text-end-pc">ค่าใช้จ่ายรถ</label>
                                                                             <div class="col-sm-7">
-                                                                                <input type="number" step="0.01" class="form-control" id="vehicle_expenses" name="vehicle_expenses" required>
+                                                                                <input type="text" step="0.01" class="form-control" id="vehicle_expenses" name="vehicle_expenses" required>
                                                                             </div>
                                                                         </div>
                                                                     </form>
@@ -969,6 +985,10 @@ include 'check_cookie.php';
                 placeholder: 'เลือกลูกค้า'
             });
 
+            //Job_Price
+            $('#Job_Price').select2({
+                placeholder: 'เลือกราคางาน'
+            });
 
 
             // Form to Object 
@@ -1437,7 +1457,7 @@ include 'check_cookie.php';
                     ajaxData['f'] = '5';
                     ajaxData['jobTemplateID'] = jobTemplateID;
 
-                    //console.log(ajaxData);
+                    console.log(ajaxData);
 
                     $.ajax({
                             type: 'POST',
@@ -1498,7 +1518,7 @@ include 'check_cookie.php';
                     .done(function(data) {
 
                         var data_arr = JSON.parse(data);
-                        
+
 
                         // Process jobHeaderForm =================================================
                         // Assuming the JSON response is stored in a variable called jsonData
@@ -1519,6 +1539,7 @@ include 'check_cookie.php';
                             $('#active').removeAttr('checked');
                         }
 
+                        
 
 
                         // Process jobDetailCostForm =================================================
@@ -1572,6 +1593,11 @@ include 'check_cookie.php';
                         } else {
                             var formattedTotal = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                             $("#totalCostPanel").html(formattedTotal + " บาท");
+                        }
+
+                        if (data_arr.jobPrice.length > 0)
+                        {
+                            $('#Job_Price').val(data_arr.jobPrice[0].service_id).trigger('change');
                         }
 
 
