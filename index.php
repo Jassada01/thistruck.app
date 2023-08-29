@@ -30,7 +30,9 @@ include 'check_cookie.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
     <!-- Data table CSS -->
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-    <link href="assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
+
+    <!-- pivotJS -->
+    <link href="assets/plugins/custom/pivot/pivot.css" rel="stylesheet" type="text/css" />
 
 
     <!--end::Global Stylesheets Bundle-->
@@ -416,7 +418,7 @@ include 'check_cookie.php';
                             </div>
                             <!--begin::Row-->
                             <div class="row gy-5 g-xl-8">
-                                <div class="col-sm-12">
+                                <div class="col-sm-8">
                                     <div class="card card-xl-stretch mb-5 mb-xl-8">
                                         <!--begin::Header-->
                                         <div class="card-header border-0 pt-5">
@@ -429,6 +431,33 @@ include 'check_cookie.php';
                                         <!--begin::Body-->
                                         <div class="card-body py-3">
                                             <div id="graphworkpayment" style="width: 100%; height: 500px;"></div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="card card-xl-stretch mb-5 mb-xl-8">
+                                        <!--begin::Header-->
+                                        <div class="card-header border-0 pt-5">
+                                            <h3 class="card-title align-items-start flex-column">
+                                                <span class="card-label fw-bolder fs-3 mb-1">สรุปงานในเดือนนี้</span>
+                                                <span class="text-muted mt-1 fw-bold fs-7"></span>
+                                            </h3>
+                                            <div class="card-toolbar">
+                                                <!--begin::Menu-->
+                                                <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary" id="btnOpenPivotTablePanel">
+                                                    <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
+                                                    <i class="bi bi-arrows-angle-expand"></i>
+                                                    <!--end::Svg Icon-->
+                                                </button>
+                                                <!--end::Menu 1-->
+                                                <!--end::Menu-->
+                                            </div>
+                                        </div>
+                                        <!--end::Header-->
+                                        <!--begin::Body-->
+                                        <div class="card-body py-3" style="max-height: 500px; overflow-y: auto;">
+                                            <div id="output" style="width: 100%;"></div>
 
                                         </div>
                                     </div>
@@ -455,6 +484,7 @@ include 'check_cookie.php';
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                         <!--end::Container-->
@@ -471,6 +501,32 @@ include 'check_cookie.php';
         <!--end::Page-->
     </div>
     <!--end::Root-->
+
+
+    <!-- Modal แก้ไขสถานที่ -->
+    <div class="modal fade" id="showPivotModal" tabindex="-1" aria-labelledby="showPivotModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="showPivotModalLabel">Pivot Table</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container my-5">
+                        <div id="myPivot" style="height: 100%; overflow-y: auto;"></div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
 
     <!--end::Main-->
     <script>
@@ -499,6 +555,10 @@ include 'check_cookie.php';
     <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
 
 
+    <!--pivottable -->
+    <script src="assets/plugins/custom/pivot/pivot.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src="assets/plugins/custom/pivot/export_renderers.js"></script>
 
 
     <!--end::Page Custom Javascript-->
@@ -657,11 +717,10 @@ include 'check_cookie.php';
                         var tbody = $('#jobProgressTable');
                         var initial_tripNo = "";
                         data_arr.forEach(function(data) {
-                            if (initial_tripNo == "")
-                            {
+                            if (initial_tripNo == "") {
                                 initial_tripNo = data.tripNo;
                             }
-                            
+
 
                             var row = $('<tr></tr>');
 
@@ -925,13 +984,22 @@ include 'check_cookie.php';
                     .done(function(data) {
                         var data_arr = JSON.parse(data);
 
-
                         var calendarEl = document.getElementById("kt_docs_fullcalendar_locales");
 
                         var events = [];
+                        var dayCount = {};
+
 
                         // สร้าง events จาก data_arr
                         for (var i = 0; i < data_arr.length; i++) {
+                            var startDate = data_arr[i].start.split(" ")[0]; // Assuming the format is "YYYY-MM-DD HH:MM:SS"
+
+                            if (dayCount[startDate] === undefined) {
+                                dayCount[startDate] = 0;
+                            }
+                            dayCount[startDate]++;
+
+
                             var completeFlag = data_arr[i].complete_flag;
 
                             var event = {
@@ -968,13 +1036,25 @@ include 'check_cookie.php';
                             navLinks: true,
                             editable: true,
                             dayMaxEvents: true,
+                            dayCellDidMount: function(info) {
+                                var dateStr = FullCalendar.formatDate(info.date, {
+                                    month: 'numeric',
+                                    day: 'numeric',
+                                    year: 'numeric',
+                                    delimiter: '-'
+                                });
+                                if (dayCount[dateStr]) {
+                                    var cell = info.el;
+                                    var countDiv = document.createElement("div");
+                                    countDiv.className = "day-count";
+                                    countDiv.innerHTML = "Count: " + dayCount[dateStr];
+                                    cell.appendChild(countDiv);
+                                }
+                            },
                             events: events // ใช้ events ที่สร้างจาก data_arr
                         });
 
                         calendar.render();
-
-
-
 
                     })
                     .fail(function() {
@@ -1224,6 +1304,79 @@ include 'check_cookie.php';
                         alert("Posting failed.");
                     });
             }
+
+            function LoadDataforPrivotTable() {
+                var ajaxData = {};
+                ajaxData['f'] = '6';
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/index/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        var data_arr = JSON.parse(data);
+                        //console.log(data_arr);
+
+                        for (let i = 0; i < data_arr.length; i++) {
+                            const oldDate = data_arr[i]['วันที่'];
+                            const newDate = moment(oldDate, 'YYYY-MM-DD').format('DD MMM');
+                            data_arr[i]['วันที่'] = newDate;
+                            data_arr[i]['จำนวน'] = parseInt(data_arr[i]['จำนวน']);
+                        }
+
+                        var sum = $.pivotUtilities.aggregatorTemplates.sum;
+                        var numberFormat = $.pivotUtilities.numberFormat;
+                        var intFormat = numberFormat({
+                            digitsAfterDecimal: 0
+                        });
+                        try {
+                            // คอนฟิกของ Pivot Table
+                            $(function() {
+
+
+                                $("#output").pivot(data_arr, {
+                                    rows: ["วันที่"],
+                                    cols: ["ประเภทงาน"],
+                                    vals: ["จำนวน"],
+                                    aggregatorName: "Integer Sum",
+                                });
+                                var renderers = $.extend($.pivotUtilities.renderers,
+                                    $.pivotUtilities.export_renderers);
+                                //myPivot
+                                $("#myPivot").pivotUI(data_arr, {
+                                    rows: ["วันที่", "สถานะทริป"],
+                                    cols: ["ประเภทงาน"],
+                                    vals: ["จำนวน"],
+                                    aggregatorName: "Integer Sum",
+                                    renderers: renderers,
+                                    rendererName: "Table"
+                                });
+
+
+
+
+                            });
+                        } catch (e) {
+                            console.error("An error occurred: ", e);
+                        }
+
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+            //btnOpenPivotTablePanel
+            //$('#addLocationModal').modal('hide');
+            $('body').on('click', '#btnOpenPivotTablePanel', function() {
+                //console.log(TEMP_MAIN_DATA);
+                $('#showPivotModal').modal('show');
+            });
+
+
             // Initial Run When start ===============================================================
             //Initialcalendar();
             loadProgress();
@@ -1231,6 +1384,7 @@ include 'check_cookie.php';
             LoadMonthlyByClient();
             LoadJobWorkLoad();
             getThisMonthPaymenteachDriver();
+            LoadDataforPrivotTable();
 
 
         });

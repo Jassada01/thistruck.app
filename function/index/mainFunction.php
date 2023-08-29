@@ -236,7 +236,7 @@ function getWorkBymonth()
 			AND b.status <> 'ยกเลิก' 
 			Group By 
 			c.ClientName, 
-			b.job_no
+			b.tripNo
 		) z 
 		Group by 
 		clientName
@@ -282,7 +282,7 @@ function getJobWorkLoad()
 	echo json_encode($data_Array);
 }
 
-// F=4
+// F=5
 function getThisMonthPaymenteachDriver()
 {
 	// Load All Data from Paramitor
@@ -332,6 +332,75 @@ function getThisMonthPaymenteachDriver()
 	echo json_encode($data_Array);
 }
 
+// F=6
+function LoadDataforPrivotTable()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
+	
+	/*$sql = "SELECT DATE(b.jobStartDateTime) AS วันที่, a.job_name AS ชื่องาน, a.job_type AS ประเภทงาน,  count(*) AS จำนวน From job_order_header a 
+	Inner Join job_order_detail_trip_info b ON a.id = b.job_id
+	Where a.status <> 'ยกเลิก'
+	AND b.status <> 'ยกเลิก'
+	AND DATE_FORMAT(a.job_date, '%m%Y') = DATE_FORMAT(current_timestamp, '%m%Y') 
+	GROUP By a.job_name, a.job_type, DATE(b.jobStartDateTime) Order By a.job_date";
+	*/
+
+	$sql = "SELECT 
+			DATE(b.jobStartDateTime) AS วันที่, 
+			a.job_name AS ชื่องาน, 
+			a.client_name AS ผู้ว่าจ้าง,
+			a.job_no AS 'เลขที่จ๊อบ', 
+			b.tripNo  AS 'เลขที่ทริป',
+			a.job_type AS ประเภทงาน, 
+			a.status AS สถานะใบงาน, 
+			b.driver_name AS คนขับรถ,
+			CASE 
+				WHEN b.status = 'จบงาน' THEN 'จบงาน'
+				WHEN b.status = 'รอเจ้าหน้าที่ยืนยัน' THEN 'รอเจ้าหน้าที่ยืนยัน'
+				ELSE 'กำลังดำเนินการ'
+		END AS สถานะทริป,
+		count(*) AS จำนวน 
+		From 
+			job_order_header a 
+			Inner Join job_order_detail_trip_info b ON a.id = b.job_id 
+		Where 
+			a.status <> 'ยกเลิก' 
+			AND b.status <> 'ยกเลิก' 
+			AND DATE_FORMAT(a.job_date, '%m%Y') = DATE_FORMAT(current_timestamp, '%m%Y') 
+		GROUP By 
+			a.job_name, 
+			a.job_type, 
+			DATE(b.jobStartDateTime), 
+			a.client_name,
+			a.status, 
+			b.driver_name, 
+			b.status,
+			a.job_no, 
+			b.tripNo
+		Order By 
+			a.job_date";
+
+
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	echo json_encode($data_Array);
+}
+
 
 
 //============================ MAIN =========================================================
@@ -354,6 +423,10 @@ switch ($f) {
 		}
 	case 5: {
 			getThisMonthPaymenteachDriver();
+			break;
+		}
+	case 6: {
+			LoadDataforPrivotTable();
 			break;
 		}
 }
