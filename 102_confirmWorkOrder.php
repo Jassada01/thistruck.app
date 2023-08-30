@@ -1259,6 +1259,8 @@ include 'check_cookie.php';
             let selectImageforSendArray = [];
             let allTrip_data = [];
 
+            let isClientConfirmed = false;
+
 
             // Set Initial Select 2
             //ClientID
@@ -1353,7 +1355,7 @@ include 'check_cookie.php';
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
-                        //console.log(data_arr);
+                        console.log(data_arr);
 
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
@@ -1516,7 +1518,7 @@ include 'check_cookie.php';
                                 if (MAIN_LINE_CLI === "" && MAIN_LINE_CUS === "") {
                                     // ปิดใช้งานปุ่ม confirmClient
                                     confirmClientBtn.prop("disabled", true);
-
+                                    isClientConfirmed = true;
                                     // เพิ่ม Tooltip และเมื่อนำเมาส์ไปชี้ที่ปุ่ม ให้แสดงข้อความ
                                     confirmClientBtn.attr("data-bs-toggle", "tooltip");
                                     confirmClientBtn.attr("data-bs-placement", "top");
@@ -1525,6 +1527,8 @@ include 'check_cookie.php';
                                     // ให้กำหนด Tooltip ให้ทำงาน
                                     confirmClientBtn.tooltip();
                                 }
+                            } else {
+                                isClientConfirmed = true;
                             }
 
 
@@ -2975,10 +2979,21 @@ include 'check_cookie.php';
             // confirmJobbyTrip
             $('body').on('click', '#confirmJobbyTrip', function() {
                 //selectTripforconfirm
-                $('#selectTripforconfirm').modal('show');
-                //console.log(allTrip_data);
-                let tableRows = allTrip_data.map(generateTableRow).join("");
-                $('#tripTableBody').html(tableRows);
+                if (isClientConfirmed) {
+
+                    $('#selectTripforconfirm').modal('show');
+                    //console.log(allTrip_data);
+                    let tableRows = allTrip_data.map(generateTableRow).join("");
+                    $('#tripTableBody').html(tableRows);
+                }
+                else
+                {
+                    Swal.fire({
+                                title: 'กรุณายืนยันข้อมูลให้ผู้ว่าจ้างก่อน',
+                                icon: 'warning',
+                                confirmButtonText: 'ตกลง'
+                            });
+                }
             });
 
             // สร้างแถวตารางจากข้อมูลใน Object
@@ -2995,9 +3010,7 @@ include 'check_cookie.php';
                 <td>${tripData.status}</td>
             </tr>
                 `;
-                }
-                else
-                {
+                } else {
                     return "";
                 }
 
