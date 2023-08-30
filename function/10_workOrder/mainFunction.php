@@ -1137,7 +1137,7 @@ function confirmJob()
 	$client_line_token = "";
 	$customer_line_token = "";
 
-	$refDoc_Data = " "; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
+	$refDoc_Data = ""; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
 	$agent = "";
 	if ($result->num_rows > 0) {
 		// วนลูปผลลัพธ์ที่ได้จากฐานข้อมูล
@@ -1580,7 +1580,8 @@ function confirmJob()
 													'type' => 'text',
 													'text' => 'คนขับ ',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
+													'weight' => 'bold',
 													'flex' => 1,
 													'wrap' => true,
 												],
@@ -1601,30 +1602,9 @@ function confirmJob()
 											'contents' => [
 												0 => [
 													'type' => 'text',
-													'text' => 'วันที่',
-													'color' => '#aaaaaa',
-													'size' => 'sm',
-													'flex' => 1,
-												],
-												1 => [
-													'type' => 'text',
-													'text' => $formattedJobDate,
-													'wrap' => true,
-													'color' => '#666666',
-													'size' => 'sm',
-													'flex' => 5,
-												],
-											],
-										],
-										2 => [
-											'type' => 'box',
-											'layout' => 'baseline',
-											'spacing' => 'sm',
-											'contents' => [
-												0 => [
-													'type' => 'text',
 													'text' => 'เริ่มงาน',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
+													'weight' => 'bold',
 													'flex' => 1,
 													'size' => 'sm',
 													'wrap' => true,
@@ -1639,21 +1619,7 @@ function confirmJob()
 												],
 											],
 										],
-										3 => [
-											'type' => 'box',
-											'layout' => 'baseline',
-											'contents' => [
-												0 => [
-													'type' => 'text',
-													'text' => 'เอกสารอ้างอิง',
-													'size' => 'sm',
-													'color' => '#aaaaaa',
-													'flex' => 5,
-													'wrap' => true,
-												],
-											],
-										],
-										4 => [
+										2 => [
 											'type' => 'box',
 											'layout' => 'vertical',
 											'contents' => [
@@ -1666,15 +1632,16 @@ function confirmJob()
 												],
 											],
 										],
-										5 => [
+										3 => [
 											'type' => 'box',
 											'layout' => 'baseline',
 											'contents' => [
 												0 => [
 													'type' => 'text',
 													'text' => 'แผนปฏิบัติงาน',
+													'weight' => 'bold',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
 													'flex' => 5,
 													'wrap' => true,
 												],
@@ -1701,8 +1668,9 @@ function confirmJob()
 												0 => [
 													'type' => 'text',
 													'text' => 'ที่อยู่ออกใบเสร็จ',
+													'weight' => 'bold',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
 													'flex' => 5,
 													'wrap' => true,
 												],
@@ -1736,8 +1704,9 @@ function confirmJob()
 												0 => [
 													'type' => 'text',
 													'text' => 'หมายเหตุ',
+													'weight' => 'bold',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
 													'flex' => 5,
 													'wrap' => true,
 												],
@@ -1858,29 +1827,7 @@ function confirmJob()
 								'margin' => 'lg',
 								'spacing' => 'sm',
 								'contents' => [
-									0 => [
-										'type' => 'box',
-										'layout' => 'baseline',
-										'spacing' => 'sm',
-										'contents' => [
-											0 => [
-												'type' => 'text',
-												'text' => 'วันที่',
-												'color' => '#aaaaaa',
-												'size' => 'sm',
-												'flex' => 1,
-											],
-											1 => [
-												'type' => 'text',
-												'text' => $formattedJobDate,
-												'wrap' => true,
-												'color' => '#666666',
-												'size' => 'sm',
-												'flex' => 5,
-											],
-										],
-									],
-									1 => [
+									2 => [
 										'type' => 'box',
 										'layout' => 'baseline',
 										'spacing' => 'sm',
@@ -1888,8 +1835,9 @@ function confirmJob()
 											0 => [
 												'type' => 'text',
 												'text' => 'เริ่มงาน',
-												'color' => '#aaaaaa',
+												'color' => '#000000',
 												'flex' => 1,
+												'weight' => 'bold',
 												'size' => 'sm',
 												'wrap' => true,
 											],
@@ -1903,21 +1851,7 @@ function confirmJob()
 											],
 										],
 									],
-									2 => [
-										'type' => 'box',
-										'layout' => 'baseline',
-										'contents' => [
-											0 => [
-												'type' => 'text',
-												'text' => 'เอกสารอ้างอิง',
-												'size' => 'sm',
-												'color' => '#aaaaaa',
-												'flex' => 5,
-												'wrap' => true,
-											],
-										],
-									],
-									3 => [
+									1 => [
 										'type' => 'box',
 										'layout' => 'vertical',
 										'contents' => [
@@ -1930,7 +1864,7 @@ function confirmJob()
 											],
 										],
 									],
-									4 => [
+									2 => [
 										'type' => 'box',
 										'layout' => 'baseline',
 										'spacing' => 'sm',
@@ -1938,7 +1872,8 @@ function confirmJob()
 											0 => [
 												'type' => 'text',
 												'text' => 'ขนาด',
-												'color' => '#aaaaaa',
+												'weight' => 'bold',
+												'color' => '#000000',
 												'flex' => 1,
 												'size' => 'sm',
 												'wrap' => true,
@@ -1953,15 +1888,16 @@ function confirmJob()
 											],
 										],
 									],
-									5 => [
+									3 => [
 										'type' => 'box',
 										'layout' => 'baseline',
 										'contents' => [
 											0 => [
 												'type' => 'text',
 												'text' => 'แผนปฏิบัติงาน',
+												'weight' => 'bold',
 												'size' => 'sm',
-												'color' => '#aaaaaa',
+												'color' => '#000000',
 												'flex' => 5,
 												'wrap' => true,
 											],
@@ -1988,8 +1924,9 @@ function confirmJob()
 											0 => [
 												'type' => 'text',
 												'text' => 'ที่อยู่ออกใบเสร็จ',
+												'weight' => 'bold',
 												'size' => 'sm',
-												'color' => '#aaaaaa',
+												'color' => '#000000',
 												'flex' => 5,
 												'wrap' => true,
 											],
@@ -2023,8 +1960,9 @@ function confirmJob()
 											0 => [
 												'type' => 'text',
 												'text' => 'หมายเหตุ',
+												'weight' => 'bold',
 												'size' => 'sm',
-												'color' => '#aaaaaa',
+												'color' => '#000000',
 												'flex' => 5,
 												'wrap' => true,
 											],
@@ -2409,15 +2347,16 @@ function cancelJob()
 													0 => [
 														'type' => 'text',
 														'text' => 'เริ่มงานเดิม',
-														'color' => '#aaaaaa',
-														'flex' => 1,
+														'color' => '#000000',
+														'flex' => 2,
+														'weight' => 'bold',
 														'size' => 'sm',
 														'wrap' => true,
 													],
 													1 => [
 														'type' => 'text',
 														'text' => $formattedDate,
-														'flex' => 5,
+														'flex' => 4,
 														'size' => 'sm',
 														'wrap' => true,
 														'color' => '#666666',
@@ -2850,7 +2789,7 @@ function confirmJobOnlyClient()
 	$client_line_token = "";
 	$customer_line_token = "";
 
-	$refDoc_Data = " "; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
+	$refDoc_Data = ""; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
 	$agent = "";
 	if ($result->num_rows > 0) {
 		// วนลูปผลลัพธ์ที่ได้จากฐานข้อมูล
@@ -3259,8 +3198,9 @@ function confirmJobOnlyClient()
 												0 => [
 													'type' => 'text',
 													'text' => 'คนขับ ',
+													'weight' => 'bold',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
 													'flex' => 1,
 													'wrap' => true,
 												],
@@ -3281,30 +3221,9 @@ function confirmJobOnlyClient()
 											'contents' => [
 												0 => [
 													'type' => 'text',
-													'text' => 'วันที่',
-													'color' => '#aaaaaa',
-													'size' => 'sm',
-													'flex' => 1,
-												],
-												1 => [
-													'type' => 'text',
-													'text' => $formattedJobDate,
-													'wrap' => true,
-													'color' => '#666666',
-													'size' => 'sm',
-													'flex' => 5,
-												],
-											],
-										],
-										2 => [
-											'type' => 'box',
-											'layout' => 'baseline',
-											'spacing' => 'sm',
-											'contents' => [
-												0 => [
-													'type' => 'text',
 													'text' => 'เริ่มงาน',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
+													'weight' => 'bold',
 													'flex' => 1,
 													'size' => 'sm',
 													'wrap' => true,
@@ -3319,21 +3238,7 @@ function confirmJobOnlyClient()
 												],
 											],
 										],
-										3 => [
-											'type' => 'box',
-											'layout' => 'baseline',
-											'contents' => [
-												0 => [
-													'type' => 'text',
-													'text' => 'เอกสารอ้างอิง',
-													'size' => 'sm',
-													'color' => '#aaaaaa',
-													'flex' => 5,
-													'wrap' => true,
-												],
-											],
-										],
-										4 => [
+										2 => [
 											'type' => 'box',
 											'layout' => 'vertical',
 											'contents' => [
@@ -3346,7 +3251,7 @@ function confirmJobOnlyClient()
 												],
 											],
 										],
-										5 => [
+										3 => [
 											'type' => 'box',
 											'layout' => 'baseline',
 											'contents' => [
@@ -3354,7 +3259,8 @@ function confirmJobOnlyClient()
 													'type' => 'text',
 													'text' => 'แผนปฏิบัติงาน',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
+													'weight' => 'bold',
 													'flex' => 5,
 													'wrap' => true,
 												],
@@ -3381,8 +3287,9 @@ function confirmJobOnlyClient()
 												0 => [
 													'type' => 'text',
 													'text' => 'ที่อยู่ออกใบเสร็จ',
+													'weight' => 'bold',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
 													'flex' => 5,
 													'wrap' => true,
 												],
@@ -3417,7 +3324,8 @@ function confirmJobOnlyClient()
 													'type' => 'text',
 													'text' => 'หมายเหตุ',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
+													'weight' => 'bold',
 													'flex' => 5,
 													'wrap' => true,
 												],
@@ -3545,30 +3453,9 @@ function confirmJobOnlyClient()
 										'contents' => [
 											0 => [
 												'type' => 'text',
-												'text' => 'วันที่',
-												'color' => '#aaaaaa',
-												'size' => 'sm',
-												'flex' => 1,
-											],
-											1 => [
-												'type' => 'text',
-												'text' => $formattedJobDate,
-												'wrap' => true,
-												'color' => '#666666',
-												'size' => 'sm',
-												'flex' => 5,
-											],
-										],
-									],
-									1 => [
-										'type' => 'box',
-										'layout' => 'baseline',
-										'spacing' => 'sm',
-										'contents' => [
-											0 => [
-												'type' => 'text',
 												'text' => 'เริ่มงาน',
-												'color' => '#aaaaaa',
+												'color' => '#000000',
+												'weight' => 'bold',
 												'flex' => 1,
 												'size' => 'sm',
 												'wrap' => true,
@@ -3583,21 +3470,7 @@ function confirmJobOnlyClient()
 											],
 										],
 									],
-									2 => [
-										'type' => 'box',
-										'layout' => 'baseline',
-										'contents' => [
-											0 => [
-												'type' => 'text',
-												'text' => 'เอกสารอ้างอิง',
-												'size' => 'sm',
-												'color' => '#aaaaaa',
-												'flex' => 5,
-												'wrap' => true,
-											],
-										],
-									],
-									3 => [
+									1 => [
 										'type' => 'box',
 										'layout' => 'vertical',
 										'contents' => [
@@ -3610,7 +3483,7 @@ function confirmJobOnlyClient()
 											],
 										],
 									],
-									4 => [
+									2 => [
 										'type' => 'box',
 										'layout' => 'baseline',
 										'spacing' => 'sm',
@@ -3618,7 +3491,8 @@ function confirmJobOnlyClient()
 											0 => [
 												'type' => 'text',
 												'text' => 'ขนาด',
-												'color' => '#aaaaaa',
+												'weight' => 'bold',
+												'color' => '#000000',
 												'flex' => 1,
 												'size' => 'sm',
 												'wrap' => true,
@@ -3633,15 +3507,16 @@ function confirmJobOnlyClient()
 											],
 										],
 									],
-									5 => [
+									3 => [
 										'type' => 'box',
 										'layout' => 'baseline',
 										'contents' => [
 											0 => [
 												'type' => 'text',
 												'text' => 'แผนปฏิบัติงาน',
+												'weight' => 'bold',
 												'size' => 'sm',
-												'color' => '#aaaaaa',
+												'color' => '#000000',
 												'flex' => 5,
 												'wrap' => true,
 											],
@@ -3668,8 +3543,9 @@ function confirmJobOnlyClient()
 											0 => [
 												'type' => 'text',
 												'text' => 'ที่อยู่ออกใบเสร็จ',
+												'weight' => 'bold',
 												'size' => 'sm',
-												'color' => '#aaaaaa',
+												'color' => '#000000',
 												'flex' => 5,
 												'wrap' => true,
 											],
@@ -3703,8 +3579,9 @@ function confirmJobOnlyClient()
 											0 => [
 												'type' => 'text',
 												'text' => 'หมายเหตุ',
+												'weight' => 'bold',
 												'size' => 'sm',
-												'color' => '#aaaaaa',
+												'color' => '#000000',
 												'flex' => 5,
 												'wrap' => true,
 											],
@@ -4187,15 +4064,16 @@ function cancelTrip()
 													0 => [
 														'type' => 'text',
 														'text' => 'เริ่มงานเดิม',
-														'color' => '#aaaaaa',
-														'flex' => 1,
+														'weight' => 'bold',
+														'color' => '#000000',
+														'flex' => 2,
 														'size' => 'sm',
 														'wrap' => true,
 													],
 													1 => [
 														'type' => 'text',
 														'text' => $formattedDate,
-														'flex' => 5,
+														'flex' => 4,
 														'size' => 'sm',
 														'wrap' => true,
 														'color' => '#666666',
@@ -4376,7 +4254,7 @@ function confirmJobbyTrip()
 	$client_line_token = "";
 	$customer_line_token = "";
 
-	$refDoc_Data = " "; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
+	$refDoc_Data = ""; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
 	$agent = "";
 	if ($result->num_rows > 0) {
 		// วนลูปผลลัพธ์ที่ได้จากฐานข้อมูล
@@ -4819,8 +4697,9 @@ function confirmJobbyTrip()
 												0 => [
 													'type' => 'text',
 													'text' => 'คนขับ ',
+													'weight' => 'bold',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
 													'flex' => 1,
 													'wrap' => true,
 												],
@@ -4841,30 +4720,9 @@ function confirmJobbyTrip()
 											'contents' => [
 												0 => [
 													'type' => 'text',
-													'text' => 'วันที่',
-													'color' => '#aaaaaa',
-													'size' => 'sm',
-													'flex' => 1,
-												],
-												1 => [
-													'type' => 'text',
-													'text' => $formattedJobDate,
-													'wrap' => true,
-													'color' => '#666666',
-													'size' => 'sm',
-													'flex' => 5,
-												],
-											],
-										],
-										2 => [
-											'type' => 'box',
-											'layout' => 'baseline',
-											'spacing' => 'sm',
-											'contents' => [
-												0 => [
-													'type' => 'text',
 													'text' => 'เริ่มงาน',
-													'color' => '#aaaaaa',
+													'weight' => 'bold',
+													'color' => '#000000',
 													'flex' => 1,
 													'size' => 'sm',
 													'wrap' => true,
@@ -4879,21 +4737,7 @@ function confirmJobbyTrip()
 												],
 											],
 										],
-										3 => [
-											'type' => 'box',
-											'layout' => 'baseline',
-											'contents' => [
-												0 => [
-													'type' => 'text',
-													'text' => 'เอกสารอ้างอิง',
-													'size' => 'sm',
-													'color' => '#aaaaaa',
-													'flex' => 5,
-													'wrap' => true,
-												],
-											],
-										],
-										4 => [
+										2 => [
 											'type' => 'box',
 											'layout' => 'vertical',
 											'contents' => [
@@ -4906,15 +4750,16 @@ function confirmJobbyTrip()
 												],
 											],
 										],
-										5 => [
+										3 => [
 											'type' => 'box',
 											'layout' => 'baseline',
 											'contents' => [
 												0 => [
 													'type' => 'text',
 													'text' => 'แผนปฏิบัติงาน',
+													'weight' => 'bold',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
 													'flex' => 5,
 													'wrap' => true,
 												],
@@ -4941,8 +4786,9 @@ function confirmJobbyTrip()
 												0 => [
 													'type' => 'text',
 													'text' => 'ที่อยู่ออกใบเสร็จ',
+													'weight' => 'bold',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
 													'flex' => 5,
 													'wrap' => true,
 												],
@@ -4976,8 +4822,9 @@ function confirmJobbyTrip()
 												0 => [
 													'type' => 'text',
 													'text' => 'หมายเหตุ',
+													'weight' => 'bold',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
 													'flex' => 5,
 													'wrap' => true,
 												],
@@ -5104,7 +4951,7 @@ function Change_Driver_Notify()
 	$client_line_token = "";
 	$customer_line_token = "";
 
-	$refDoc_Data = " "; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
+	$refDoc_Data = ""; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
 	$agent = "";
 	if ($result->num_rows > 0) {
 		// วนลูปผลลัพธ์ที่ได้จากฐานข้อมูล
@@ -5462,7 +5309,7 @@ function Change_Driver_Notify()
 									'wrap' => true,
 									'weight' => 'bold',
 									'style' => 'normal',
-									'align' => 'end',
+									'align' => 'center',
 								],
 								1 => [
 									'type' => 'text',
@@ -5516,7 +5363,8 @@ function Change_Driver_Notify()
 													'type' => 'text',
 													'text' => 'คนขับ ',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'weight' => 'bold',
+													'color' => '#000000',
 													'flex' => 1,
 													'wrap' => true,
 												],
@@ -5537,30 +5385,9 @@ function Change_Driver_Notify()
 											'contents' => [
 												0 => [
 													'type' => 'text',
-													'text' => 'วันที่',
-													'color' => '#aaaaaa',
-													'size' => 'sm',
-													'flex' => 1,
-												],
-												1 => [
-													'type' => 'text',
-													'text' => $formattedJobDate,
-													'wrap' => true,
-													'color' => '#666666',
-													'size' => 'sm',
-													'flex' => 5,
-												],
-											],
-										],
-										2 => [
-											'type' => 'box',
-											'layout' => 'baseline',
-											'spacing' => 'sm',
-											'contents' => [
-												0 => [
-													'type' => 'text',
 													'text' => 'เริ่มงาน',
-													'color' => '#aaaaaa',
+													'weight' => 'bold',
+													'color' => '#000000',
 													'flex' => 1,
 													'size' => 'sm',
 													'wrap' => true,
@@ -5575,21 +5402,7 @@ function Change_Driver_Notify()
 												],
 											],
 										],
-										3 => [
-											'type' => 'box',
-											'layout' => 'baseline',
-											'contents' => [
-												0 => [
-													'type' => 'text',
-													'text' => 'เอกสารอ้างอิง',
-													'size' => 'sm',
-													'color' => '#aaaaaa',
-													'flex' => 5,
-													'wrap' => true,
-												],
-											],
-										],
-										4 => [
+										2 => [
 											'type' => 'box',
 											'layout' => 'vertical',
 											'contents' => [
@@ -5602,15 +5415,16 @@ function Change_Driver_Notify()
 												],
 											],
 										],
-										5 => [
+										3 => [
 											'type' => 'box',
 											'layout' => 'baseline',
 											'contents' => [
 												0 => [
 													'type' => 'text',
 													'text' => 'แผนปฏิบัติงาน',
+													'weight' => 'bold',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
 													'flex' => 5,
 													'wrap' => true,
 												],
@@ -5637,8 +5451,9 @@ function Change_Driver_Notify()
 												0 => [
 													'type' => 'text',
 													'text' => 'ที่อยู่ออกใบเสร็จ',
+													'weight' => 'bold',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
 													'flex' => 5,
 													'wrap' => true,
 												],
@@ -5672,8 +5487,9 @@ function Change_Driver_Notify()
 												0 => [
 													'type' => 'text',
 													'text' => 'หมายเหตุ',
+													'weight' => 'bold',
 													'size' => 'sm',
-													'color' => '#aaaaaa',
+													'color' => '#000000',
 													'flex' => 5,
 													'wrap' => true,
 												],
@@ -5872,15 +5688,16 @@ function Change_Driver_Notify()
 													0 => [
 														'type' => 'text',
 														'text' => 'เริ่มงานเดิม',
-														'color' => '#aaaaaa',
-														'flex' => 1,
+														'weight' => 'bold',
+														'color' => '#000000',
+														'flex' => 2,
 														'size' => 'sm',
 														'wrap' => true,
 													],
 													1 => [
 														'type' => 'text',
 														'text' => $formattedDate,
-														'flex' => 5,
+														'flex' => 4,
 														'size' => 'sm',
 														'wrap' => true,
 														'color' => '#666666',
