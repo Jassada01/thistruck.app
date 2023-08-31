@@ -2084,6 +2084,14 @@ License: For each use you must have a valid license purchased only from above li
             });
 
             $("#jobDetailCostForm input").on("keyup", function() {
+                if ($(this).attr("id") == "deduction_note")
+                {
+                    check_value = $(this).val();
+                    if ((check_value.trim() != "") && (check_value.charAt(0) != "-"))
+                    {
+                        $(this).val("-" + check_value);
+                    }
+                }
                 var total = 0;
                 $("#jobDetailCostForm input").each(function() {
                     if (($(this).attr("id") != "total_expenses")) {
