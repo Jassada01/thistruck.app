@@ -366,6 +366,7 @@ function LoadDataforPrivotTable()
 			CASE 
 				WHEN b.status = 'จบงาน' THEN 'จบงาน'
 				WHEN b.status = 'รอเจ้าหน้าที่ยืนยัน' THEN 'รอเจ้าหน้าที่ยืนยัน'
+				WHEN b.status = 'คนขับยืนยันจบงานแล้ว' THEN 'คนขับยืนยันจบงาน'
 				ELSE 'กำลังดำเนินการ'
 		END AS สถานะทริป,
 		count(*) AS จำนวน 
