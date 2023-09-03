@@ -434,6 +434,9 @@ License: For each use you must have a valid license purchased only from above li
                                         <div class="card-toolbar">
                                             <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="printJob"><i class="fas fa-file-pdf fs-3"></i>ใบงาน</button>
                                         </div>
+                                        <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary d-none" id="closeJob">
+                                                <i class="fas fa-check-circle fs-4"></i> จบงาน
+                                        </button>
                                     </div>
                                     <div class="card-body">
                                         <div class="row mt-5">
@@ -1820,6 +1823,54 @@ License: For each use you must have a valid license purchased only from above li
                 return result;
             }
 
+            $('#closeJob').click(function() {
+                Swal.fire({
+                    title: "ยืนยันจบงาน",
+                    text: "ต้องการยืนยันจบงาน?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: "ยืนยัน",
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var ajaxData = {};
+                        ajaxData['f'] = '21';
+                        ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
+                        ajaxData['MAIN_trip_id'] = MAIN_trip_id;
+                        ajaxData['update_user'] = MAIN_DriverName;
+                        $.ajax({
+                                type: 'POST',
+                                dataType: "text",
+                                url: 'function/10_workOrder/mainFunction.php',
+                                data: (ajaxData),
+                                beforeSend: function() {
+                                    // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
+                                    $('#loading-spinner').show();
+                                },
+                            })
+                            .done(function(data) {
+                                //console.log(data);
+                                $('#loading-spinner').hide();
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'บันทึกข้อมูลสำเร็จ',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => {
+                                    location.reload();
+                                    //null
+                                });
+                            })
+                            .fail(function() {
+                                // just in case posting your form failed
+                                alert("Posting failed.");
+                            });
+                    }
+                });
+            });
+
 
 
 
@@ -1956,6 +2007,18 @@ License: For each use you must have a valid license purchased only from above li
                         $("#MAIN_TRIP_ID_TITLE").html(data_arr.JobDetailTrip[0].tripNo);
 
                         MAIN_TRIP_STATUS = data_arr.JobDetailTrip[0].status;
+
+                        // แปลง jobStartDateTime เป็นวันที่ของ JavaScript
+                        let jobStartDate = new Date(data_arr.JobDetailTrip[0].jobStartDateTime.replace(' ', 'T'));
+
+                        // ใช้ Date.now() ในการเข้าถึงเวลาปัจจุบัน (เป็นมิลลิวินาที)
+                        let currentTime = Date.now();
+
+                        if(currentTime - jobStartDate > 6 * 3600000) {
+                            $("#closeJob").removeClass('d-none');
+                        }
+
+
                         // Set job status text and apply styles
                         var jobStatusText = $('#jobStatusText');
                         jobStatusText.text(MAIN_TRIP_STATUS);
