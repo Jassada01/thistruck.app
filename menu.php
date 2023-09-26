@@ -31,15 +31,52 @@
                                         </span>
                                         <span class="menu-title">รายการใบงาน</span>
                                     </a>
-                                </div>
-                                <div class="separator my-2"></div>
-                                <div class="menu-item">
                                     <a class="menu-link py-3" href="101_createWorkOrder.php">
                                         <span class="menu-icon">
                                             <i class="bi bi-file-earmark-plus-fill fs-3"></i>
                                         </span>
                                         <span class="menu-title">สร้างใบงาน</span>
                                     </a>
+                                </div>
+                                <div class="separator my-2"></div>
+                                <div class="menu-item" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+                                    <!--begin::Menu link-->
+                                    <a href="#" class="menu-link">
+                                        <span class="menu-icon">
+                                            <i class="bi bi-receipt-cutoff fs-3"></i>
+                                        </span>
+                                        <span class="menu-title">อินวอยซ์</span>
+                                        <span class="menu-arrow"></span>
+                                    </a>
+                                    <!--end::Menu link-->
+
+                                    <!--begin::Menu sub-->
+                                    <div class="menu-sub menu-sub-dropdown w-250px py-2">
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item">
+                                            <a href="070_InvoiceIndex.php" class="menu-link">
+                                                <span class="menu-icon">
+                                                    <i class="fas fa-list-ul fs-3"></i>
+                                                </span>
+                                                <span class="menu-title">รายการ อินวอยซ์</span>
+                                            </a>
+                                        </div>
+                                        <!--end::Menu item-->
+
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item">
+                                            <a href="071_createInvoice.php" class="menu-link">
+                                                <span class="menu-icon">
+                                                    <i class="fas fa-receipt  fs-3"></i>
+                                                </span>
+                                                <span class="menu-title">สร้าง อินวอยซ์</span>
+                                            </a>
+                                        </div>
+                                        <!--end::Menu item-->
+
+
+                                    </div>
+                                    <!--end::Menu sub-->
                                 </div>
                             </div>
                         </div>
@@ -175,6 +212,45 @@
                                                     <i class="bi bi-currency-bitcoin fs-3"></i>
                                                 </span>
                                                 <span class="menu-title">ราคาการจัดส่ง</span>
+                                            </a>
+                                        </div>
+                                        <!--end::Menu item-->
+
+
+                                    </div>
+                                    <!--end::Menu sub-->
+                                </div>
+                                <div class="menu-item" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+                                    <!--begin::Menu link-->
+                                    <a href="#" class="menu-link">
+                                        <span class="menu-icon">
+                                            <i class="bi bi-upload fs-3"></i>
+                                        </span>
+                                        <span class="menu-title">อัพโหลดข้อมูล</span>
+                                        <span class="menu-arrow"></span>
+                                    </a>
+                                    <!--end::Menu link-->
+
+                                    <!--begin::Menu sub-->
+                                    <div class="menu-sub menu-sub-dropdown w-250px py-2">
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item">
+                                            <a href="081_UploadProduct.php" class="menu-link">
+                                                <span class="menu-icon">
+                                                    <i class="bi bi-upload fs-3"></i>
+                                                </span>
+                                                <span class="menu-title">อัพโหลดราคาสินค้าและบริการ</span>
+                                            </a>
+                                        </div>
+                                        <!--end::Menu item-->
+
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item">
+                                            <a href="082_UploadContact.php" class="menu-link">
+                                                <span class="menu-icon">
+                                                    <i class="bi bi-upload fs-3"></i>
+                                                </span>
+                                                <span class="menu-title">อัพโหลดผู้ติดต่อ</span>
                                             </a>
                                         </div>
                                         <!--end::Menu item-->

@@ -93,7 +93,7 @@ function insertDriverInfo()
 	include "../connectionDb.php";
 
 	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
-	$sql = "INSERT INTO truck_driver_info (driver_name, driver_license_number, driver_license_expiry_date, contact_number, line_id, image_path, note, type) VALUES ('$driver_name', '$driver_license_number', '$driver_license_expiry_date', '$contact_number', '$line_id', '$image_path', '$note', '$type')";
+	$sql = "INSERT INTO truck_driver_info (driver_name, driver_license_number, driver_license_expiry_date, contact_number, line_id, image_path, note, type, payto) VALUES ('$driver_name', '$driver_license_number', '$driver_license_expiry_date', '$contact_number', '$line_id', '$image_path', '$note', '$type', '$payto')";
 
 	//$result = $conn->query($sql);
 	if (!$conn->query($sql)) {
@@ -151,6 +151,8 @@ function updateDriverInfoByID()
 		line_id = '$line_id',
 		type = '$type',
 		note = '$note',
+		payto = '$payto',
+		NameVisable = $NameVisable,
 		active = $active
 	WHERE driver_id = $driver_id;";
 

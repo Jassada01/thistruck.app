@@ -164,6 +164,7 @@ include 'check_cookie.php';
                                                         <th class="font-weight-bold text-center">ชื่อ</th>
                                                         <th class="font-weight-bold text-center">เบอร์โทร</th>
                                                         <th class="font-weight-bold text-center">ประเภท</th>
+                                                        <th class="font-weight-bold text-center">จ่ายให้กับ</th>
                                                         <th class="font-weight-bold text-center"></th>
                                                     </tr>
                                                 </thead>
@@ -177,9 +178,9 @@ include 'check_cookie.php';
 
                                                     // ส่วนของการดึงข้อมูลจากฐานข้อมูล
                                                     if ($inactive) {
-                                                        $sql = "Select * From truck_driver_info";
+                                                        $sql = "Select a.*, b.ContactName From truck_driver_info a  Left Join contacts b ON a.payto = b.ContactID";
                                                     } else {
-                                                        $sql = "Select * From truck_driver_info Where active = 1";
+                                                        $sql = "Select a.*, b.ContactName From truck_driver_info a  Left Join contacts b ON a.payto = b.ContactID Where a.active = 1";
                                                     }
                                                     $result = mysqli_query($conn, $sql);
 
@@ -196,6 +197,7 @@ include 'check_cookie.php';
                                                         echo "<td>" . $row['driver_name'] . $nonActive . "</td>";
                                                         echo "<td class='text-center'>{$row['contact_number']}</td>";
                                                         echo "<td class='text-center'>{$row['type']}</td>";
+                                                        echo "<td class='text-center'>{$row['ContactName']}</td>";
                                                         echo '<td class="text-center">';
                                                         echo '<div class="btn-group">';
                                                         echo '<button type="button" class="btn btn-sm btn-secondary btnDriverView" data-bs-toggle="modal" data-bs-target="#EditdriverModal" value="' . $row['driver_id'] . '"><i class="fa fa-eye"></i></button>';
@@ -307,6 +309,31 @@ include 'check_cookie.php';
 
                                 </div>
                                 <div class="form-group mt-3 row">
+                                    <label for="type" class="col-sm-3 col-form-label text-end-pc">จ่ายให้กับ</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control mb-2 mb-md-0 payto" name="payto" id="paytoCreate">
+                                            <option></option>
+                                            <?php
+                                            // Connect to database
+                                            include "function/connectionDb.php";
+
+                                            // Query Payto 
+                                            $sql = "SELECT * FROM contacts";
+                                            $result = mysqli_query($conn, $sql);
+
+                                            // Loop through data and create dropdown options
+                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                echo "<option value='" . $row['ContactID'] . "'>" . $row['ContactID'] . " : " . $row['ContactName'] . "</option>";
+                                            }
+
+                                            // Close database connection
+                                            mysqli_close($conn);
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group mt-3 row">
                                     <label for="note" class="col-sm-3 col-form-label text-end-pc">หมายเหตุ</label>
                                     <div class="col-sm-6">
                                         <textarea class="form-control" id="note" name="note" autocomplete="off"></textarea>
@@ -407,9 +434,43 @@ include 'check_cookie.php';
 
                                 </div>
                                 <div class="form-group mt-3 row">
+                                    <label for="type" class="col-sm-3 col-form-label text-end-pc">จ่ายให้กับ</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control mb-2 mb-md-0 payto" name="payto" id="paytoEdit">
+                                            <option></option>
+                                            <?php
+                                            // Connect to database
+                                            include "function/connectionDb.php";
+
+                                            // Query Payto 
+                                            $sql = "SELECT * FROM contacts";
+                                            $result = mysqli_query($conn, $sql);
+
+                                            // Loop through data and create dropdown options
+                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                echo "<option value='" . $row['ContactID'] . "'>" . $row['ContactID'] . " : " . $row['ContactName'] . "</option>";
+                                            }
+
+                                            // Close database connection
+                                            mysqli_close($conn);
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group mt-3 row">
                                     <label for="note" class="col-sm-3 col-form-label text-end-pc">หมายเหตุ</label>
                                     <div class="col-sm-6">
                                         <textarea class="form-control" id="edit_note" name="note" autocomplete="off"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group mt-3 row">
+                                    <label for="editNameVisable" class="col-sm-3 col-form-label text-end-pc">รายชื่อบนใบงาน</label>
+                                    <div class="col-sm-3 ">
+                                        <div class="form-check form-switch form-check-custom form-check-success form-check-solid me-10 ">
+                                            <input class="form-check-input h-30px w-50px align-items-center" type="checkbox" value="" id="editNameVisable" name="NameVisable" checked />
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group mt-3 row">
@@ -509,6 +570,17 @@ include 'check_cookie.php';
                 thaiBuddhist: true,
             });
 
+             //paytoCreate
+             $('#paytoCreate').select2({
+                placeholder: 'เลือกจ่ายให้กับ',
+                dropdownParent: $("#driverModal"),
+            });
+
+            //paytoEdit
+            $('#paytoEdit').select2({
+                placeholder: 'เลือกจ่ายให้กับ',
+                dropdownParent: $("#EditdriverModal"),
+            });
 
             // Create Data Table 
             let locationTable = $("#driverTable").DataTable({
@@ -519,6 +591,7 @@ include 'check_cookie.php';
                     "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json"
                 },
                 "autoWidth": false,
+                "pageLength": 50 // กำหนดให้แสดงแถวต่อหน้าเริ่มต้นที่ 50 แถว
 
             });
             // Show Table 
@@ -691,6 +764,7 @@ include 'check_cookie.php';
                     .done(function(data) {
 
                         var data_arr = JSON.parse(data);
+                        //console.log(data_arr);
 
 
                         let form = $('#edit_driverForm');
@@ -709,6 +783,14 @@ include 'check_cookie.php';
                         } else {
                             form.find('#edit_active').removeAttr('checked');
                         }
+
+                        if (data_arr[0].nameVisable == 1) {
+                            form.find('#editNameVisable').attr('checked', true);
+                        } else {
+                            form.find('#editNameVisable').removeAttr('checked');
+                        }
+
+                        $('#paytoEdit').val(data_arr[0].payto).trigger('change');
 
                         $("#edit_avatar_preview").attr("src", "assets/media/uploadfile/" + data_arr[0].image_path);
 
@@ -832,7 +914,7 @@ include 'check_cookie.php';
                         data: (data)
                     })
                     .done(function(data) {
-                        console.log(data);
+                        //console.log(data);
                         Swal.fire({
                             icon: 'success',
                             title: 'บันทึกข้อมูลสำเร็จ',
@@ -859,13 +941,16 @@ include 'check_cookie.php';
                     ajaxData['f'] = '7';
                     ajaxData['line_id'] = target;
                     $.ajax({
+
+
+
                             type: 'POST',
                             dataType: "text",
                             url: 'function/00_systemManagement/mainFunction.php',
                             data: (ajaxData)
                         })
                         .done(function(data) {
-                            console.log(data);
+                            //console.log(data);
                             Swal.fire({
                                 icon: 'success',
                                 title: 'ส่งข้อความแล้ว',

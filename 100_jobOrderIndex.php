@@ -140,6 +140,7 @@ include 'check_cookie.php';
                                                         <th class="font-weight-bold text-center"><B>ชื่อลูกค้า</B></th>
                                                         <th class="font-weight-bold text-center"><B>เอกสารอ้างอิง</B></th>
                                                         <th class="font-weight-bold text-center"><B>หมายเลขตู้สินค้า</B></th>
+                                                        <th class="font-weight-bold text-center"><B>เลขที่อินวอยซ์</B></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -159,6 +160,7 @@ include 'check_cookie.php';
                                                         ";
                                                     }
                                                     */
+                                                    /*
                                                     $sql = "SELECT 
                                                     a.*, 
                                                     b.jobStartDateTime, 
@@ -186,6 +188,39 @@ include 'check_cookie.php';
                                                   Order By 
                                                     a.id DESC;
                                                   ";
+                                                  */
+                                                  $sql = "SELECT 
+                                                  a.*, 
+                                                  b.jobStartDateTime, 
+                                                  b.containerID, 
+                                                  CASE WHEN d.document_number IS NULL 
+                                                  AND d.id IS NOT NULL THEN 'ยังไม่กำหนด' WHEN d.id IS NULL THEN '' ELSE d.document_number END AS invoiceNo,
+                                                  d.id as INVID
+                                                FROM 
+                                                  job_order_header a 
+                                                  Left Join (
+                                                    SELECT 
+                                                      a.job_id, 
+                                                      a.jobStartDateTime, 
+                                                      REPLACE(
+                                                        GROUP_CONCAT(
+                                                          IF(
+                                                            a.containerID = '', NULL, a.containerID
+                                                          ) SEPARATOR ','
+                                                        ), 
+                                                        ',', 
+                                                        '<br>'
+                                                      ) AS containerID 
+                                                    FROM 
+                                                      job_order_detail_trip_info a 
+                                                    GROUP BY 
+                                                      a.job_id
+                                                  ) b ON a.id = b.job_id 
+                                                  LEFT JOIN invoice_job_mapping c ON a.id = c.job_id AND c.attr = 'ใช้งาน'
+                                                  LEFT JOIN invoice_header d ON c.invoice_id = d.id AND d.attr1 = 'ใช้งาน' 
+                                                Order By 
+                                                  a.id DESC;
+                                                ";
 
 
 
@@ -288,7 +323,7 @@ include 'check_cookie.php';
                                                             echo '<td>' . $row["client_name"] . '</td>';
                                                             echo '<td>' . $refDoc_Data . '</td>';
                                                             echo '<td class="font-weight-bold text-center">' . $row["containerID"] . '</td>';
-
+                                                            echo '<td class="font-weight-bold text-center"><a href="072_preformInvoice.php?invoice_id=' . $row['INVID'] . '" target="_blank">' . $row["invoiceNo"] . '</a></td>';
 
                                                             echo '</tr>';
                                                         }

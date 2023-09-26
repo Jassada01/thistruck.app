@@ -39,7 +39,7 @@
 						<h1 class="fw-bolder fs-2qx pb-5 pb-md-10" style="color: #986923;">ยินดีต้อนรับเข้าสู่ This Truck</h1>
 						<!--end::Title-->
 						<!--begin::Description-->
-						<p class="fw-bold fs-2 text-muted" style="color: #986923;"> Version 1.0
+						<p class="fw-bold fs-2 text-muted" style="color: #986923;"> Version 1.1
 						</p>
 						<!--end::Description-->
 					</div>
