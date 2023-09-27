@@ -268,11 +268,19 @@ if (!empty($quantity)) {
 
 $fontColor = array(48, 84, 150);
 
+
+
+// Get All Trip in Job
+$sql = "SELECT COUNT(*) AS countAllTrip FROM job_order_detail_trip_info a WHERE a.job_id = $job_id";
+$result = $conn->query($sql);
+$row = $result->fetch_assoc();
+$AllTripinJob = $row['countAllTrip'];
+
 if (isset($_GET['trip_id'])) {
 	$trip_id = $_GET['trip_id'];
-	$sql = "SELECT a.*, b.contact_number FROM job_order_detail_trip_info a LEFT JOIN truck_driver_info b ON a.driver_id = b.driver_id WHERE a.job_id = $job_id AND a.id = $trip_id";
+	$sql = "SELECT a.*, b.contact_number, b.nameVisable FROM job_order_detail_trip_info a LEFT JOIN truck_driver_info b ON a.driver_id = b.driver_id WHERE a.job_id = $job_id AND a.id = $trip_id";
 } else {
-	$sql = "SELECT a.*, b.contact_number FROM job_order_detail_trip_info a LEFT JOIN truck_driver_info b ON a.driver_id = b.driver_id WHERE a.job_id = $job_id";
+	$sql = "SELECT a.*, b.contact_number, b.nameVisable FROM job_order_detail_trip_info a LEFT JOIN truck_driver_info b ON a.driver_id = b.driver_id WHERE a.job_id = $job_id";
 }
 $result = $conn->query($sql);
 
@@ -303,7 +311,13 @@ if ($result->num_rows > 0) {
 		$trip_complete_flag = $row['complete_flag'];
 		$trip_contact_number = $row['contact_number'];
 		$trip_random_code = $row['random_code'];
+		$trip_driver_visable = $row['nameVisable'];
 
+		if ($trip_driver_visable == "0") {
+			$trip_driver_name = ".................................................................";
+			$trip_truck_licenseNo = ".................................................................";
+			$trip_contact_number = ".................................................................";
+		}
 
 		mysqli_set_charset($conn, "utf8");
 		// ---------------------------------------------------------
@@ -377,31 +391,57 @@ if ($result->num_rows > 0) {
 		$pdf->Cell(0, 10, $job_type, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 
+		// trip_tripSeq
+		$pdf->SetXY(191, 2); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetFont('thsarabunb', 'B', 16);
+		//$pdf->Cell(0, 10, $trip_tripSeq, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+		$pdf->Cell(0, 10, $trip_tripSeq."/".$AllTripinJob, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+
 		// trip_truckType
 		$pdf->SetXY(164, 59.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 		$pdf->SetFont('thsarabunb', 'B', 16);
 		//$pdf->Cell(0, 10, $trip_truckType, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 		//$pdf->setFillColor(255, 255, 255);
-		$pdf->MultiCell(40, 5, $trip_truckType . "\n", 0, 'J', false, 1, '', '', true);
+		$pdf->MultiCell(40, 5, $trip_truckType . "\n", 0, 'L', false, 1, '', '', true);
 
-		// trip_driver_name
-		$pdf->SetXY(36, 109.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
-		$pdf->SetFont('thsarabunb', 'B', 18);
-		$pdf->Cell(0, 10, $trip_driver_name, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+		if ($trip_driver_visable == 0) {
 
-		// trip_contact_number
-		$pdf->SetXY(100, 109.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
-		$pdf->SetFont('thsarabunb', 'B', 18);
-		$pdf->Cell(0, 10, $trip_contact_number, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+			// trip_driver_name
+			$pdf->SetXY(32, 111.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+			$pdf->SetFont('thsarabunb', 'B', 10);
+			$pdf->Cell(0, 10, $trip_driver_name, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
-		// trip_truck_licenseNo
-		$licensefs = 18;
-		if (strlen($trip_truck_licenseNo) > 30) {
-			$licensefs = 14;
+			// trip_contact_number
+			$pdf->SetXY(96, 111.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+			$pdf->SetFont('thsarabunb', 'B', 10);
+			$pdf->Cell(0, 10, $trip_contact_number, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+			// trip_truck_licenseNo
+			$pdf->SetXY(161, 111.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+			$pdf->SetFont('thsarabunb', 'B', 10);
+			$pdf->Cell(0, 10, $trip_truck_licenseNo, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+		} else {
+
+			// trip_driver_name
+			$pdf->SetXY(36, 109.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+			$pdf->SetFont('thsarabunb', 'B', 18);
+			$pdf->Cell(0, 10, $trip_driver_name, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+
+			// trip_contact_number
+			$pdf->SetXY(100, 109.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+			$pdf->SetFont('thsarabunb', 'B', 18);
+			$pdf->Cell(0, 10, $trip_contact_number, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+
+			// trip_truck_licenseNo
+			$licensefs = 18;
+			if (strlen($trip_truck_licenseNo) > 30) {
+				$licensefs = 14;
+			}
+			$pdf->SetXY(162, 109.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+			$pdf->SetFont('thsarabunb', 'B', $licensefs);
+			$pdf->Cell(0, 10, $trip_truck_licenseNo, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 		}
-		$pdf->SetXY(162, 109.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
-		$pdf->SetFont('thsarabunb', 'B', $licensefs);
-		$pdf->Cell(0, 10, $trip_truck_licenseNo, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+
+
 
 		// trip_container 1 ===========================================================
 		// trip_containerID
@@ -410,8 +450,8 @@ if ($result->num_rows > 0) {
 		$pdf->Cell(0, 10, $trip_containerID, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 		// trip_seal_no
-		$pdf->SetXY(98, 120); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
-		$pdf->SetFont('thsarabunb', 'B', 18);
+		$pdf->SetXY(98.5, 120); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+		$pdf->SetFont('thsarabunb', 'B', 16);
 		$pdf->Cell(0, 10, $trip_seal_no, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 		// trip_containersize
@@ -528,6 +568,9 @@ if ($result->num_rows > 0) {
 			$trip_detail_job_characteristic = $row2['job_characteristic'];
 			$trip_detail_job_note = $row2['job_note'];
 
+			if ($trip_detail_location_code == "XXX") {
+				$trip_detail_location_code = "__________________";
+			}
 			if (in_array($trip_detail_job_characteristic_id, ['1000', '1001'])) {
 				// Pickup Process
 				$pdf->SetXY(46, 141); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
@@ -592,7 +635,7 @@ if ($result->num_rows > 0) {
 						case '9':
 							$timeStampX = 120.5;
 							$timeStampY = 168.5 + ($cnt * 18);
-							
+
 							break;
 						default:
 							// NULL

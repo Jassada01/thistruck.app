@@ -380,9 +380,9 @@ include 'check_cookie.php';
                                                         </div>
                                                     </div>
                                                     <div class="mb-3 row">
-                                                        <label for="remark" class="col-sm-3 col-form-label text-end-pc">หมายเหตุ</label>
+                                                        <label for="remark" class="col-sm-3 col-form-label text-end-pc">หมายเหตุ<BR><small class="text-muted">สูงสุด 4 บรรทัด</small></label>
                                                         <div class="col-sm-6">
-                                                            <textarea class="form-control" id="remark" name="remark" autocomplete="off"></textarea>
+                                                            <textarea class="form-control" id="remark" name="remark" autocomplete="off" style="resize:none;" rows="4"></textarea>
                                                         </div>
                                                     </div>
                                                     <div class="form-group mt-3 row d-none">
