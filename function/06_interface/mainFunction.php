@@ -439,7 +439,7 @@ function createNewInvoice()
 	$sql = "UPDATE invoice_detail_raw 
 		Inner Join invoice_expense_desc ON invoice_detail_raw.cost_type = invoice_expense_desc.expense
 		SET description = invoice_expense_desc.desc_main
-		WHERE invoice_detail_raw.invoice_id = $invoice_id";
+		WHERE invoice_detail_raw.invoice_id = $invoice_id AND expense <> 'hire_price'";
 
 	if (!$conn->query($sql)) {
 		echo  $conn->errno;
@@ -458,6 +458,16 @@ function createNewInvoice()
 		exit();
 	}
 
+	// Update hire_price
+	$sql = "UPDATE invoice_detail_raw  a
+	LEFT JOIN job_order_header b ON a.job_id = b.id
+	SET description = CONCAT('ค่าจ้างขนส่ง : ', IFNULL(b.job_name, '' ))
+	Where a.invoice_id = $invoice_id AND a.cost_type = 'hire_price'";
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
 
 
 
@@ -1115,9 +1125,9 @@ function cancelInvoice()
 		exit();
 	}
 
-	
 
-	
+
+
 
 	// Cancel in Mapping
 	$sql = "UPDATE invoice_job_mapping SET attr = 'ยกเลิก' WHERE invoice_id = $invoice_id";
