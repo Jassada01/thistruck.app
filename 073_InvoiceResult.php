@@ -418,6 +418,9 @@ include 'check_cookie.php';
         <!--daterangepicker ภาษาไทย -->
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+
 
 
 
@@ -485,7 +488,7 @@ include 'check_cookie.php';
                             //console.log(data)
                             var data_arr = JSON.parse(data);
 
-                            console.log(data_arr);
+                            //console.log(data_arr);
 
                             // Header Process ===============
                             const headerData = data_arr.header[0];
@@ -520,7 +523,7 @@ include 'check_cookie.php';
                                 <tr>
                                     <td>${item.ProductCode || '-'}</td>
                                     <td>${item.accounting_type || '-'}</td>
-                                    <td>${item.description || '-'}</td>
+                                    <td>${item.description.replace(/\n/g, '<br>') || '-'}</td>
                                     <td class="text-end">${formatNumber(item.QTY, 0)}</td>
                                     <td class="text-end">${formatNumber(item.unit_price)}</td>
                                     <td class="text-end">${formatNumber(item.AMT)}</td>
@@ -709,7 +712,8 @@ include 'check_cookie.php';
                             //console.log(data);
                             var data_arr = JSON.parse(data);
                             //console.log(data_arr);
-                            if ($.fn.dataTable.isDataTable('#ExportInvoiceTable')) {
+                            exportToExcel(data_arr, `ใบแจ้งหนี้_${_invoice_id}.xlsx`);
+                            /*if ($.fn.dataTable.isDataTable('#ExportInvoiceTable')) {
                                 // ถ้ามีการ Set DataTable แล้ว จะทำการ Destroy มัน
                                 $('#ExportInvoiceTable').DataTable().destroy();
                             }
@@ -795,6 +799,7 @@ include 'check_cookie.php';
 
                             $(".btnExport_file").trigger("click");
                             //ExportInvoiceTable
+                            */
                         })
                         .fail(function() {
                             // just in case posting your form failed
@@ -817,6 +822,8 @@ include 'check_cookie.php';
                             //console.log(data);
                             var data_arr = JSON.parse(data);
                             //console.log(data_arr);
+                            exportToExcel(data_arr, `บันทึกค่าใช้จ่าย_${_invoice_id}.xlsx`);
+                            /*
                             if ($.fn.dataTable.isDataTable('#ExportPurchaseNote')) {
                                 // ถ้ามีการ Set DataTable แล้ว จะทำการ Destroy มัน
                                 $('#ExportPurchaseNote').DataTable().destroy();
@@ -909,6 +916,8 @@ include 'check_cookie.php';
 
                             $(".btnExport_file2").trigger("click");
                             //ExportInvoiceTable
+
+                            */
                         })
                         .fail(function() {
                             // just in case posting your form failed
@@ -920,6 +929,53 @@ include 'check_cookie.php';
                     window.location.href = '072_preformInvoice.php?invoice_id=' + _invoice_id;
                 });
 
+
+                function exportToExcel(data, fileName) {
+                    // สร้าง workbook
+                    var wb = XLSX.utils.book_new();
+
+                    // แปลงข้อมูลเป็น worksheet
+                    var ws = XLSX.utils.json_to_sheet(data);
+
+                    // เพิ่ม worksheet เข้าไปใน workbook
+                    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+                    // บันทึกเป็นไฟล์ .xlsx
+                    var wbout = XLSX.write(wb, {
+                        bookType: 'xlsx',
+                        type: 'binary'
+                    });
+
+                    // ใช้งาน FileSaver เพื่อบันทึกไฟล์
+                    //saveAs(new Blob([s2ab(wbout)], {
+                    //    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    //}), 'output.xlsx');
+                    // การใช้งาน:
+                    let blob = new Blob([s2ab(wbout)], {
+                        type: "application/octet-stream"
+                    });
+                    openBlobWithName(blob, fileName);
+
+                }
+
+                function openBlobWithName(blob, filename) {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename; // ตั้งชื่อไฟล์
+                    a.target = "_blank"; // เปิดในแท็บใหม่
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }
+
+                function s2ab(s) {
+                    var buf = new ArrayBuffer(s.length);
+                    var view = new Uint8Array(buf);
+                    for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+                    return buf;
+                }
 
                 // Initial Run ===================================================================
                 loadInvoiceData();

@@ -609,7 +609,8 @@ include 'check_cookie.php';
                             //console.log(data);
                             window.location.href = '072_preformInvoice.php?invoice_id=' + data.match(/\d+/g).join("");;
                         })
-                        .fail(function() {
+                        .fail(function(data) {
+                            console.log(data);
                             // just in case posting your form failed
                             alert("Posting failed.");
                         });

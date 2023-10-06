@@ -34,6 +34,9 @@ include 'check_cookie.php';
     <!-- pivotJS -->
     <link href="assets/plugins/custom/pivot/pivot.css" rel="stylesheet" type="text/css" />
 
+    <!-- github_contribution_graph -->
+    <link href="assets/plugins/custom/Github-Contribution-Graph/css/github_contribution_graph.css" rel="stylesheet" type="text/css" />
+
 
     <!--end::Global Stylesheets Bundle-->
     <style>
@@ -365,6 +368,47 @@ include 'check_cookie.php';
                             </div>
                             <!--begin::Row-->
                             <div class="row gy-5 g-xl-8">
+                                <div class="col-sm-6">
+                                    <div class="card card-xl-stretch mb-5 mb-xl-8">
+                                        <!--begin::Header-->
+                                        <div class="card-header border-0 pt-5">
+                                            <h3 class="card-title align-items-start flex-column">
+                                                <span class="card-label fw-bolder fs-3 mb-1">Trip ในแต่ละวัน</span>
+                                            </h3>
+                                            <div class="card-toolbar">
+
+                                            </div>
+                                        </div>
+                                        <!--end::Header-->
+                                        <!--begin::Body-->
+                                        <div class="card-body py-3 d-flex justify-content-center"> <!-- เพิ่ม class ที่นี่ -->
+                                            <div id="github_chart_1" style="width: auto; overflow-x: scroll;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="card card-xl-stretch mb-5 mb-xl-8">
+                                        <!--begin::Header-->
+                                        <div class="card-header border-0 pt-5">
+                                            <h3 class="card-title align-items-start flex-column">
+                                                <span class="card-label fw-bolder fs-3 mb-1">Trip ในแต่ละเดือน</span>
+                                            </h3>
+                                            <div class="card-toolbar">
+
+                                            </div>
+                                        </div>
+                                        <!--end::Header-->
+                                        <!--begin::Body-->
+                                        <div class="card-body py-3 d-flex justify-content-center"> <!-- เพิ่ม class ที่นี่ -->
+                                            <div id="chart_Month" style="width: 100%; overflow-x: scroll;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row gy-5 g-xl-8">
                                 <div class="col-sm-4">
                                     <div class="card card-xl-stretch mb-5 mb-xl-8">
                                         <!--begin::Header-->
@@ -560,6 +604,10 @@ include 'check_cookie.php';
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script src="assets/plugins/custom/pivot/export_renderers.js"></script>
 
+
+
+    <!--github_contribution_graph -->
+    <script src="assets/plugins/custom/Github-Contribution-Graph/js/github_contribution.js"></script>
 
     <!--end::Page Custom Javascript-->
     <script>
@@ -1376,6 +1424,162 @@ include 'check_cookie.php';
                 $('#showPivotModal').modal('show');
             });
 
+            function randomInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1) + min);
+            }
+
+            function getRandomTimeStamps(min, max, fromDate, isObject) {
+                var return_list = [];
+
+                var entries = randomInt(min, max);
+                for (var i = 0; i < entries; i++) {
+                    var day = fromDate ? new Date(fromDate.getTime()) : new Date();
+
+                    //Genrate random
+                    var previous_date = randomInt(0, 365);
+                    if (!fromDate) {
+                        previous_date = -previous_date;
+                    }
+                    day.setDate(day.getDate() + previous_date);
+
+                    if (isObject) {
+                        var count = randomInt(1, 20);
+                        return_list.push({
+                            timestamp: day.getTime(),
+                            count: count
+                        });
+                    } else {
+                        return_list.push(day.getTime());
+                    }
+                }
+
+                return return_list;
+
+            }
+
+            function loadDJobPerDate() {
+                var ajaxData = {};
+                ajaxData['f'] = '7';
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/index/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        var data_arr = JSON.parse(data);
+                        //console.log(data_arr);
+                        const transformedData = data_arr.map(item => {
+                            return {
+                                timestamp: parseInt(item.timestamp),
+                                count: parseInt(item.count)
+                            };
+                        });
+                        //console.log(transformedData);
+                        //console.log(getRandomTimeStamps(50, 20, null, true));
+                        $('#github_chart_1').github_graph({
+                            //Generate random entries from 50-> 200 entries
+                            data: transformedData,
+                            texts: ['งาน', 'งาน'],
+                            month_names: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
+                            h_days: ['จ.', 'พ.', 'ศ.'],
+                            colors: [
+                                'rgba(240,240,240,1)', // สีเทาอ่อน
+                                'rgba(228,239,228,1)',
+                                'rgba(217,238,217,1)',
+                                'rgba(205,236,205,1)',
+                                'rgba(194,235,194,1)',
+                                'rgba(182,233,182,1)',
+                                'rgba(171,232,171,1)',
+                                'rgba(159,230,159,1)',
+                                'rgba(148,229,148,1)',
+                                'rgba(136,227,136,1)',
+                                'rgba(125,226,125,1)',
+                                'rgba(113,224,113,1)',
+                                'rgba(102,223,102,1)',
+                                'rgba(91,222,91,1)',
+                                'rgba(79,220,79,1)',
+                                'rgba(68,219,68,1)',
+                                'rgba(56,217,56,1)',
+                                'rgba(45,216,45,1)',
+                                'rgba(33,214,33,1)',
+                                'rgba(22,213,22,1)',
+                                'rgba(10,211,10,1)' // สีเขียวเข้ม
+                            ]
+                        });
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+
+            function loadDJobPerMonth() {
+                var ajaxData = {};
+                ajaxData['f'] = '8';
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/index/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        var data_arr = JSON.parse(data);
+                        data_arr.forEach(function(item) {
+                            item.formattedYM = moment(item.YM, "YYYYMM").format("MMM YY");
+                        });
+                        //console.log(data_arr);
+
+                        // chart_Month
+                        var chart = am4core.create("chart_Month", am4charts.XYChart);
+
+                        // ใส่ข้อมูล
+                        chart.data = data_arr;
+
+                        var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+                        categoryAxis.dataFields.category = "formattedYM";
+                        categoryAxis.renderer.grid.template.location = 0;
+                        categoryAxis.renderer.minGridDistance = 30;
+
+                        var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+
+                        var series = chart.series.push(new am4charts.ColumnSeries());
+                        series.dataFields.valueY = "CNT";
+                        series.dataFields.categoryX = "formattedYM";
+                        series.name = "CNT";
+                        series.columns.template.tooltipText = "{categoryX}: [bold]{valueY}[/]";
+                        series.columns.template.fillOpacity = .8;
+                        series.columns.template.fill = am4core.color("#A8E6CF");
+                        series.columns.template.stroke = am4core.color("#A8E6CF");
+                        series.columns.template.column.cornerRadiusTopLeft = 10;
+                        series.columns.template.column.cornerRadiusTopRight = 10;
+
+                        series.columns.template.column.fillOpacity = 0.8;
+
+                        //var hoverState = series.columns.template.states.create("hover");
+                        //hoverState.properties.scale = 1.1;
+
+
+                        var columnTemplate = series.columns.template;
+                        columnTemplate.strokeWidth = 2;
+                        columnTemplate.strokeOpacity = 1;
+
+                        var labelBullet = series.bullets.push(new am4charts.LabelBullet());
+                        labelBullet.label.verticalCenter = "bottom";
+                        labelBullet.label.dy = -10;
+                        labelBullet.label.text = "{values.valueY.workingValue.formatNumber('#.')}";
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
 
             // Initial Run When start ===============================================================
             //Initialcalendar();
@@ -1385,6 +1589,8 @@ include 'check_cookie.php';
             LoadJobWorkLoad();
             getThisMonthPaymenteachDriver();
             LoadDataforPrivotTable();
+            loadDJobPerDate();
+            loadDJobPerMonth();
 
 
         });

@@ -475,6 +475,10 @@ include 'check_cookie.php';
         <!--daterangepicker ภาษาไทย -->
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+
+
 
 
 
@@ -578,7 +582,7 @@ include 'check_cookie.php';
                             let current_job_no = "";
                             let current_trip_no = "";
                             detailData.forEach(function(item) {
-                                //console.log(item);
+                                console.log(item);
                                 // Show Job No
                                 if (item.job_no !== current_job_no) {
                                     current_job_no = item.job_no;
@@ -630,7 +634,21 @@ include 'check_cookie.php';
                                     </tr>
                                 `);
                                 }
-                                $('#detailTable').append(`
+
+                                if (item.cost_type == "job_price") {
+                                    $('#detailTable').append(`
+                                    <tr>
+                                        <td class="bg-opacity-10 bg-success"></td>
+                                        <td class="bg-opacity-5 bg-info"></td>
+                                        <td><textarea class="form-control form-control-sm tableINVInput" d-type="description" d-id="${item.id}" value="${item.description}">${item.description}</textarea></td>
+                                        <td><input type="text" class="form-control form-control-sm tableINVInput" d-type="unit_price" d-id="${item.id}"  value="${item.unit_price}"></td>
+                                        <td><div class="form-check  form-check-solid"><input type="checkbox" class="form-check-input tableINVInputCB" d-type="pay_invoice" d-id="${item.id}"  ${item.pay_invoice === "1" ? "checked" : ""}></div></td>
+                                        <td><div class="form-check  form-check-custom form-check-danger form-check-solid"><input type="checkbox" class="form-check-input tableINVInputCB" d-type="pay_purchase" d-id="${item.id}"  ${item.pay_purchase === "1" ? "checked" : ""}></div></td>
+                                        <td class="text-center">${item.ContactName ? '<span class="badge badge-light-success badge_pointer" d-value="'+item.payto+'" d-id='+item.id+' d-type="payto">'+item.ContactName+"</span>" : '<span class="badge badge-light badge_pointer" d-value="" d-id='+item.id+' d-type="payto">ไม่กำหนด</span>'}</td>
+                                    </tr>
+                                `);
+                                } else {
+                                    $('#detailTable').append(`
                                     <tr>
                                         <td class="bg-opacity-10 bg-success"></td>
                                         <td class="bg-opacity-5 bg-info"></td>
@@ -641,6 +659,8 @@ include 'check_cookie.php';
                                         <td class="text-center">${item.ContactName ? '<span class="badge badge-light-success badge_pointer" d-value="'+item.payto+'" d-id='+item.id+' d-type="payto">'+item.ContactName+"</span>" : '<span class="badge badge-light badge_pointer" d-value="" d-id='+item.id+' d-type="payto">ไม่กำหนด</span>'}</td>
                                     </tr>
                                 `);
+                                }
+
                             });
                         })
                         .fail(function() {
@@ -868,6 +888,9 @@ include 'check_cookie.php';
                             //console.log(data);
                             var data_arr = JSON.parse(data);
                             //console.log(data_arr);
+
+                            exportToExcel(data_arr, `ใบแจ้งหนี้_${_invoice_id}.xlsx`);
+                            /*
                             if ($.fn.dataTable.isDataTable('#ExportInvoiceTable')) {
                                 // ถ้ามีการ Set DataTable แล้ว จะทำการ Destroy มัน
                                 $('#ExportInvoiceTable').DataTable().destroy();
@@ -935,24 +958,85 @@ include 'check_cookie.php';
                                 ],
                                 "info": false,
                                 autoWidth: false,
-                                wrap: false,
+                                wrap: true,
                                 'order': [],
                                 'pageLength': 10,
                                 dom: 'Bfrtip',
                                 buttons: [{
-                                    extend: 'excel',
+                                    extend: 'excelHtml5',
                                     title: '',
                                     text: 'Export Excel',
                                     filename: `ใบแจ้งหนี้_${_invoice_id}`,
                                     className: 'btn btn-success btnExport_file',
+                                    /*
+                                    exportOptions: {
+                                        format: {
+                                            footer: function(data, row, column, node) {
+                                                // `column` contains the footer node, apply the concat function and char(10) if its newline class
+                                                if ($(column).hasClass('newline')) {
+                                                    //need to change double quotes to single
+                                                    data = data.replace(/"/g, "'");
+                                                    //split at each new line
+                                                    splitData = data.split('<br>');
+                                                    data = '';
+                                                    for (i = 0; i < splitData.length; i++) {
+                                                        //add escaped double quotes around each line
+                                                        data += '\"' + splitData[i] + '\"';
+                                                        //if its not the last line add CHAR(13)
+                                                        if (i + 1 < splitData.length) {
+                                                            data += ', CHAR(10), ';
+                                                        }
+                                                    }
+                                                    //Add concat function
+                                                    data = 'CONCATENATE(' + data + ')';
+                                                    return data;
+                                                }
+                                                return data;
+                                            }
+                                        }
+
+                                    },
+                                    customize: function(xlsx) {
+                                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                                        // ค้นหาและปรับเปลี่ยนข้อมูลในคอลัมน์ "คำอธิบาย"
+                                        $('row c[r^="L"]', sheet).each(function() { // สมมติว่า "คำอธิบาย" อยู่ในคอลัมน์ L ของ Excel
+                                            var text = $('is t', this).text();
+                                            if (text.includes('<br>')) {
+                                                // แยกข้อมูลด้วย <br>
+                                                var splitText = text.split('<br>');
+                                                var newText = '';
+
+                                                for (var i = 0; i < splitText.length; i++) {
+                                                    newText += '\"' + splitText[i].trim() + '\"';
+                                                    if (i + 1 < splitText.length) {
+                                                        newText += ', CHAR(10), ';
+                                                    }
+                                                }
+
+                                                // แปลงเป็นฟอร์มูลา Excel
+                                                newText = 'CONCATENATE(' + newText + ')';
+                                                $(this).attr('t', 'str').children().remove(); // ลบข้อมูลเดิมออก
+                                                $(this).append('<f>' + newText + '</f>'); // เพิ่มฟอร์มูลาใหม่เข้าไป
+                                            }
+                                        });
+                                    },
+
                                     init: function(api, node, config) {
                                         $(node).removeClass('dt-button').html('<i class="far fa-file-excel"></i> ' + config.text);
                                     }
+
+                                    
+
+                                    
                                 }],
 
                             });
 
                             $(".btnExport_file").trigger("click");
+                            
+                            
+                                    */
                             //ExportInvoiceTable
                         })
                         .fail(function() {
@@ -976,6 +1060,8 @@ include 'check_cookie.php';
                             //console.log(data);
                             var data_arr = JSON.parse(data);
                             //console.log(data_arr);
+                            exportToExcel(data_arr, `บันทึกค่าใช้จ่าย_${_invoice_id}.xlsx`);
+                            /*
                             if ($.fn.dataTable.isDataTable('#ExportPurchaseNote')) {
                                 // ถ้ามีการ Set DataTable แล้ว จะทำการ Destroy มัน
                                 $('#ExportPurchaseNote').DataTable().destroy();
@@ -1054,20 +1140,24 @@ include 'check_cookie.php';
                                 'pageLength': 10,
                                 dom: 'Bfrtip',
                                 buttons: [{
-                                    extend: 'excel',
+                                    extend: 'excelHtml5',
                                     title: '',
                                     text: 'Export Excel',
                                     filename: `บันทึกค่าใช้จ่าย_${_invoice_id}`,
                                     className: 'btn btn-success btnExport_file2',
                                     init: function(api, node, config) {
                                         $(node).removeClass('dt-button').html('<i class="far fa-file-excel"></i> ' + config.text);
-                                    }
+                                    },
+
+
                                 }],
 
                             });
 
                             $(".btnExport_file2").trigger("click");
                             //ExportInvoiceTable
+                            */
+
                         })
                         .fail(function() {
                             // just in case posting your form failed
@@ -1120,6 +1210,54 @@ include 'check_cookie.php';
                         }
                     });
                 });
+
+                function exportToExcel(data, fileName) {
+                    // สร้าง workbook
+                    var wb = XLSX.utils.book_new();
+
+                    // แปลงข้อมูลเป็น worksheet
+                    var ws = XLSX.utils.json_to_sheet(data);
+
+                    // เพิ่ม worksheet เข้าไปใน workbook
+                    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+                    // บันทึกเป็นไฟล์ .xlsx
+                    var wbout = XLSX.write(wb, {
+                        bookType: 'xlsx',
+                        type: 'binary'
+                    });
+
+                    // ใช้งาน FileSaver เพื่อบันทึกไฟล์
+                    //saveAs(new Blob([s2ab(wbout)], {
+                    //    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    //}), 'output.xlsx');
+                    // การใช้งาน:
+                    let blob = new Blob([s2ab(wbout)], {
+                        type: "application/octet-stream"
+                    });
+                    openBlobWithName(blob, fileName);
+
+                }
+
+                function openBlobWithName(blob, filename) {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename; // ตั้งชื่อไฟล์
+                    a.target = "_blank"; // เปิดในแท็บใหม่
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }
+
+                function s2ab(s) {
+                    var buf = new ArrayBuffer(s.length);
+                    var view = new Uint8Array(buf);
+                    for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+                    return buf;
+                }
+
                 // Initial Run ===================================================================
                 loadInvoiceData();
             });

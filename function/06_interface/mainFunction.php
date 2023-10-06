@@ -469,6 +469,78 @@ function createNewInvoice()
 		exit();
 	}
 
+	// Process Update Ref Doc
+	foreach ($job_ids as $job_id) {
+		$sql = "SELECT * FROM job_order_header a Where a.id = $job_id";
+		$result = $conn->query($sql);
+		
+		if ($result->num_rows > 0) {
+			while ($row = $result->fetch_assoc()) {
+				// Process Here ======================
+				$refDoc_Data = "\n";
+
+				$customerJobNo = $row['customer_job_no'];
+				if (!empty($customerJobNo)) {
+					$refDoc_Data .= "Job NO: " . $customerJobNo . "\n";
+				}
+
+				$booking = $row['booking'];
+				if (!empty($booking)) {
+					$refDoc_Data .= "Booking: " . $booking . "\n";
+				}
+
+				$customerPoNo = $row['customer_po_no'];
+				if (!empty($customerPoNo)) {
+					$refDoc_Data .= "PO No.: " . $customerPoNo . "\n";
+				}
+
+				$billOfLading = $row['bill_of_lading'];
+				if (!empty($billOfLading)) {
+					$refDoc_Data .= "B/L: " . $billOfLading . "\n";
+				}
+
+				$customerInvoiceNo = $row['customer_invoice_no'];
+				if (!empty($customerInvoiceNo)) {
+					$refDoc_Data .= "Invoice No.: " . $customerInvoiceNo . "\n";
+				}
+
+				$agent = $row['agent'];
+				if (!empty($agent)) {
+					$refDoc_Data .= "Agent: " . $agent . "\n";
+				}
+
+				$goods = $row['goods'];
+				if (!empty($goods)) {
+					$refDoc_Data .= "ชื่อสินค้า: " . $goods . "\n";
+				}
+
+				$quantity = $row['quantity'];
+				if (!empty($quantity)) {
+					$refDoc_Data .= "QTY/No. of Package: " . $quantity . "\n";
+				}
+
+				// Update Process 
+				
+				if ($refDoc_Data != "\n") {
+					$update_sql = "UPDATE invoice_detail_raw 
+				  SET 
+					description = CONCAT(description, '$refDoc_Data') 
+				  WHERE 
+					invoice_id = $invoice_id
+					AND job_id = $job_id
+					AND cost_type = 'job_price'
+				  ";
+				//echo $update_sql;
+					if (!$conn->query($update_sql)) {
+						echo  $conn->errno;
+						exit();
+					}
+				}
+
+				
+			}
+		}
+	}
 
 
 
@@ -859,7 +931,7 @@ function loadPaymentDataSummary()
 			'' AS TAXINV_DATE, 
 			'3' AS TAX_TYPE, 
 			CASE WHEN b.cost_type = 'hire_price' THEN e.item_name ELSE '' END AS Job_Name, 
-			CASE WHEN b.cost_type = 'hire_price' THEN '510112' ELSE '113302' END AS Accounting_No, 
+			CASE WHEN b.cost_type = 'hire_price' THEN '510112' ELSE '114102' END AS Accounting_No, 
 			b.description, 
 			COUNT(*) AS QTY, 
 			b.unit_price, 
@@ -1054,7 +1126,7 @@ function ExportPurchaseFile()
 	'' AS 'วันที่ใบกำกับฯ (ถ้ามี)', 
 	'3' AS 'ประเภทราคา', 
 	CASE WHEN b.cost_type = 'hire_price' THEN e.item_name ELSE '' END AS 'สินค้า/บริการ',  
-	CASE WHEN b.cost_type = 'hire_price' THEN '510112' ELSE '113302' END AS 'บัญชี', 
+	CASE WHEN b.cost_type = 'hire_price' THEN '510112' ELSE '114102' END AS 'บัญชี', 
 	b.description AS 'คำอธิบาย', 
 	COUNT(*) AS 'จำนวน', 
 	b.unit_price AS 'ราคาต่อหน่วย', 

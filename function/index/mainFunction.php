@@ -345,7 +345,7 @@ function LoadDataforPrivotTable()
 	include "../connectionDb.php";
 
 	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
-	
+
 	/*$sql = "SELECT DATE(b.jobStartDateTime) AS วันที่, a.job_name AS ชื่องาน, a.job_type AS ประเภทงาน,  count(*) AS จำนวน From job_order_header a 
 	Inner Join job_order_detail_trip_info b ON a.id = b.job_id
 	Where a.status <> 'ยกเลิก'
@@ -402,6 +402,67 @@ function LoadDataforPrivotTable()
 	echo json_encode($data_Array);
 }
 
+// F=7
+function loadDJobPerDate()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	$sql = "SELECT UNIX_TIMESTAMP(DATE(a.jobStartDateTime)) * 1000 AS timestamp, COUNT(*) AS count FROM job_order_detail_trip_info a WHERE a.status <> 'ยกเลิก'
+	AND YEAR(a.jobStartDateTime) = YEAR(NOW())
+	Group By DATE(a.jobStartDateTime)
+	ORDER BY a.jobStartDateTime";
+
+
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	echo json_encode($data_Array);
+}
+
+// F=8
+function loadDJobPerMonth()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	$sql = "SELECT EXTRACT(YEAR_MONTH FROM a.jobStartDateTime) AS YM, COUNT(*) AS CNT
+	FROM job_order_detail_trip_info a 
+	WHERE a.status <> 'ยกเลิก'
+	AND a.jobStartDateTime >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+	GROUP BY EXTRACT(YEAR_MONTH FROM a.jobStartDateTime) 
+	ORDER BY YM";
+
+
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	echo json_encode($data_Array);
+}
+
+
 
 
 //============================ MAIN =========================================================
@@ -428,6 +489,14 @@ switch ($f) {
 		}
 	case 6: {
 			LoadDataforPrivotTable();
+			break;
+		}
+	case 7: {
+			loadDJobPerDate();
+			break;
+		}
+	case 8: {
+			loadDJobPerMonth();
 			break;
 		}
 }
