@@ -207,6 +207,15 @@ include 'check_cookie.php';
                                             </button>
                                             <!--begin::Menu 3-->
                                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-bold w-200px py-3" data-kt-menu="true">
+                                                <div class="menu-item px-3 printPDFInvoice">
+                                                    <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">
+                                                        <i class="fas fa-file-pdf fs-3"> </i> Export to PDF
+                                                    </div>
+
+                                                    <div class="menu-item px-3">
+                                                        <a class="menu-link flex-stack px-3" id="exportInvoicePDF">ใบแจ้งหนี้</a>
+                                                    </div>
+                                                </div>
                                                 <!--begin::Heading-->
                                                 <div class="menu-item px-3">
                                                     <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">
@@ -976,6 +985,12 @@ include 'check_cookie.php';
                     for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
                     return buf;
                 }
+
+                $('body').on('click', '#exportInvoicePDF', function() {
+                    //window.open = "PDF_invoice.php?invoiceID=" + _invoice_id, '_blank';
+                    window.open( "PDF_invoice.php?invoiceID=" + _invoice_id, '_blank');
+
+                });
 
                 // Initial Run ===================================================================
                 loadInvoiceData();

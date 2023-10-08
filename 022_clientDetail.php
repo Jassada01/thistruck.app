@@ -174,6 +174,13 @@ include 'check_cookie.php';
                                                 <div class="col-sm-3">
                                                     <input type="text" class="form-control" id="TaxID" name="TaxID">
                                                 </div>
+                                                <label for="Attr1" class="col-sm-1 col-form-label text-end-pc">เครดิต</label>
+                                                <div class="col-sm-2">
+                                                    <div class="input-group mb-5">
+                                                        <input type="text" class="form-control" aria-describedby="basic-addon2" id="Attr1" name="Attr1" />
+                                                        <span class="input-group-text" id="basic-addon2">วัน</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="mb-3 row">
                                                 <label for="ContactPerson" class="col-sm-3 col-form-label text-end-pc">ผู้ติดต่อ<span class="text-danger">*</span></label>
@@ -485,6 +492,7 @@ include 'check_cookie.php';
                         form.find('#Email').val(data_arr[0].Email);
                         form.find('#Line_token').val(data_arr[0].Line_token);
                         form.find('#Remark').val(data_arr[0].Remark);
+                        form.find('#Attr1').val(data_arr[0].Attr1);
                         if (data_arr[0].Active == 1) {
                             form.find('#Active').attr('checked', true);
                         } else {

@@ -208,6 +208,15 @@ include 'check_cookie.php';
                                             </button>
                                             <!--begin::Menu 3-->
                                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-bold w-200px py-3" data-kt-menu="true">
+                                                <div class="menu-item px-3 printPDFInvoice">
+                                                    <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">
+                                                        <i class="fas fa-file-pdf fs-3"> </i> Export to PDF
+                                                    </div>
+
+                                                    <div class="menu-item px-3">
+                                                        <a class="menu-link flex-stack px-3" id="exportInvoicePDF">ใบแจ้งหนี้</a>
+                                                    </div>
+                                                </div>
                                                 <!--begin::Heading-->
                                                 <div class="menu-item px-3">
                                                     <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">
@@ -245,22 +254,23 @@ include 'check_cookie.php';
                                             <div class="container">
                                                 <form id="headerForm">
                                                     <div class="row">
-                                                        <div class="col-sm-4">
+                                                        <div class="col-sm-2">
 
                                                             <div class="form-floating mb-7">
                                                                 <input type="text" class="form-control" id="documentNumber" placeholder="เลขที่ Invoice จากระบบ PEAK" />
-                                                                <label for="documentNumber">เลขที่ Invoice จากระบบ PEAK</label>
+                                                                <label for="documentNumber">เลขที่ Invoice</label>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6">
+                                                        <div class="col-sm-4">
 
                                                             <div class="form-floating mb-7">
                                                                 <input type="text" class="form-control" id="reference" placeholder="เอกสารอ้างอิง" />
                                                                 <label for="reference">เอกสารอ้างอิง</label>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-2">
+                                                        <div class="col-sm-4">
                                                             <a href="#" class="btn btn-light-success" id="btnSaveHeader">บันทึกข้อมูล</a>
+                                                            <a href="#" class="btn btn-light-primary d-none" id="btnconfirmInvoice">สร้าง Invoice บนระบบ Thistruck</a>
                                                         </div>
                                                     </div>
                                                 </form>
@@ -500,6 +510,8 @@ include 'check_cookie.php';
                 var _select_yearMonth = "";
                 let detailData = {};
 
+                let MAIN_DOC_DATE = "";
+
                 // TEMP DATA
                 let TEMP_data_type = "";
                 let TEMP_data_id = "";
@@ -560,6 +572,8 @@ include 'check_cookie.php';
                             // Header Process ===============
                             const headerData = data_arr.header[0];
 
+                            MAIN_DOC_DATE = headerData.document_date;
+
                             if (headerData.attr1 === 'ยกเลิก') {
                                 // cc_ribbon
                                 $('.cc_ribbon').removeClass('d-none');
@@ -569,11 +583,25 @@ include 'check_cookie.php';
                                     confirmButtonText: 'ตกลง'
                                 });
                             }
+
+                            if (headerData.document_number == "" || headerData.document_number == "null") {
+                                //btnconfirmInvoice
+                                $("#btnconfirmInvoice").removeClass('d-none')
+                            } else {
+                                if (headerData.document_number.substring(0, 3) == "INV") {
+                                    $("#documentNumber").attr("disabled", "disabled");
+                                    
+                                    $(".printPDFInvoice").removeClass('d-none')
+                                }
+
+                            }
                             // นำข้อมูลไปใส่ใน input box
                             $('#documentNumber').val(headerData.document_number);
                             $('#reference').val(headerData.reference);
                             $('#INVclientName').html(headerData.customer_code + " - " + headerData.ClientName);
                             //INVclientName
+
+
 
 
                             $('#detailTable').html("");
@@ -582,7 +610,7 @@ include 'check_cookie.php';
                             let current_job_no = "";
                             let current_trip_no = "";
                             detailData.forEach(function(item) {
-                                console.log(item);
+                                //console.log(item);
                                 // Show Job No
                                 if (item.job_no !== current_job_no) {
                                     current_job_no = item.job_no;
@@ -1258,6 +1286,53 @@ include 'check_cookie.php';
                     return buf;
                 }
 
+                // btnconfirmInvoice
+                $('body').on('click', '#btnconfirmInvoice', function() {
+                    Swal.fire({
+                        title: 'สร้างอินวอยซ์',
+                        text: "ยืนยันสร้างอินวอยซ์บนระบบ Thistruck",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#3085d6d33',
+                        confirmButtonText: 'ยืนยันสร้างอินวอยซ์',
+                        cancelButtonText: 'ยกเลิก'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            let ajaxData = {};
+                            ajaxData['f'] = '16';
+                            ajaxData['invoice_id'] = _invoice_id;
+                            ajaxData['doc_date'] = MAIN_DOC_DATE;
+                            $.ajax({
+                                    type: 'POST',
+                                    dataType: "text",
+                                    url: 'function/06_interface/mainFunction.php',
+                                    data: (ajaxData)
+                                })
+                                .done(function(data) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'สร้างอินวอยซ์สำเร็จ',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                })
+                                .fail(function() {
+                                    // just in case posting your form failed
+                                    alert("Posting failed.");
+                                });
+
+                        }
+                    });
+                });
+                // exportInvoicePDF
+                $('body').on('click', '#exportInvoicePDF', function() {
+                    //window.open = "PDF_invoice.php?invoiceID=" + _invoice_id, '_blank';
+                    window.open( "PDF_invoice.php?invoiceID=" + _invoice_id, '_blank');
+
+                });
                 // Initial Run ===================================================================
                 loadInvoiceData();
             });

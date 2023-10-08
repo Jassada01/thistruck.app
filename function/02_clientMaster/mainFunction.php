@@ -93,8 +93,8 @@ function insertClientInfo()
 	include "../connectionDb.php";
 
 	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
-	$sql = "INSERT INTO client_info (ClientCode, ClientName, Branch, Address, BillingAddress, TaxID, ContactPerson, Phone, Email)
-	VALUES ('$ClientCode', '$ClientName', '$Branch', '$Address', '$BillingAddress', '$TaxID', '$ContactPerson', '$Phone', '$Email')";
+	$sql = "INSERT INTO client_info (ClientCode, ClientName, Branch, Address, BillingAddress, TaxID, ContactPerson, Phone, Email, Attr1)
+	VALUES ('$ClientCode', '$ClientName', '$Branch', '$Address', '$BillingAddress', '$TaxID', '$ContactPerson', '$Phone', '$Email', '$Attr1')";
 
 	//$result = $conn->query($sql);
 	if (!$conn->query($sql)) {
@@ -163,6 +163,7 @@ function updateClientInfobyID()
             Email = '$Email',
             Remark = '$Remark',
             Line_token = '$Line_token',
+			Attr1 = '$Attr1',
             Active = $Active
         WHERE ClientID = $ClientID";
 	//$result = $conn->query($sql);

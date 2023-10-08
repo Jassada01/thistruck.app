@@ -78,6 +78,47 @@ function gen_rnd_str($length = 10)
 	return $randomString;
 }
 
+function getRunningNo($running_type, $running_prefix, $date)
+{
+	// Running Digit
+	$leadZerodigit = 3;
+	// เชื่อมต่อฐานข้อมูล
+	include "../connectionDb.php";
+
+	// กำหนดค่าตัวแปร
+	$last_running_no = 0;
+
+	// แยกปีและเดือนจากวันที่
+	$running_year = date('y', strtotime($date));
+	$running_month = date('m', strtotime($date));
+
+	// ค้นหา last running no จากตาราง system_running_no
+	$sql = "SELECT last_running_no FROM system_running_no WHERE running_type='$running_type' AND running_prefix='$running_prefix' AND running_year='$running_year' AND running_month='$running_month'";
+	$result = $conn->query($sql);
+	if ($result->num_rows > 0) {
+		$row = $result->fetch_assoc();
+		$last_running_no = $row["last_running_no"];
+	} else {
+		// ถ้าไม่พบในตาราง ให้เพิ่มข้อมูลลงในตาราง
+		$sql = "INSERT INTO system_running_no (running_type, running_prefix, running_year, running_month, last_document_no, last_running_no) VALUES ('$running_type', '$running_prefix', '$running_year', '$running_month', 0, 0)";
+		$conn->query($sql);
+	}
+
+	// สร้างเลขที่รันรหัสใหม่
+	$last_running_no++;
+	$document_no = $running_prefix . "-" . $running_year . $running_month . "-" . str_pad($last_running_no, $leadZerodigit, '0', STR_PAD_LEFT);
+
+	// อัพเดท last running no ในตาราง system_running_no
+	$sql = "UPDATE system_running_no SET last_document_no='$document_no', last_running_no='$last_running_no' WHERE running_type='$running_type' AND running_prefix='$running_prefix' AND running_year='$running_year' AND running_month='$running_month'";
+	$conn->query($sql);
+
+	// ปิดการเชื่อมต่อฐานข้อมูล
+	$conn->close();
+
+	// คืนค่าเลขที่รันรหัสใหม่
+	return $document_no;
+}
+
 
 // ======== Function ========
 // F=1
@@ -473,7 +514,7 @@ function createNewInvoice()
 	foreach ($job_ids as $job_id) {
 		$sql = "SELECT * FROM job_order_header a Where a.id = $job_id";
 		$result = $conn->query($sql);
-		
+
 		if ($result->num_rows > 0) {
 			while ($row = $result->fetch_assoc()) {
 				// Process Here ======================
@@ -520,7 +561,7 @@ function createNewInvoice()
 				}
 
 				// Update Process 
-				
+
 				if ($refDoc_Data != "\n") {
 					$update_sql = "UPDATE invoice_detail_raw 
 				  SET 
@@ -530,14 +571,12 @@ function createNewInvoice()
 					AND job_id = $job_id
 					AND cost_type = 'job_price'
 				  ";
-				//echo $update_sql;
+					//echo $update_sql;
 					if (!$conn->query($update_sql)) {
 						echo  $conn->errno;
 						exit();
 					}
 				}
-
-				
 			}
 		}
 	}
@@ -1212,6 +1251,30 @@ function cancelInvoice()
 	mysqli_close($conn);
 }
 
+// F = 16
+function generateInvoiceNo()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	$new_Invoice_No = getRunningNo('InvNo', 'INV', $doc_date);
+	// Cancel In Header
+	$sql = "UPDATE invoice_header SET document_number = '$new_Invoice_No' WHERE id = $invoice_id";
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	mysqli_close($conn);
+}
+
+
 
 
 
@@ -1275,6 +1338,10 @@ switch ($f) {
 		}
 	case 15: {
 			cancelInvoice();
+			break;
+		}
+	case 16: {
+			generateInvoiceNo();
 			break;
 		}
 }

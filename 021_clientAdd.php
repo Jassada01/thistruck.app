@@ -2,10 +2,11 @@
 <html lang="en">
 <!--begin::Head-->
 <?php
-    include 'system_config.php';
-    $CURRENT_URL = str_replace($SERVERDIRNAME, "", $_SERVER['REQUEST_URI']);
-    include 'check_cookie.php';
+include 'system_config.php';
+$CURRENT_URL = str_replace($SERVERDIRNAME, "", $_SERVER['REQUEST_URI']);
+include 'check_cookie.php';
 ?>
+
 <head>
     <title>ข้อมูลผู้ว่าจ้าง > เพิ่มข้อมูล</title>
     <meta charset="utf-8" />
@@ -156,6 +157,13 @@
                                                 <div class="col-sm-3">
                                                     <input type="text" class="form-control" id="TaxID" name="TaxID">
                                                 </div>
+                                                <label for="Attr1" class="col-sm-1 col-form-label text-end-pc">เครดิต</label>
+                                                <div class="col-sm-2">
+                                                    <div class="input-group mb-5">
+                                                        <input type="text" class="form-control" aria-describedby="basic-addon2" id="Attr1" name="Attr1" />
+                                                        <span class="input-group-text" id="basic-addon2">วัน</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="mb-3 row">
                                                 <label for="ContactPerson" class="col-sm-3 col-form-label text-end-pc">ผู้ติดต่อ<span class="text-danger">*</span></label>
@@ -200,7 +208,7 @@
                 <!--end::Content-->
                 <!--begin::Footer-->
                 <?php
-                    include 'footer.php';
+                include 'footer.php';
                 ?>
                 <!--end::Footer-->
             </div>
@@ -270,13 +278,13 @@
                             timer: 1500
                         }).then(() => {
                             // Redirect ไปยังหน้า 022_clientDetail.php พร้อมกับส่งค่า client_id ที่ต้องการไปด้วย parameter
-                            window.location.href = "022_clientDetail.php?client_id="+response;
+                            window.location.href = "022_clientDetail.php?client_id=" + response;
                         });
                     },
                     error: function(xhr, textStatus, errorThrown) {
-                        console.log(textStatus);
-                        console.log(errorThrown);
-                        console.log(xhr.responseText);
+                        //console.log(textStatus);
+                        //console.log(errorThrown);
+                        //console.log(xhr.responseText);
                         Swal.fire({
                             icon: 'error',
                             title: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล',
