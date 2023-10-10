@@ -1289,7 +1289,7 @@ include 'check_cookie.php';
             });
 
             // job_date
-            let  workOrder_Jobdate =  $("#job_date").flatpickr({
+            let workOrder_Jobdate = $("#job_date").flatpickr({
                 dateFormat: "Y-m-d",
                 locale: "th",
                 altInput: true,
@@ -2069,7 +2069,19 @@ include 'check_cookie.php';
 
             $('body').on('change', '.jobStartDateTime', function() {
                 var firstDate_time = $('#DriverList').find('.jobStartDateTime:first').val();
-                workOrder_Jobdate.setDate(firstDate_time);
+                var currentDate = moment(); // ได้เวลาปัจจุบัน
+                var firstDate = moment(firstDate_time, "YYYY-MM-DD HH:mm");
+                if (currentDate.isAfter(firstDate)) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'เวลาเข้างานเลยมาแล้ว',
+                        text: 'คุณเลือกวันที่และเวลาที่เลยมาแล้ว กรุณาตรวจสอบความถูกต้อง',
+
+                    });
+                    workOrder_Jobdate.setDate(firstDate_time);
+                } else {
+                    workOrder_Jobdate.setDate(firstDate_time);
+                }
 
             });
 

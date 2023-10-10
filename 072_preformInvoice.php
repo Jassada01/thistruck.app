@@ -584,7 +584,7 @@ include 'check_cookie.php';
                                 });
                             }
 
-                            if (headerData.document_number == "" || headerData.document_number == "null") {
+                            if (headerData.document_number == "" || headerData.document_number == null) {
                                 //btnconfirmInvoice
                                 $("#btnconfirmInvoice").removeClass('d-none')
                             } else {
