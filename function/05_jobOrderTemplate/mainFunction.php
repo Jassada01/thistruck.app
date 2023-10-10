@@ -150,7 +150,7 @@ function insertNewJobTemplate()
 	// เตรียมข้อมูลที่จะเพิ่มลงในตาราง job_order_template_header
 	$jobHeaderForm = $_POST['jobHeaderForm'];
 	$clientID = $jobHeaderForm['ClientID'];
-	$jobName = $jobHeaderForm['job_name'];
+	$jobName = trim($jobHeaderForm['job_name']);
 	$jobType = $jobHeaderForm['job_type'];
 	$remark = $jobHeaderForm['remark'];
 	$customer_id = $jobHeaderForm['customerID'];
@@ -326,7 +326,7 @@ function updateJobTemplateByID()
 	// เตรียมข้อมูลที่จะอัพเดตลงในตาราง job_order_template_header
 	$jobHeaderForm = $_POST['jobHeaderForm'];
 	$clientID = $jobHeaderForm['ClientID'];
-	$jobName = $jobHeaderForm['job_name'];
+	$jobName = trim($jobHeaderForm['job_name']);
 	$jobType = $jobHeaderForm['job_type'];
 	$remark = $jobHeaderForm['remark'];
 	$active = $jobHeaderForm['active'];
