@@ -703,6 +703,7 @@ include 'check_cookie.php';
                                                         <th class="font-weight-bold text-center">ประเภทเอกสาร</th>
                                                         <th class="font-weight-bold text-center">ไฟล์</th>
                                                         <th class="font-weight-bold text-center">วันเวลา</th>
+                                                        <th class="font-weight-bold text-center"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="AttachedFileList">
@@ -2048,7 +2049,7 @@ include 'check_cookie.php';
                     })
                     .done(function(data) {
                         var data_arr = JSON.parse(data);
-                        //console.log(data_arr);
+                        console.log(data_arr);
                         // เลือก Select2
                         // สร้างตัวแปรสำหรับ tbody ใน HTML
                         var tbody = document.getElementById('AttachedFileList');
@@ -2132,8 +2133,14 @@ include 'check_cookie.php';
                                 var created_at = moment(data_arr[i].created_at);
                                 col3.textContent = created_at.format('DD MMM YY HH:mm');
                                 row.appendChild(col3);
-
                             }
+
+                            var col4 = document.createElement('td');
+                            col4.classList.add('text-center');
+                            //console.log(data_arr[i].created_at);
+                            var created_at = moment(data_arr[i].created_at);
+                            col4.textContent = "xxx";
+                            row.appendChild(col4);
 
                             // เพิ่มแถวลงใน tbody
                             tbody.appendChild(row);
@@ -2985,14 +2992,12 @@ include 'check_cookie.php';
                     //console.log(allTrip_data);
                     let tableRows = allTrip_data.map(generateTableRow).join("");
                     $('#tripTableBody').html(tableRows);
-                }
-                else
-                {
+                } else {
                     Swal.fire({
-                                title: 'กรุณายืนยันข้อมูลให้ผู้ว่าจ้างก่อน',
-                                icon: 'warning',
-                                confirmButtonText: 'ตกลง'
-                            });
+                        title: 'กรุณายืนยันข้อมูลให้ผู้ว่าจ้างก่อน',
+                        icon: 'warning',
+                        confirmButtonText: 'ตกลง'
+                    });
                 }
             });
 
