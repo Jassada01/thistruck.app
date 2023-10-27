@@ -1356,7 +1356,6 @@ include 'check_cookie.php';
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
-                        console.log(data_arr);
 
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
@@ -2049,7 +2048,6 @@ include 'check_cookie.php';
                     })
                     .done(function(data) {
                         var data_arr = JSON.parse(data);
-                        console.log(data_arr);
                         // เลือก Select2
                         // สร้างตัวแปรสำหรับ tbody ใน HTML
                         var tbody = document.getElementById('AttachedFileList');
@@ -2139,7 +2137,7 @@ include 'check_cookie.php';
                             col4.classList.add('text-center');
                             //console.log(data_arr[i].created_at);
                             var created_at = moment(data_arr[i].created_at);
-                            col4.textContent = "xxx";
+                            col4.innerHTML = '<span class="btn btn-icon btn-sm btn-active-color-danger pe-0 me-2 deleteAttachedImage" doc_type="' + data_arr[i].document_type + '" fileName="' + data_arr[i].originalFileName + '" rnd="' + data_arr[i].random_code + '"><i class="fa fa-trash fs-3 mb-3"></i>				</span>';
                             row.appendChild(col4);
 
                             // เพิ่มแถวลงใน tbody
@@ -3106,6 +3104,47 @@ include 'check_cookie.php';
 
 
                 //alert('Trips ที่ถูกเลือก: ' + selectedTrips.join(", "));
+            });
+
+            // deleteAttachedImage
+            $('body').on('click', '.deleteAttachedImage', function() {
+                let doc_type = $(this).attr('doc_type');
+                let fileName = $(this).attr('fileName');
+                let rnd = $(this).attr('rnd')
+
+                Swal.fire({
+                    title: 'ลบไฟล์' + doc_type,
+                    text: 'ต้องการลบ' + doc_type + ' (' + fileName + ') ใช่หรือไม่',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'ลบ',
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // ทำงานเมื่อ user กด "ยืนยัน"
+                        //confirm_data();
+                        var ajaxData = {};
+                        ajaxData['f'] = '29';
+                        ajaxData['random_code'] = rnd;
+                        //console.log(ajaxData);
+                        $.ajax({
+                                type: 'POST',
+                                dataType: "text",
+                                url: 'function/10_workOrder/mainFunction.php',
+                                data: (ajaxData),
+                            })
+                            .done(function(data) {
+                                loadAttachedData();
+                            })
+                            .fail(function() {
+                                // just in case posting your form failed
+                                alert("Posting failed.");
+                            });
+                    }
+                });
+
             });
 
 

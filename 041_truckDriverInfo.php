@@ -164,6 +164,7 @@ include 'check_cookie.php';
                                                         <th class="font-weight-bold text-center">ชื่อ</th>
                                                         <th class="font-weight-bold text-center">เบอร์โทร</th>
                                                         <th class="font-weight-bold text-center">ประเภท</th>
+                                                        <th class="font-weight-bold text-center">บริษัทซับ</th>
                                                         <th class="font-weight-bold text-center">จ่ายให้กับ</th>
                                                         <th class="font-weight-bold text-center"></th>
                                                     </tr>
@@ -178,9 +179,9 @@ include 'check_cookie.php';
 
                                                     // ส่วนของการดึงข้อมูลจากฐานข้อมูล
                                                     if ($inactive) {
-                                                        $sql = "Select a.*, b.ContactName From truck_driver_info a  Left Join contacts b ON a.payto = b.ContactID";
+                                                        $sql = "Select a.*, b.ContactName, c.companyName AS subcontractcarcompaniename From truck_driver_info a Left Join contacts b ON a.payto = b.ContactID Left Join subcontractcarcompanies c ON a.subContractCompany = c.id";
                                                     } else {
-                                                        $sql = "Select a.*, b.ContactName From truck_driver_info a  Left Join contacts b ON a.payto = b.ContactID Where a.active = 1";
+                                                        $sql = "Select a.*, b.ContactName, c.companyName AS subcontractcarcompaniename From truck_driver_info a Left Join contacts b ON a.payto = b.ContactID Left Join subcontractcarcompanies c ON a.subContractCompany = c.id Where a.active = 1";
                                                     }
                                                     $result = mysqli_query($conn, $sql);
 
@@ -197,6 +198,7 @@ include 'check_cookie.php';
                                                         echo "<td>" . $row['driver_name'] . $nonActive . "</td>";
                                                         echo "<td class='text-center'>{$row['contact_number']}</td>";
                                                         echo "<td class='text-center'>{$row['type']}</td>";
+                                                        echo "<td class='text-center'>{$row['subcontractcarcompaniename']}</td>";
                                                         echo "<td class='text-center'>{$row['ContactName']}</td>";
                                                         echo '<td class="text-center">';
                                                         echo '<div class="btn-group">';
@@ -300,13 +302,38 @@ include 'check_cookie.php';
                                 <div class="form-group mt-3 row">
                                     <label for="type" class="col-sm-3 col-form-label text-end-pc">ประเภท</label>
                                     <div class="col-sm-6">
-                                        <select class="form-select" id="type" name="type">
+                                        <select class="form-select" id="type" name="type" >
                                             <option value="พนักงานบริษัท">พนักงานบริษัท</option>
                                             <option value="ซับ คอนแทรค">ซับคอนแทรค</option>
                                             <option value="อื่นๆ">อื่นๆ</option>
                                         </select>
                                     </div>
 
+                                </div>
+                                <div class="form-group mt-3 row d-none" id="truck_driver_infoCreatPanel">
+                                    <label for="type" class="col-sm-3 col-form-label text-end-pc">บริษัทซับ</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control mb-2 mb-md-0 subContractCompany" name="subContractCompany" id="truck_driver_infoCreat">
+                                            <option></option>
+                                            <?php
+                                            // Connect to database
+                                            include "function/connectionDb.php";
+
+                                            // Query Payto 
+                                            $sql = "SELECT * FROM subcontractcarcompanies";
+                                            $result = mysqli_query($conn, $sql);
+
+                                            // Loop through data and create dropdown options
+                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                echo "<option value='" . $row['id'] . "'>" . $row['companyName'] . "</option>";
+                                            }
+
+                                            // Close database connection
+                                            mysqli_close($conn);
+                                            ?>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="form-group mt-3 row">
                                     <label for="type" class="col-sm-3 col-form-label text-end-pc">จ่ายให้กับ</label>
@@ -433,6 +460,31 @@ include 'check_cookie.php';
                                     </div>
 
                                 </div>
+                                <div class="form-group mt-3 row" id="truck_driver_infoEditPanel">
+                                    <label for="type" class="col-sm-3 col-form-label text-end-pc">บริษัทซับ</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control mb-2 mb-md-0 subContractCompany" name="subContractCompany" id="truck_driver_infoEdit">
+                                            <option></option>
+                                            <?php
+                                            // Connect to database
+                                            include "function/connectionDb.php";
+
+                                            // Query Payto 
+                                            $sql = "SELECT * FROM subcontractcarcompanies";
+                                            $result = mysqli_query($conn, $sql);
+
+                                            // Loop through data and create dropdown options
+                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                echo "<option value='" . $row['id'] . "'>" . $row['companyName'] . "</option>";
+                                            }
+
+                                            // Close database connection
+                                            mysqli_close($conn);
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="form-group mt-3 row">
                                     <label for="type" class="col-sm-3 col-form-label text-end-pc">จ่ายให้กับ</label>
                                     <div class="col-sm-8">
@@ -458,7 +510,7 @@ include 'check_cookie.php';
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group mt-3 row">
                                     <label for="note" class="col-sm-3 col-form-label text-end-pc">หมายเหตุ</label>
                                     <div class="col-sm-6">
@@ -570,8 +622,8 @@ include 'check_cookie.php';
                 thaiBuddhist: true,
             });
 
-             //paytoCreate
-             $('#paytoCreate').select2({
+            //paytoCreate
+            $('#paytoCreate').select2({
                 placeholder: 'เลือกจ่ายให้กับ',
                 dropdownParent: $("#driverModal"),
             });
@@ -580,6 +632,18 @@ include 'check_cookie.php';
             $('#paytoEdit').select2({
                 placeholder: 'เลือกจ่ายให้กับ',
                 dropdownParent: $("#EditdriverModal"),
+            });
+
+            //truck_driver_infoEdit
+            $('#truck_driver_infoEdit').select2({
+                placeholder: 'เลือกบริษัทซับคอนแทรก',
+                dropdownParent: $("#EditdriverModal"),
+            });
+
+            //truck_driver_infoCreat
+            $('#truck_driver_infoCreat').select2({
+                placeholder: 'เลือกบริษัทซับคอนแทรก',
+                dropdownParent: $("#driverModal"),
             });
 
             // Create Data Table 
@@ -778,6 +842,16 @@ include 'check_cookie.php';
                         form.find('#edit_type').val(data_arr[0].type);
                         flatpickr_edit_driver_license_expiry_date.setDate(data_arr[0].driver_license_expiry_date);
 
+                        if (data_arr[0].type == "ซับ คอนแทรค") {
+
+                            $("#truck_driver_infoEditPanel").removeClass("d-none");
+                            $('#truck_driver_infoEdit').val(data_arr[0].subContractCompany).trigger('change');
+                        } else {
+                            $("#truck_driver_infoEditPanel").addClass("d-none");
+                        }
+
+
+
                         if (data_arr[0].active == 1) {
                             form.find('#edit_active').attr('checked', true);
                         } else {
@@ -962,6 +1036,32 @@ include 'check_cookie.php';
                             // just in case posting your form failed
                             alert("Posting failed.");
                         });
+                }
+            });
+
+            // edit_type
+            $('body').on('change', '#edit_type', function() {
+                var target = $(this).val();
+                //console.log(target);
+                if (target == "ซับ คอนแทรค") {
+
+                    $("#truck_driver_infoEditPanel").removeClass("d-none");
+                } else {
+                    $("#truck_driver_infoEditPanel").addClass("d-none");
+                    $('#truck_driver_infoEdit').val("").trigger('change');
+                }
+            });
+
+            //truck_driver_infoCreatPanel
+            $('body').on('change', '#type', function() {
+                var target = $(this).val();
+                console.log(target);
+                if (target == "ซับ คอนแทรค") {
+
+                    $("#truck_driver_infoCreatPanel").removeClass("d-none");
+                } else {
+                    $("#truck_driver_infoCreatPanel").addClass("d-none");
+                    $('#truck_driver_infoCreat').val("").trigger('change');
                 }
             });
 

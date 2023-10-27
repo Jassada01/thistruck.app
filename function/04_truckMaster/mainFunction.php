@@ -93,7 +93,7 @@ function insertDriverInfo()
 	include "../connectionDb.php";
 
 	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
-	$sql = "INSERT INTO truck_driver_info (driver_name, driver_license_number, driver_license_expiry_date, contact_number, line_id, image_path, note, type, payto) VALUES ('$driver_name', '$driver_license_number', '$driver_license_expiry_date', '$contact_number', '$line_id', '$image_path', '$note', '$type', '$payto')";
+	$sql = "INSERT INTO truck_driver_info (driver_name, driver_license_number, driver_license_expiry_date, contact_number, line_id, image_path, note, type, payto, subContractCompany) VALUES ('$driver_name', '$driver_license_number', '$driver_license_expiry_date', '$contact_number', '$line_id', '$image_path', '$note', '$type', '$payto', '$subContractCompany')";
 
 	//$result = $conn->query($sql);
 	if (!$conn->query($sql)) {
@@ -149,6 +149,7 @@ function updateDriverInfoByID()
 		contact_number = '$contact_number',
 		image_path = '$image_path',
 		line_id = '$line_id',
+		subContractCompany = '$subContractCompany',
 		type = '$type',
 		note = '$note',
 		payto = '$payto',
@@ -356,6 +357,86 @@ function updateTruckDatabyID()
 	mysqli_close($conn);
 }
 
+// F=10
+function createNewSubContractCompany()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	$sql = "Insert Into subcontractcarcompanies(companyName, contactPerson, phoneNumber, email, line_group_id) Values ('$companyName', '$contactPerson', '$phoneNumber', '$email', '$line_group_id')";
+
+	//echo $sql;
+	//$result = $conn->query($sql);
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+	// Close connection
+	mysqli_close($conn);
+}
+
+// F=11
+function loadSubContractCompany()
+{
+	//sleep(2);
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
+	$sql = "SELECT * FROM subcontractcarcompanies WHERE id = $target_id";
+
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+	echo json_encode($data_Array);
+}
+
+// F=12
+function updateSubContractCompany()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	$sql = "UPDATE subcontractcarcompanies
+	SET companyName = '$companyName'
+	, contactPerson = '$contactPerson'
+	, phoneNumber = '$phoneNumber'
+	, email = '$email'
+	, line_group_id = '$line_group_id'
+	WHERE id = '$id'";
+
+	//echo $sql;
+	//$result = $conn->query($sql);
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+	// Close connection
+	mysqli_close($conn);
+}
+
 
 //============================ MAIN =========================================================
 switch ($f) {
@@ -395,6 +476,16 @@ switch ($f) {
 			updateTruckDatabyID();
 			break;
 		}
+	case 10: {
+			createNewSubContractCompany();
+			break;
+		}
+	case 11: {
+			loadSubContractCompany();
+			break;
+		}
+	case 12: {
+			updateSubContractCompany();
+			break;
+		}
 }
-
-

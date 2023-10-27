@@ -3303,7 +3303,7 @@ function confirmJobOnlyClient()
 		}
 
 		$totalQTYDataText = countValues($totalQTYData);
-		
+
 		// Create MSG for Line Notification
 		$main_msgforCustomer = createMainMsgForCustomer($job_name, $formattedJobDate, $formattedDate, $refDoc_Data, $totalQTYDataText, $jsonJobActionTimeLine, $fullAddress, $hdRemark);
 
@@ -4845,6 +4845,27 @@ function Change_Driver_Notify()
 	mysqli_close($conn);
 }
 
+// F=29
+function deleteAttachedImage()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้างคำสั่ง SQL UPDATE
+	$sql = "Delete From attached_files WHere random_code = '$random_code'";
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+	mysqli_close($conn);
+}
+
 
 
 //============================ MAIN =========================================================
@@ -4959,6 +4980,10 @@ switch ($f) {
 		}
 	case 28: {
 			Change_Driver_Notify();
+			break;
+		}
+	case 29: {
+			deleteAttachedImage();
 			break;
 		}
 }

@@ -176,6 +176,17 @@
                                         </div>
                                         <!--end::Menu item-->
 
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item">
+                                            <a href="043_contractTruckCompany.php" class="menu-link">
+                                                <span class="menu-icon">
+                                                    <i class="fas fa-handshake fs-3"></i>
+                                                </span>
+                                                <span class="menu-title">บริษัทรถร่วม</span>
+                                            </a>
+                                        </div>
+                                        <!--end::Menu item-->
+
 
                                     </div>
                                     <!--end::Menu sub-->
