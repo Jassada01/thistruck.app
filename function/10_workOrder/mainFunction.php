@@ -991,6 +991,243 @@ function createMainMsgForCustomer($job_name, $formattedJobDate, $formattedDate, 
 	return $main_msgforCustomer;
 }
 
+function createMainMsgForSubcontract($job_name, $formattedJobDate, $formattedDate, $refDoc_Data, $totalQTYDataText, $jsonJobActionTimeLine, $fullAddress, $hdRemark,$jsonJoblist)
+{
+	$main_msgforsub =  [
+		[
+			'type' => 'flex',
+			'altText' => "คอนเฟิร์มงานซับ",
+			'contents' => [
+				'type' => 'bubble',
+				'header' => [
+					'type' => 'box',
+					'layout' => 'vertical',
+					'contents' => [
+						0 => [
+							'type' => 'text',
+							'text' => ' ',
+							'size' => 'md',
+							'color' => '#FFFFFF',
+							'wrap' => true,
+							'weight' => 'bold',
+							'style' => 'normal',
+							'align' => 'end',
+						],
+						1 => [
+							'type' => 'separator',
+							'margin' => 'md',
+							'color' => '#99ff9960',
+						],
+						2 => [
+							'type' => 'text',
+							'text' => $job_name,
+							'size' => 'lg',
+							'color' => '#FFFFFF',
+							'wrap' => true,
+							'weight' => 'bold',
+							'style' => 'normal',
+							'align' => 'start',
+							'offsetBottom' => '20px',
+							'offsetTop' => '10px',
+						],
+						3 => [
+							'type' => 'box',
+							'layout' => 'vertical',
+							'contents' => [
+								0 => [
+									'type' => 'text',
+									'text' =>  'คอนเฟิร์มงานซับ',
+									'color' => '#00b300',
+									'align' => 'center',
+									'size' => 'md',
+									'offsetTop' => '1px',
+									'weight' => 'bold',
+								],
+							],
+							'position' => 'absolute',
+							'cornerRadius' => '15px',
+							'backgroundColor' => '#FFFFFFAA',
+							'offsetTop' => '10px',
+							'offsetStart' => '10px',
+							'height' => '30px',
+							'width' => '120px',
+						],
+					],
+					'backgroundColor' => '#00b300',
+					'paddingTop' => '20px',
+				],
+				'body' => [
+					'type' => 'box',
+					'layout' => 'vertical',
+					'contents' => [
+						0 => [
+							'type' => 'box',
+							'layout' => 'vertical',
+							'margin' => 'lg',
+							'spacing' => 'sm',
+							'contents' => [
+								0 => [
+									'type' => 'box',
+									'layout' => 'vertical',
+									'contents' => [
+										0 => [
+											'type' => 'text',
+											'text' => 'เลขอ้างอิง',
+											'color' => '#000000',
+											'size' => 'sm',
+											'wrap' => true,
+											'weight' => 'bold',
+										],
+									],
+								],
+								1 => [
+									'type' => 'box',
+									'layout' => 'vertical',
+									'contents' => [
+										0 => [
+											'type' => 'text',
+											'text' => $refDoc_Data,
+											'color' => '#666666',
+											'size' => 'sm',
+											'wrap' => true,
+										],
+									],
+								],
+								2 => [
+									'type' => 'box',
+									'layout' => 'baseline',
+									'spacing' => 'sm',
+									'contents' => [
+										0 => [
+											'type' => 'text',
+											'text' => 'ขนาด',
+											'color' => '#000000',
+											'flex' => 1,
+											'size' => 'md',
+											'wrap' => true,
+											'weight' => 'bold',
+										],
+										1 => [
+											'type' => 'text',
+											'text' => $totalQTYDataText,
+											'flex' => 5,
+											'size' => 'md',
+											'wrap' => true,
+											'color' => '#000000',
+										],
+									],
+								],
+								3 => [
+									'type' => 'box',
+									'layout' => 'baseline',
+									'contents' => [
+										0 => [
+											'type' => 'text',
+											'text' => 'แผนปฏิบัติงาน',
+											'size' => 'sm',
+											'color' => '#000000',
+											'flex' => 5,
+											'wrap' => true,
+											'weight' => 'bold',
+										],
+									],
+								],
+							],
+						],
+						1 => [
+							'type' => 'box',
+							'layout' => 'vertical',
+							'contents' => $jsonJobActionTimeLine,
+							'paddingTop' => 'xxl',
+						],
+						2 => [
+							'type' => 'box',
+							'layout' => 'vertical',
+							'margin' => 'lg',
+							'spacing' => 'sm',
+							'contents' => [
+								0 => [
+									'type' => 'box',
+									'layout' => 'baseline',
+									'contents' => [
+										0 => [
+											'type' => 'text',
+											'text' => 'ที่อยู่ออกใบเสร็จ',
+											'size' => 'sm',
+											'color' => '#000000',
+											'flex' => 5,
+											'wrap' => true,
+											'weight' => 'bold',
+										],
+									],
+								],
+								1 => [
+									'type' => 'box',
+									'layout' => 'vertical',
+									'contents' => [
+										0 => [
+											'type' => 'text',
+											'text' => $fullAddress,
+											'color' => '#666666',
+											'size' => 'sm',
+											'wrap' => true,
+										],
+									],
+								],
+							],
+						],
+						3 => [
+							'type' => 'box',
+							'layout' => 'vertical',
+							'margin' => 'lg',
+							'spacing' => 'sm',
+							'contents' => [
+								0 => [
+									'type' => 'box',
+									'layout' => 'baseline',
+									'contents' => [
+										0 => [
+											'type' => 'text',
+											'text' => 'หมายเหตุ',
+											'size' => 'sm',
+											'color' => '#000000',
+											'flex' => 5,
+											'wrap' => true,
+											'weight' => 'bold',
+										],
+									],
+								],
+								1 => [
+									'type' => 'box',
+									'layout' => 'vertical',
+									'contents' => [
+										0 => [
+											'type' => 'text',
+											'color' => '#666666',
+											'size' => 'sm',
+											'wrap' => true,
+											'text' => !empty($hdRemark) ? $hdRemark : '-',
+										],
+									],
+								],
+							],
+						],
+					],
+					'paddingTop' => 'xs',
+				],
+				'footer' => [
+					'type' => 'box',
+					'layout' => 'vertical',
+					'contents' => $jsonJoblist
+				]
+			]
+		]
+	];
+
+	// Additional processing here if needed
+
+	return $main_msgforsub;
+}
 
 
 
@@ -1284,6 +1521,7 @@ function loadJobdatabyJobID()
 	$data_Array = array();
 	$data_Array['jobHeader'] = array();
 	$data_Array['JobDetailTrip'] = array();
+	$data_Array['jobforSubContract'] = array();
 
 
 	// เชื่อมต่อฐานข้อมูล MySQL
@@ -1451,6 +1689,18 @@ function loadJobdatabyJobID()
 	}
 
 	$data_Array['jobActionLog'] = $jobActionLog;
+
+	// 
+	$sql = "Select a.driver_name, c.id, c.companyName, c.line_group_id From job_order_detail_trip_info a
+	Left Join truck_driver_info b ON a.driver_id = b.driver_id
+	Left Join subcontractcarcompanies c ON b.subContractCompany = c.id
+	Where a.job_id = $MAIN_JOB_ID  AND c.id IS NOT NULL";
+	$result4 = $conn->query($sql);
+
+	while ($row = $result4->fetch_assoc()) {
+		$data_Array['jobforSubContract'][] = $row;
+	}
+
 
 	mysqli_close($conn);
 	echo json_encode($data_Array, JSON_UNESCAPED_UNICODE);
@@ -4866,6 +5116,532 @@ function deleteAttachedImage()
 	mysqli_close($conn);
 }
 
+// 30
+function sendJobNoticetosub()
+{
+	// รับค่า MAIN_JOB_ID จาก Ajax
+	$MAIN_JOB_ID = $_POST['MAIN_JOB_ID'];
+	$subContractID = $_POST['subContractID'];
+	$update_user = $_POST['update_user'];
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// Get Line Token 
+	$sql = "SELECT * FROM master_data WHERE type = 'system_value' AND name = 'Line Token'";
+	$result = $conn->query($sql);
+	$row = $result->fetch_assoc();
+	$Line_Token = $row['value'];
+	// Get Server vname
+	$sql = "SELECT * FROM master_data WHERE type = 'server_name'";
+	$result = $conn->query($sql);
+	$row = $result->fetch_assoc();
+	$SERVER_NAME = $row['value'];
+
+
+	// Delete for ลานตู้ and ท่าเรือ
+	$sql = "DELETE FROM job_order_detail_trip_action_log WHERE id IN (SELECT a.id FROM job_order_detail_trip_action_log a
+    Inner Join job_order_detail_trip_list b ON a.trip_id = b.trip_id AND a.plan_order = b.plan_order
+    WHERE a.job_id = $MAIN_JOB_ID AND a.main_order = 3 AND a.minor_order NOT IN (1, 9) AND (b.location_type like '%ลาน%' OR b.location_type like '%ท่าเรือ%'))"; // Add ท่าเรือ
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+
+	// สร้างคำสั่ง SQL สำหรับดึงข้อมูล refDoc_Data
+	$sql = "SELECT customer_job_no, booking, customer_po_no, bill_of_lading, customer_invoice_no, agent, goods, quantity
+    FROM job_order_header where id = $MAIN_JOB_ID";
+
+	$result = $conn->query($sql);
+
+	$client_line_token = "";
+	$customer_line_token = "";
+
+	$refDoc_Data = " "; // ตัวแปรสำหรับเก็บข้อมูลที่ต้องแสดง
+	$agent = "";
+	if ($result->num_rows > 0) {
+		// วนลูปผลลัพธ์ที่ได้จากฐานข้อมูล
+		while ($row = $result->fetch_assoc()) {
+			// ตรวจสอบและเก็บข้อมูลที่ไม่ใช่ Null
+			$customerJobNo = $row['customer_job_no'];
+			if (!empty($customerJobNo)) {
+				$refDoc_Data .= "Job NO ของลูกค้า: " . $customerJobNo . "\n";
+			}
+
+			$booking = $row['booking'];
+			if (!empty($booking)) {
+				$refDoc_Data .= "Booking (บุ๊กกิ้ง): " . $booking . "\n";
+			}
+
+			$customerPoNo = $row['customer_po_no'];
+			if (!empty($customerPoNo)) {
+				$refDoc_Data .= "PO No.: " . $customerPoNo . "\n";
+			}
+
+			$billOfLading = $row['bill_of_lading'];
+			if (!empty($billOfLading)) {
+				$refDoc_Data .= "B/L(ใบขน): " . $billOfLading . "\n";
+			}
+
+			$customerInvoiceNo = $row['customer_invoice_no'];
+			if (!empty($customerInvoiceNo)) {
+				$refDoc_Data .= "Invoice No.: " . $customerInvoiceNo . "\n";
+			}
+
+			$agent = $row['agent'];
+			if (!empty($agent)) {
+				$refDoc_Data .= "Agent(เอเย่นต์): " . $agent . "\n";
+			}
+
+			$goods = $row['goods'];
+			if (!empty($goods)) {
+				$refDoc_Data .= "ชื่อสินค้า: " . $goods . "\n";
+			}
+
+			$quantity = $row['quantity'];
+			if (!empty($quantity)) {
+				$refDoc_Data .= "QTY/No. of Package: " . $quantity . "\n";
+			}
+		}
+		$refDoc_Data = rtrim($refDoc_Data, "\n");
+	}
+	/*
+    $sql = "SELECT 
+        a.id, 
+        a.job_id,
+        a.driver_name, 
+        c.job_name, 
+        a.job_no, 
+        a.tripNo, 
+        a.status, 
+        a.random_code, 
+        b.line_id,
+        a.jobStartDateTime,
+        a.containersize,
+        d.insInvAdd1, d.insInvAdd2, d.insInvAdd3,
+        c.remark,
+        e.Line_token AS client_line_token,
+        f.line_token AS customer_line_token
+    FROM 
+        job_order_detail_trip_info a 
+        Inner Join job_order_header c ON a.job_id = c.id
+        LEFT Join truck_driver_info b ON a.driver_id = b.driver_id
+        inner Join job_order_detail_trip_cost d ON a.id = d.trip_id AND a.job_id = d.job_id
+        LEFT JOIN client_info e ON c.ClientID = e.ClientID
+        LEFT JOIN customers f ON c.customer_id = f.customer_id
+    WHERE 
+        a.job_id = $MAIN_JOB_ID
+        AND a.status = 'รอเจ้าหน้าที่ยืนยัน' 
+        and a.complete_flag IS NULL";
+
+        */
+	$sql = "SELECT 
+        a.id, 
+        a.job_id,
+        a.driver_name, 
+        c.job_name, 
+        a.job_no, 
+        a.tripNo, 
+        a.status, 
+        a.random_code, 
+        b.line_id,
+        a.jobStartDateTime,
+        a.containersize,
+        d.insInvAdd1, d.insInvAdd2, d.insInvAdd3,
+        c.remark,
+        e.Line_token AS client_line_token,
+        f.line_token AS customer_line_token,
+        g.line_group_id
+        
+    FROM 
+        job_order_detail_trip_info a 
+        Inner Join job_order_header c ON a.job_id = c.id
+        LEFT Join truck_driver_info b ON a.driver_id = b.driver_id
+        inner Join job_order_detail_trip_cost d ON a.id = d.trip_id AND a.job_id = d.job_id
+        LEFT JOIN client_info e ON c.ClientID = e.ClientID
+        LEFT JOIN customers f ON c.customer_id = f.customer_id
+        LEFT JOIN subcontractcarcompanies g ON b.subContractCompany = g.id
+    WHERE 
+        a.job_id = $MAIN_JOB_ID
+        AND g.id = $subContractID
+		AND a.status <> 'ยกเลิก'";
+	// ส่งคำสั่ง SQL ไปยังฐานข้อมูล
+	$result = $conn->query($sql);
+	$progress = "";
+	// ตรวจสอบผลลัพธ์การค้นหา
+	$totalQTYData = array();
+	$jsonJoblist = array();
+	$tripCount = 0;
+	if ($result->num_rows > 0) {
+		// วนลูปแสดงผลลัพธ์
+		$jsonJoblist[] = [
+			'type' => 'text',
+			'text' => 'รายการทริปในใบงาน',
+			'size' => 'lg',
+			'color' => '#000000',
+			'weight' => 'bold',
+		];
+		$tripCount = 0;
+		while ($row = $result->fetch_assoc()) {
+			// ค้นหา job_order_detail_trip_action_log.id ที่มีค่าน้อยที่สุดที่มี complete_flag == NULL
+			$tripCount = $tripCount+1;
+			$id = $row['id'];
+			$driver_name = $row['driver_name'];
+			$job_name = $row['job_name'];
+			$job_no = $row['job_no'];
+			$tripNo = $row['tripNo'];
+			$status = $row['status'];
+			$random_code = $row['random_code'];
+			$jobStartDateTime = $row['jobStartDateTime'];
+			$User_line_id = $row['line_id'];
+			$containersize = $row['containersize'];
+			$insInvAdd1 = $row['insInvAdd1'];
+			$insInvAdd2 = $row['insInvAdd2'];
+			$insInvAdd3 = $row['insInvAdd3'];
+			$hdRemark = $row['remark'];
+			$client_line_token = $row['client_line_token'];
+			$customer_line_token = $row['customer_line_token'];
+			$subcontractLineGroupID = $row['line_group_id'];
+			$progress = "";
+
+			if (trim($containersize) == "") {
+				$containersize = "ไม่ระบุ";
+			}
+
+			array_push($totalQTYData, $containersize);
+
+
+
+			$sql = "SELECT id, progress FROM job_order_detail_trip_action_log WHERE trip_id = $id AND complete_flag IS NULL ORDER BY id ASC LIMIT 1";
+			$result2 = $conn->query($sql);
+
+			// ตรวจสอบผลลัพธ์การค้นหา
+			if ($result2->num_rows > 0) {
+				// แสดงผลลัพธ์และอัพเดทค่าในฐานข้อมูล
+				while ($row2 = $result2->fetch_assoc()) {
+					$progress = $row2['progress'];
+					$id2 = $row2['id'];
+					/* RELEASE HERE ===========================================================================
+                    // อัพเดทค่าใน job_order_detail_trip_info
+                    $sql = "UPDATE job_order_detail_trip_info SET status = '$progress', update_user = '$update_user' WHERE id = $id";
+                    // ทำการ Update ข้อมูล 
+                    if (!$conn->query($sql)) {
+                        echo  $conn->errno;
+                        exit();
+                    }
+
+                    // อัพเดทค่าใน job_order_detail_trip_action_log
+                    $sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = 1, timestamp = CURRENT_TIMESTAMP(), complete_user = '$update_user' WHERE id = $id2";
+                    // ทำการ Update ข้อมูล 
+                    if (!$conn->query($sql)) {
+                        echo  $conn->errno;
+                        exit();
+                    }
+                    // แสดงผลลัพธ์ในรูปแบบ JSON
+                    //echo json_encode($row2);
+                    */
+				}
+			} else {
+				echo "0 results";
+			}
+
+
+			//$sql = "SELECT a.job_characteristic_id, a.job_characteristic, a.location_code, a.map_url, b.attr1 AS JSC , b.attr2 AS Color
+			//FROM job_order_detail_trip_list a Inner JOIN master_data b ON a.job_characteristic_id = b.id AND b.type = 'job_characteristic' 
+			//WHERE a.trip_id = $id Order By a.plan_order";
+
+			$sql = "SELECT a.job_characteristic_id, a.job_characteristic, a.location_code, c.map_url, b.attr1  AS JSC , c.latitude, c.longitude , b.attr2 AS Color, c.location_name
+            FROM job_order_detail_trip_list a Inner JOIN master_data b ON a.job_characteristic_id = b.id AND b.type = 'job_characteristic' 
+            Left Join locations c ON a.location_id = c.location_id
+            WHERE a.trip_id = $id  Order By a.plan_order";
+
+			$result3 = $conn->query($sql);
+			$jobActionLog = array();
+			$jobActionLogtext = "";
+
+			while ($row3 = $result3->fetch_assoc()) {
+				$job_characteristic_id = $row3['job_characteristic_id'];
+				$job_characteristic = $row3['job_characteristic'];
+				$location_code = $row3['location_code'];
+				$map_url = $row3['map_url'];
+				$JSC = $row3['JSC'];
+				$Color = $row3['Color'];
+				$latitude = $row3['latitude'];
+				$longitude = $row3['longitude'];
+				$location_name = $row3['location_name'];
+
+				// URL encode the place name
+				$placeName = urlencode($location_name);
+
+				// Generate the Google Maps link
+				$googleMapsLink = "https://www.google.com/maps/search/?api=1&query={$latitude},{$longitude}&query_place_id={$placeName}";
+
+				// สร้างคำสั่ง SQL สำหรับการค้นหา URL
+				$sql4 = "SELECT rnd FROM shot_url WHERE url = '$map_url'";
+				$result4 = $conn->query($sql4);
+				// ตรวจสอบว่าพบ URL หรือไม่
+				$rnd = "";
+				if ($result4->num_rows > 0) {
+					// พบ URL ในฐานข้อมูล
+					$row = $result4->fetch_assoc();
+					$rnd = $row["rnd"];
+					echo "พบ URL และรหัส rnd: " . $rnd;
+				} else {
+					// ไม่พบ URL ในฐานข้อมูล
+					// สร้างรหัส rnd แบบสุ่ม
+					$rnd = bin2hex(random_bytes(16));
+
+					// สร้างคำสั่ง SQL สำหรับการเพิ่มข้อมูล URL และ rnd
+					$insert_sql = "INSERT INTO shot_url (rnd, url) VALUES ('$rnd', '$map_url')";
+
+					if ($conn->query($insert_sql) === TRUE) {
+						echo "เพิ่มข้อมูล URL และรหัส rnd สำเร็จ";
+					} else {
+						echo "การเพิ่มข้อมูลล้มเหลว: " . $conn->error;
+					}
+				}
+
+
+				$map_msg_url = $SERVER_NAME . "sht.php?r=" . $rnd;
+
+
+				$jobActionLog[] = array(
+					"action" => $JSC,
+					"color" => $Color,
+					"code" => $location_code,
+					"link" => $map_msg_url
+				);
+				$jobActionLogtext = $jobActionLogtext . "\n" . $JSC . " : " . $location_code;
+			}
+
+			// สร้าง Array สำหรับ JSON ที่เราต้องการสร้าง
+			$jsonJobActionTimeLine = array();
+
+			// วนลูปเพื่อสร้างส่วนของ JSON จากแต่ละองค์ประกอบใน $jobActionLog
+			$idxjobActionLog = 0;
+			foreach ($jobActionLog as $log) {
+				$idxjobActionLog = $idxjobActionLog + 1;
+				$jsonJobActionTimeLine[] = createActionBox($log['action'], $log['color'], $log['code'], $log['link']);
+
+				//echo $idxjobActionLog < count($jobActionLog);
+				if ($idxjobActionLog < count($jobActionLog)) {
+					$jsonJobActionTimeLine[] = [
+						'type' => 'box',
+						'layout' => 'horizontal',
+						'contents' => [
+							0 => [
+								'type' => 'box',
+								'layout' => 'baseline',
+								'contents' => [
+									0 => [
+										'type' => 'filler',
+									],
+								],
+								'flex' => 2,
+							],
+							1 => [
+								'type' => 'box',
+								'layout' => 'horizontal',
+								'contents' => [
+									0 => [
+										'type' => 'filler',
+									],
+									1 => [
+										'type' => 'box',
+										'layout' => 'vertical',
+										'contents' => [],
+										'width' => '2px',
+										'backgroundColor' => '#B7B7B7',
+									],
+									2 => [
+										'type' => 'filler',
+									],
+								],
+								'flex' => 1,
+							],
+							2 => [
+								'type' => 'box',
+								'layout' => 'vertical',
+								'contents' => [],
+								'flex' => 4,
+							],
+						],
+						'spacing' => 'lg',
+						'height' => '30px',
+					];
+				}
+			}
+
+			// แปลง Array เป็น JSON
+			//$jsonJobActionTimeLine = json_encode($jsonArray, JSON_PRETTY_PRINT);
+
+
+			// Send Line Notification =======================================================
+			$thai_date = date('j F', strtotime($jobStartDateTime));
+			$thai_date = str_replace(
+				['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+				[
+					'ม.ค.',
+					'ก.พ.',
+					'มี.ค.',
+					'เม.ย.',
+					'พ.ค.',
+					'มิ.ย.',
+					'ก.ค.',
+					'ส.ค.',
+					'ก.ย.',
+					'ต.ค.',
+					'พ.ย.',
+					'ธ.ค.'
+				],
+				$thai_date
+			);
+
+			$formattedTime = date('H:i', strtotime($jobStartDateTime));
+			$formattedDate = $thai_date . ' ' . $formattedTime . ' น.';
+			$formattedJobDate = $thai_date;
+
+			$fullAddress = " ";
+
+			if (!empty($insInvAdd1)) {
+				$fullAddress .= $insInvAdd1 . "\n";
+			}
+
+			if (!empty($insInvAdd2)) {
+				// "\n" คือ การขึ้นบรรทัดใหม่
+				$fullAddress .= $insInvAdd2 . "\n";
+			}
+
+			if (!empty($insInvAdd3)) {
+				$fullAddress .= $insInvAdd3 . "\n";
+			}
+
+			// ลบบรรทัดว่างที่สุดท้ายออก
+			$fullAddress = rtrim($fullAddress, "\n");
+
+			$link = $SERVER_NAME . 'tripDetail.php?r=' . $random_code;
+
+
+			//print_r($jsonJobActionTimeLine);
+
+			// Confirm Only Client
+			/*
+            $main_msg = generateMainMsgNoticeNewJob(
+                $job_name,
+                $job_no,
+                $tripNo,
+                $driver_name,
+                $formattedJobDate,
+                $formattedDate,
+                $refDoc_Data,
+                $jsonJobActionTimeLine,
+                $fullAddress,
+                $hdRemark,
+                $link
+            );
+            */
+
+
+
+			//echo $message;
+			// Send Line Notice to Driver 
+			//if (trim($User_line_id != "")) {
+
+			//  SendNoticeJobConfirm($User_line_id, $Line_Token, $main_msg);
+			//}
+
+
+			
+			$jsonJoblist[] = [
+				'type' => 'box',
+				'layout' => 'baseline',
+				'paddingTop' => 'lg',
+				'contents' => [
+					[
+						'type' => 'text',
+						'text' => $tripCount.". ".$driver_name,
+						'weight' => 'bold',
+					],
+					[
+						'type' => 'text',
+						'text' => $formattedDate,
+						'align' => 'end',
+						'color' => '#AAAAAA',
+					],
+				],
+				'action' => [
+					'type' => 'uri',
+					'uri' => $link,
+				]
+			];
+		}
+
+
+
+
+		$totalQTYDataText = countValues($totalQTYData);
+
+		// Create MSG for Line Notification
+		$main_msgforCustomer = createMainMsgForSubcontract($job_name, $formattedJobDate, $formattedDate, $refDoc_Data, $totalQTYDataText, $jsonJobActionTimeLine, $fullAddress, $hdRemark,$jsonJoblist);
+
+
+		$messagefor_lineNotification = "คอนเฟิร์มงาน
+$job_name
+วันที่ : $formattedJobDate
+เริ่มงาน : $formattedDate
+เอกสารอ้างอิง : 
+$refDoc_Data
+ขนาด : $totalQTYDataText
+=== แผนปฏิบัติงาน ===$jobActionLogtext
+
+=== ที่อยู่ออกใบเสร็จ ===
+$fullAddress
+หมายเหตุ : 
+$hdRemark";
+
+		//echo $messagefor_lineNotification ;
+
+		// Process after finished each trip =======================================
+		$prefix = "NOTIFY_";
+		/*
+        if (trim($client_line_token != "")) {
+
+            //SendNoticeJobConfirmforCustomerClient($client_line_token, $Line_Token, 'คอนเฟิร์มงาน', $messageforClientandCustomer);
+
+            if (substr($client_line_token, 0, strlen($prefix)) == $prefix) {
+                $client_line_token = substr($client_line_token, strlen($prefix));
+                sendLineNotify($client_line_token, $messagefor_lineNotification);
+            } else {
+                SendNoticeJobConfirm($client_line_token, $Line_Token, $main_msgforCustomer);
+            }
+        }
+
+        if (trim($customer_line_token != "")) {
+
+            //SendNoticeJobConfirmforCustomerClient($customer_line_token, $Line_Token, 'คอนเฟิร์มงาน', $messageforClientandCustomer);
+            if (substr($customer_line_token, 0, strlen($prefix)) == $prefix) {
+                $customer_line_token = substr($customer_line_token, strlen($prefix));
+                sendLineNotify($customer_line_token, $messagefor_lineNotification);
+            } else {
+                SendNoticeJobConfirm($customer_line_token, $Line_Token, $main_msgforCustomer);
+            }
+        }
+        */
+		SendNoticeJobConfirm($subcontractLineGroupID, $Line_Token, $main_msgforCustomer);
+	}
+	
+	$sql = "UPDATE job_order_header SET sub_confirmed = 1, update_by = '$update_user' WHERE id = $MAIN_JOB_ID";
+	//echo $sql;
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+	
+	mysqli_close($conn);
+}
+
 
 
 //============================ MAIN =========================================================
@@ -4984,6 +5760,10 @@ switch ($f) {
 		}
 	case 29: {
 			deleteAttachedImage();
+			break;
+		}
+	case 30: {
+			sendJobNoticetosub();
 			break;
 		}
 }

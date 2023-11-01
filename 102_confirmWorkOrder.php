@@ -359,6 +359,9 @@ include 'check_cookie.php';
                                                             <button type="button" class="btn  btn-sm  btn-success d-none me-1" id="confirmClient">
                                                                 <i class="fas  fa-check-circle"></i> ยืนยันให้ผู้ว่าจ้างก่อน
                                                             </button>
+                                                            <button type="button" class="btn  btn-sm  btn-info me-1 d-none" id="confirmsubContract">
+                                                                <i class="fas  fa-check-circle"></i> ยืนยันงานให้กับรถร่วม
+                                                            </button>
                                                             <div class="btn-group btn-group-sm d-none" role="group" id="confirmJobGroup">
                                                                 <button type="button" class="btn btn-sm btn-primary d-none " id="confirmJob">
                                                                     <i class="fas fa-check"></i> ยืนยันใบงาน
@@ -1031,7 +1034,7 @@ include 'check_cookie.php';
         </div>
     </div>
 
-    <!-- Modal แผนที่ -->
+    <!-- Modal เลือก Confirm ราย Trip -->
     <div class="modal fade" id="selectTripforconfirm" tabindex="-1" aria-labelledby="selectTripforconfirmLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -1062,6 +1065,28 @@ include 'check_cookie.php';
             </div>
         </div>
     </div>
+
+    <!-- Modal เลือก Confirm ราย Trip -->
+    <div class="modal fade" id="selectSubcontracttoConFirm" tabindex="-1" aria-labelledby="selectSubcontracttoConFirmLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="selectSubcontracttoConFirmLabel">คอนเฟิร์มงานไปยังรถร่วม</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="checkboxContainerforSelectPartner" class="form-group">
+                        <!-- ที่นี่จะเป็นที่วาง checkbox -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary" id="confirmtoSubBtn">ยืนยัน</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         var hostUrl = "assets/";
@@ -1261,6 +1286,7 @@ include 'check_cookie.php';
             let allTrip_data = [];
 
             let isClientConfirmed = false;
+            let subContractJob = [];
 
 
             // Set Initial Select 2
@@ -1356,7 +1382,7 @@ include 'check_cookie.php';
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
-
+                        //console.log(data_arr);
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
 
@@ -1534,6 +1560,10 @@ include 'check_cookie.php';
 
                         }
 
+                        //sub_confirmed
+                        //confirmsubContract
+                        
+
                         if (jobHeader.status === 'ยกเลิก') {
                             // Disable cancelJob button
                             $('#cancelJob').prop('disabled', true);
@@ -1622,6 +1652,15 @@ include 'check_cookie.php';
 
                         //console.log(MAIN_LINE_MSG);
 
+                        // Sub Contract Handel
+                        subContractJob = data_arr.jobforSubContract;
+                        if(jobHeader.sub_confirmed == null)
+                        {
+                            if (subContractJob.length > 0)
+                            {
+                                $("#confirmsubContract").removeClass("d-none");
+                            }
+                        }
 
                         $('#loading-spinner').hide();
                     })
@@ -3147,12 +3186,98 @@ include 'check_cookie.php';
 
             });
 
+            //selectSubcontracttoConFirm
+            //
+            $('body').on('click', '#confirmsubContract', function() {
+                //selectSubcontracttoConFirm
+                //console.log(subContractJob);
+                // ใช้ Object เพื่อจัดเก็บ id ที่ปรากฏแล้ว เพื่อหลีกเลี่ยงการซ้ำซ้อน
+                let seenIds = {};
+                $('#checkboxContainerforSelectPartner').html("");
+                if (subContractJob.length > 0) {
+                    for (let i = 0; i < subContractJob.length; i++) {
+                        const job = subContractJob[i];
+                        const {
+                            id,
+                            companyName,
+                            line_group_id
+                        } = job;
+
+                        if (!seenIds[id]) {
+                            seenIds[id] = true;
+                            disableText = "disabled";
+                            checkText = "checked"
+                            if (line_group_id == "") {
+                                disableText = "disabled"
+                                checkText = "";
+                            }
+                            const checkboxHtml = `
+                        <div class="form-check mb-2 ms-10">
+                            <input class="form-check-input" type="checkbox" value="${id}" id="checkbox-${id}" ${disableText} ${checkText}>
+                            <label class="form-check-label" for="checkbox-${id}">
+                                ${companyName}
+                            </label>
+                        </div>
+                        `;
+
+                            $('#checkboxContainerforSelectPartner').append(checkboxHtml);
+                        }
+                    }
+                } else {
+                    $('#checkboxContainerforSelectPartner').append("<h3 class='text-danger'>ไม่มีรถร่วมในใบงานนี้</h3>");
+                }
+
+
+                $('#selectSubcontracttoConFirm').modal('show');
+
+            });
+
+            function sendNotificationtoSubCar(subContractID) {
+                var ajaxData = {};
+                ajaxData['f'] = '30';
+                ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
+                ajaxData['subContractID'] = subContractID;
+                ajaxData['update_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData),
+                    })
+                    .done(function(data) {
+                        Swal.fire({
+                                icon: 'success',
+                                title: 'ส่งไลน์ไปยังบริษัทซับแล้ว',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                                //null
+                            });
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+            // confirmtoSubBtn
+            $('body').on('click', '#confirmtoSubBtn', function() {
+                $('#selectSubcontracttoConFirm').modal('hide');
+                let checkedIds = [];
+
+                // หา checkbox ที่ถูก check
+                $("#checkboxContainerforSelectPartner input[type='checkbox']:checked").each(function() {
+                    checkedIds.push($(this).val());
+                });
+                $.each(checkedIds, function(index, val) {
+                    //console.log(val);
+                    sendNotificationtoSubCar(val);
+                });
 
 
 
-
-
-
+            });
 
 
 
