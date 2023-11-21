@@ -694,11 +694,9 @@ function updateValueSystem()
 	if ($result->num_rows > 0) {
 		// ถ้ามีข้อมูลแล้ว ให้ทำการ Update
 		$sql = "UPDATE master_data SET name = '$name', value = '$value' WHERE type = '$type'";
-
 	} else {
 		// ถ้ายังไม่มีข้อมูล ให้ทำการ Insert
 		$sql = "INSERT INTO master_data (id, name, value, type) VALUES (3001, '$name', '$value', '$type')";
-		
 	}
 
 	//echo $sql;
@@ -712,7 +710,7 @@ function updateValueSystem()
 	mysqli_close($conn);
 }
 
-// F=6
+// F=11
 function loadInitialDataSystem()
 {
 	// Load All Data from Paramitor
@@ -725,8 +723,8 @@ function loadInitialDataSystem()
 	include "../connectionDb.php";
 
 	// สร้างคำสั่ง SQL สำหรับอัพเดตข้อมูล
-	$sql = "Select * From master_data a Where a.type = 'companyGroupLine'";
-	
+	$sql = "Select * From master_data a Where a.type in ('OilPrice', 'companyGroupLine')";
+
 	$res = $conn->query(trim($sql));
 	mysqli_close($conn);
 	$data_Array = array();
@@ -736,6 +734,61 @@ function loadInitialDataSystem()
 	}
 	echo json_encode($data_Array);
 }
+
+// F=12
+function updateOilPrice()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// ข้อมูลที่ต้องการ Insert หรือ Update
+	$name = 'OilPrice';
+	$value = $currentOilPrice;
+	$type = "OilPrice";
+
+	// ตรวจสอบว่ามีข้อมูลในฐานข้อมูลแล้วหรือไม่
+	$sql_check = "SELECT id FROM master_data WHERE type = '$type'";
+	$result = $conn->query($sql_check);
+
+	if ($result->num_rows > 0) {
+		// ถ้ามีข้อมูลแล้ว ให้ทำการ Update
+		$sql = "UPDATE master_data SET name = '$name', value = '$value', attr1=CURRENT_TIMESTAMP WHERE type = '$type'";
+	} else {
+		// ถ้ายังไม่มีข้อมูล ให้ทำการ Insert
+		$sql = "Insert into master_data(id, name, value, type, attr1) Values (4001, 'OilPrice', '$value', 'OilPrice', CURRENT_TIMESTAMP)";
+	}
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	// Process for update to price list
+	$sql = "UPDATE service_items
+	Inner Join dynamicpricedetail ON service_items.id = dynamicpricedetail.id
+	SET service_items.price = dynamicpricedetail.price
+	, service_items.updated_at = CURRENT_TIMESTAMP
+	WHERE dynamicpricedetail.min <= $value
+	AND dynamicpricedetail.max >= $value";
+
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+
+	// Close connection
+	mysqli_close($conn);
+}
+
+
 
 
 //============================ MAIN =========================================================
@@ -780,8 +833,13 @@ switch ($f) {
 			updateValueSystem();
 			break;
 		}
-		case 11: {
+	case 11: {
 			loadInitialDataSystem();
+			break;
+		}
+
+	case 12: {
+			updateOilPrice();
 			break;
 		}
 }

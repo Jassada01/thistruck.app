@@ -172,28 +172,78 @@ include 'check_cookie.php';
 
                                 </div>
                                 <!-- เริ่มต้น Card -->
+
                                 <div class="card">
                                     <div class="card-body">
-                                        <form id="updateValueSystem" method="post" class="m-form m-form--fit m-form--label-align-right">
-                                            <form method="post">
-                                                <div class="form-group  mb-3 row">
-                                                    <label for="lineGroupID" class="col-sm-3 col-form-label text-end-pc">Line Group บริษัท</label>
-                                                    <div class="col-sm-4">
-                                                        <input type="text" class="form-control" id="lineGroupID" name="lineGroupID" required autocomplete="off">
+                                        <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" data-bs-toggle="tab" href="#kt_tab_pane_1">ราคาน้ำมัน</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#kt_tab_pane_2">Line Group บริษัท</a>
+                                            </li>
+                                        </ul>
+
+                                        <div class="tab-content" id="myTabContent">
+                                            <div class="tab-pane fade show active" id="kt_tab_pane_1" role="tabpanel">
+                                                <h3 class="card-title align-items-start flex-column">
+                                                    <span class="card-label fw-bold text-gray-900">ราคาน้ำมันขณะนี้</span><Br />
+                                                    <div class="mb-2">
+                                                        <!--begin::Statistics-->
+                                                        <span class="fs-2hx fw-bold  text-gray-800 me-2 mb-2 lh-1 ls-n2" id="oilPricePanel"></span>
+                                                        <!--end::Statistics-->
+
+                                                        <!--begin::Description-->
+                                                        <span class="fs-6 fw-semibold text-gray-500">บาทต่อลิตร</span>
+                                                        <!--end::Description-->
                                                     </div>
-                                                    <div class="col-sm-2">
-                                                        <button type="button" class="btn  btn-light-danger" id="TestSendLineBTN">ทดสอบ</button>
+                                                    <span class="text-gray-500 mt-1 fw-semibold fs-6" id="oilPriceLastUpdate">Update เมื่อ</span>
+                                                </h3>
+                                                <form id="updateCurrentOilPrice" method="post" class="m-form m-form--fit m-form--label-align-right">
+                                                    <div class="form-group  mb-3 row">
+                                                        <label for="currentOilPrice" class="col-sm-3 col-form-label text-end-pc">แก้ไขราคาน้ำมันปัจจุบัน</label>
+                                                        <div class="col-sm-4">
+
+                                                            <div class="input-group mb-5">
+                                                                <input type="text" class="form-control" id="currentOilPrice" name="currentOilPrice" required autocomplete="off" aria-describedby="basic-addon2" />
+                                                                <span class="input-group-text" id="basic-addon2">บาทต่อลิตร</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="mb-3 row">
-                                                    <div class="col-sm-3"></div>
-                                                    <div class="col-sm-9">
-                                                        <button type="submit" class="btn btn-primary" id="btnUpdateData">
-                                                            <i class="fas fa-save me-2"></i>บันทึกข้อมูล
-                                                        </button>
+                                                    <div class="mb-3 row">
+                                                        <div class="col-sm-3"></div>
+                                                        <div class="col-sm-9">
+                                                            <button type="submit" class="btn btn-primary" id="btnUpdateOilPrice">
+                                                                <i class="fas fa-save me-2"></i>บันทึกข้อมูล
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </form>
+                                                </form>
+
+                                            </div>
+                                            <div class="tab-pane fade" id="kt_tab_pane_2" role="tabpanel">
+                                                <form id="updateValueSystem" method="post" class="m-form m-form--fit m-form--label-align-right">
+                                                    <div class="form-group  mb-3 row">
+                                                        <label for="lineGroupID" class="col-sm-3 col-form-label text-end-pc">Line Group บริษัท</label>
+                                                        <div class="col-sm-4">
+                                                            <input type="text" class="form-control" id="lineGroupID" name="lineGroupID" required autocomplete="off">
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <button type="button" class="btn  btn-light-danger" id="TestSendLineBTN">ทดสอบ</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3 row">
+                                                        <div class="col-sm-3"></div>
+                                                        <div class="col-sm-9">
+                                                            <button type="submit" class="btn btn-primary" id="btnUpdateData">
+                                                                <i class="fas fa-save me-2"></i>บันทึกข้อมูล
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                                 <!-- จบ Card -->
@@ -232,9 +282,14 @@ include 'check_cookie.php';
     <!-- MD5 JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/md5.js"> </script>
     <!--end::Page Custom Javascript-->
+    <!-- Moment JS -->
+    <script src="assets/plugins/custom/moment/moment-with-locales.js"></script>
     <script>
         // เมื่อ Document โหลดเสร็จแล้ว
         $(document).ready(function() {
+
+            // Set Moment 
+            moment.locale('th');
 
             function formToObject(form) {
                 var data = {};
@@ -259,7 +314,7 @@ include 'check_cookie.php';
                 let ajaxData = formToObject(this);
                 ajaxData['f'] = 10;
                 //console.log(ajaxData);
-                
+
                 // ส่งข้อมูลไปบันทึก
                 $.ajax({
                     type: 'POST',
@@ -284,13 +339,12 @@ include 'check_cookie.php';
                         });
                     }
                 });
-            
+
 
             });
 
 
-            function loadInitialData()
-            {
+            function loadInitialData() {
                 var ajaxData = {};
                 ajaxData['f'] = '11';
                 $.ajax({
@@ -306,11 +360,23 @@ include 'check_cookie.php';
                     .done(function(data) {
 
                         var data_arr = JSON.parse(data);
-                        //console.log(data_arr);
-                        $('#lineGroupID').val(data_arr[0].value);
+                        var result = {};
+
+                        data_arr.forEach(function(item) {
+                            var key = item.type + '_data';
+                            result[key] = item;
+                        });
+
+                        // lineGroupID
+                        $('#lineGroupID').val(result.companyGroupLine_data.value);
                         
+
+                        // Oil Price
+                        $("#oilPricePanel").html(result.OilPrice_data.value)
+                        $("#oilPriceLastUpdate").html("อัพเดทล่าสุดเมื่อ " + moment(result.OilPrice_data.attr1, "YYYY-MM-DD HH:mm").calendar());
+                        $('#currentOilPrice').val(result.OilPrice_data.value);
                         $('#loading-spinner').hide();
-                       
+
                     })
                     .fail(function() {
                         // just in case posting your form failed
@@ -344,6 +410,77 @@ include 'check_cookie.php';
                             alert("Posting failed.");
                         });
                 }
+            });
+
+            $('#updateValueSystem').on('submit', function(e) {
+                e.preventDefault(); // ไม่ให้รีเฟรชหน้าเว็บ
+
+                let ajaxData = formToObject(this);
+                ajaxData['f'] = 10;
+                //console.log(ajaxData);
+
+                // ส่งข้อมูลไปบันทึก
+                $.ajax({
+                    type: 'POST',
+                    url: 'function/00_systemManagement/mainFunction.php', // URL ของไฟล์ PHP ที่รับข้อมูลจาก Form
+                    data: ajaxData,
+                    success: function(response) {
+                        //console.log(response)
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'บันทึกข้อมูลสำเร็จ',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล',
+                            text: xhr.responseText
+                        });
+                    }
+                });
+
+
+            });
+
+
+            $('#updateCurrentOilPrice').on('submit', function(e) {
+                e.preventDefault(); // ไม่ให้รีเฟรชหน้าเว็บ
+
+                let ajaxData = formToObject(this);
+                ajaxData['f'] = 12;
+                console.log(ajaxData);
+                
+                // ส่งข้อมูลไปบันทึก
+                $.ajax({
+                    type: 'POST',
+                    url: 'function/00_systemManagement/mainFunction.php', // URL ของไฟล์ PHP ที่รับข้อมูลจาก Form
+                    data: ajaxData,
+                    success: function(response) {
+                        //console.log(response)
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'บันทึกข้อมูลสำเร็จ',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล',
+                            text: xhr.responseText
+                        });
+                    }
+                });
+                
+
             });
 
             // Load Initial Data ========================================================

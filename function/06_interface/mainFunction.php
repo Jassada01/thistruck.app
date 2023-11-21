@@ -698,12 +698,12 @@ function rewriteServicePrice()
 	$uploadResult = json_decode($_POST["uploadResult"], true);
 
 	// Initial Delete All Data 
-	$sql = "TRUNCATE Table service_items";
-
-	if (!$conn->query($sql)) {
-		echo  $conn->errno;
-		exit();
-	}
+	//$sql = "TRUNCATE Table service_items";
+	//
+	//if (!$conn->query($sql)) {
+	//	echo  $conn->errno;
+	//	exit();
+	//}
 
 
 	foreach ($uploadResult as $item) {
@@ -712,41 +712,38 @@ function rewriteServicePrice()
 			continue;
 		}
 
-		// แปลงค่า null ของ item_desc ให้เป็น ""
+		$item_code = $item['item_code'];
 		$item_desc = $item["item_desc"] ?? "";
+		$price = $item['price'];
 
-		// เตรียมและรัน SQL Query
-		$stmt = $conn->prepare("INSERT INTO service_items (item_name, description, price) VALUES (?, ?, ?)");
-		$stmt->bind_param("ssd", $item["item_code"], $item_desc, $item["price"]);
+		// แปลงค่า null ของ item_desc ให้เป็น ""
 
-		if (!$stmt->execute()) {
-			echo "Error: " . $stmt->error;
+
+		// ตรวจสอบว่า item_code มีอยู่ในฐานข้อมูลหรือไม่
+		$query = "SELECT id FROM service_items WHERE item_name = '$item_code'";
+		$result = $conn->query($query);
+		$rowcount = mysqli_num_rows($result);
+		//echo $rowcount;
+		if ($rowcount > 0) {
+			// มี item_code นี้อยู่แล้วในฐานข้อมูล, ทำการอัปเดต
+			$update_query = "UPDATE service_items SET description='$item_desc', price='$price' WHERE item_name='$item_code'";
+			if (!$conn->query($update_query)) {
+				//echo $update_query;
+				echo  $conn->errno;
+				exit();
+			}
+		} else {
+			// ไม่มี item_code นี้, ทำการเพิ่มข้อมูลใหม่
+			$insert_query = "INSERT INTO service_items (item_name, description, price) VALUES ('$item_code', '$item_desc', '$price')";
+			//echo $insert_query;
+			if (!$conn->query($insert_query)) {
+				echo  $conn->errno;
+				exit();
+			}
 		}
 	}
 
-	$stmt->close();
-
-
-	// Initial Delete service_items_mapping  Data 
-	$sql = "TRUNCATE Table service_items_mapping";
-
-	if (!$conn->query($sql)) {
-		echo  $conn->errno;
-		exit();
-	}
-
-	// Remap Data
-	$sql = "Insert INTO service_items_mapping SELECT a.id, b.id FROM job_order_template_header a  INNER Join service_items b ON a.job_name = b.item_name";
-
-	if (!$conn->query($sql)) {
-		echo  $conn->errno;
-		exit();
-	}
-
-
-
 	mysqli_close($conn);
-	echo json_encode($data_Array);
 }
 
 
@@ -1274,6 +1271,133 @@ function generateInvoiceNo()
 	mysqli_close($conn);
 }
 
+// F = 17
+function createNewPriceList()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// Cancel In Header
+	$insert_query = "INSERT INTO service_items (item_name, description, price) VALUES ('$item_name', '$description', '$price')";
+	//echo $insert_query;
+	if (!$conn->query($insert_query)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	mysqli_close($conn);
+}
+
+// F = 18
+function updatePrice()
+{
+	// Load All Data from Paramitor
+	//foreach ($_POST as $key => $value) {
+	//	$a = htmlspecialchars($key);
+	//	$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	//}
+	$MAIN_EDIT_PRICELIST_ID = $_POST['MAIN_EDIT_PRICELIST_ID'];
+	$description = $_POST['description'];
+	$dynamicChangePrice = $_POST['dynamicChangePrice'];
+	$dynamicpriceStape = $_POST['dynamicpriceStape'];
+	$editDynamicPrice = $_POST['editDynamicPrice'];
+	$item_name = $_POST['item_name'];
+	$price = $_POST['price'];
+	$priceDetails = $_POST['priceDetails'];
+	$starter_price = $_POST['starter_price'];
+
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// Cancel In Header
+	$update_sql = "UPDATE service_items SET
+		item_name = '$item_name'
+		, price = '$price'
+		, description = '$description'
+		,dynamicPrice = '$editDynamicPrice'
+		,updated_at = CURRENT_TIMESTAMP
+		WHERE id = $MAIN_EDIT_PRICELIST_ID";
+	//echo $update_sql;
+	if (!$conn->query($update_sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	// Initial Delete
+	$sql = "Delete From dynamicpriceheader Where id = $MAIN_EDIT_PRICELIST_ID";
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	$sql = "Delete From dynamicpricedetail Where id = $MAIN_EDIT_PRICELIST_ID";
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	if ($editDynamicPrice == "1") {
+		// Insert Header 
+		$sql = "Insert Into dynamicpriceheader(id, priceStart, priceStep, Step) Values ($MAIN_EDIT_PRICELIST_ID, $starter_price, $dynamicChangePrice, $dynamicpriceStape)";
+		if (!$conn->query($sql)) {
+			echo  $conn->errno;
+			exit();
+		}
+
+		// Insert Detail 
+		foreach ($priceDetails as $detail) {
+			$min = $detail['Min'];
+			$max = $detail['Max'];
+			$price = $detail['Price'];
+
+			// เตรียมคำสั่ง SQL
+			$sql = "INSERT INTO dynamicpricedetail (id, min, max, price) VALUES ($MAIN_EDIT_PRICELIST_ID, $min, $max, $price)";
+			if (!$conn->query($sql)) {
+				echo $sql;
+				echo  $conn->errno;
+				exit();
+			}
+		}
+	}
+
+
+	mysqli_close($conn);
+}
+
+// F = 19
+function loadDynamicPrice()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+
+	$data_Array = array();
+
+
+	$sql = " Select * From dynamicpriceheader where id = $MAIN_EDIT_PRICELIST_ID";
+	$res = $conn->query(trim($sql));
+
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	mysqli_close($conn);
+	echo json_encode($data_Array);
+}
 
 
 
@@ -1342,6 +1466,19 @@ switch ($f) {
 		}
 	case 16: {
 			generateInvoiceNo();
+			break;
+		}
+
+	case 17: {
+			createNewPriceList();
+			break;
+		}
+	case 18: {
+			updatePrice();
+			break;
+		}
+	case 19: {
+			loadDynamicPrice();
 			break;
 		}
 }

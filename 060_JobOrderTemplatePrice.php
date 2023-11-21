@@ -27,10 +27,15 @@ include 'check_cookie.php';
     <!-- Sweet Alert 2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.css">
     <!-- Font Awsome CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-k9cPbgC07G16z+6Uf2n/lZi6uhgYbYzgBPOpUPP9dmO/M5ONPXHYKm3mJxEZiE+w5r5BzK5QdL5YSX9RbKMDaA==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
     <!-- Data table CSS -->
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
     <!--end::Global Stylesheets Bundle-->
+    <style>
+        .editPriceList {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <!--end::Head-->
 <!--begin::Body-->
@@ -94,7 +99,9 @@ include 'check_cookie.php';
                                 <!--begin::Wrapper-->
                                 <!--end::Wrapper-->
                                 <!--begin::Button-->
-
+                                <button type="button" class="btn  btn-sm  btn-primary" data-bs-toggle="modal" data-bs-target="#addPriceListModal">
+                                    <i class="fas fa-plus"></i> เพิ่มเซตราคาแผนการจัดส่ง
+                                </button>
                                 <!--end::Button-->
                             </div>
                             <!--end::Actions-->
@@ -122,6 +129,7 @@ include 'check_cookie.php';
                                                     <tr>
                                                         <th class="font-weight-bold text-center">ชื่องาน</th>
                                                         <th class="font-weight-bold text-end">ราคา</th>
+                                                        <th class="font-weight-bold text-end">ประเภทราคา</th>
                                                         <th class="font-weight-bold text-center">อัพเดท</th>
                                                     </tr>
                                                 </thead>
@@ -139,10 +147,14 @@ include 'check_cookie.php';
 
                                                     // ส่วนของการแสดงข้อมูลผู้ว่าจ้างในตาราง
                                                     while ($row = mysqli_fetch_array($result)) {
-
+                                                        $price_type = '<span class="badge badge-light-dark">ราคาคงที่</span>';
+                                                        if ($row['dynamicPrice'] == '1') {
+                                                            $price_type = '<span class="badge badge-light-danger">ราคาผกผัน</span>';
+                                                        }
                                                         echo "<tr>";
-                                                        echo "<td class='ml-5'>" . $row['item_name'] . "</td>";
+                                                        echo "<td class='ml-5'><a class='editPriceList' value='" . $row['id'] . "' jobName='" . $row['item_name'] . "' price='" . $row['price'] . "' description='" . $row['description'] . "'  dynamicPrice='" . $row['dynamicPrice'] . "'>" . $row['item_name'] . "</a></td>";
                                                         echo "<td  class='text-end'>" . $row['price'] . "</td>";
+                                                        echo '<td  class="text-end">' . $price_type . '</td>';
                                                         echo "<td  class='text-center'>" . $row['updated_at'] . "</td>";
                                                         echo "</tr>";
                                                     }
@@ -177,7 +189,143 @@ include 'check_cookie.php';
         <!--end::Page-->
     </div>
     <!--end::Root-->
+    <!--begin::Modals-->
+    <!-- Modal เพิ่มList ราคา -->
+    <div class="modal fade" id="addPriceListModal" tabindex="-1" aria-labelledby="addPriceListModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addPriceListModalLabel">เพิ่มราคาแผนการจัดส่ง</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container my-5">
+                        <div class="row">
+                            <div class="col-md-8 offset-md-2">
+                                <form id="createPriceForm" method="post" class="m-form m-form--fit m-form--label-align-right">
+                                    <div class="form-group mt-3 row">
+                                        <label for="item_name" class="col-sm-3 col-form-label text-end-pc">ชื่องาน<span class="text-danger">*</span></label>
+                                        <div class="col-sm-6">
+                                            <input type="text" class="form-control m-input" id="item_name" name="item_name" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-3 row">
+                                        <label for="description" class="col-sm-3 col-form-label text-end-pc">คำอธิบาย</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control m-input" id="description" name="description">
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-3 row">
+                                        <label for="price" class="col-sm-3 col-form-label text-end-pc">ราคา<span class="text-danger">*</span></label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control m-input" id="price" name="price" required value=0>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="submit" class="btn btn-primary" id="btnSaveNewPrice">บันทึก</button>
+                </div>
+            </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Modal EditList ราคา -->
+    <div class="modal fade" id="editPriceListModal" tabindex="-1" aria-labelledby="editPriceListModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPriceListModalLabel">แก้ไขราคาแผนการจัดส่ง</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container my-5">
+                        <div class="row">
+                            <div class="col-md-8 offset-md-2">
+                                <form id="editPriceForm" method="post" class="m-form m-form--fit m-form--label-align-right">
+                                    <div class="form-group mt-3 row">
+                                        <label for="edit_item_name" class="col-sm-3 col-form-label text-end-pc">ชื่องาน<span class="text-danger">*</span></label>
+                                        <div class="col-sm-6">
+                                            <input type="text" class="form-control m-input" id="edit_item_name" name="item_name" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-3 row">
+                                        <label for="edit_description" class="col-sm-3 col-form-label text-end-pc">คำอธิบาย</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control m-input" id="edit_description" name="description">
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-3 row">
+                                        <label for="edit_price" class="col-sm-3 col-form-label text-end-pc">ราคา<span class="text-danger">*</span></label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control m-input" id="edit_price" name="price" required value=0>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-3 row">
+                                        <label for="editDynamicPrice" class="col-sm-3 col-form-label text-end-pc">ราคาผกผัน</label>
+                                        <div class="col-sm-3 ">
+                                            <div class="form-check form-switch form-check-custom form-check-success form-check-solid me-10 ">
+                                                <input class="form-check-input h-30px w-50px align-items-center" type="checkbox" value="" id="editDynamicPrice" name="editDynamicPrice" checked />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="dynamicPricePanel" class="d-none">
+                                        <div class="form-group mt-3 row">
+                                            <label for="starter_price" class="col-sm-3 col-form-label text-end-pc">ราคาตั้งต้น<span class="text-danger">*</span></label>
+                                            <div class="col-sm-4">
+                                                <div class="input-group mb-5">
+                                                    <input type="text" class="form-control" id="starter_price" name="starter_price" autocomplete="off" aria-describedby="basic-addon2" />
+                                                    <span class="input-group-text" id="basic-addon2">บาท</span>
+                                                </div>
+                                            </div>
+                                            <label class="col-sm-5 col-form-label text-end-pc">ณ. ขณะที่น้ำมันราคา 20 บาท</label>
+                                        </div>
+                                        <div class="form-group mt-3 row">
+                                            <label for="dynamicChangePrice" class="col-sm-3 col-form-label text-end-pc">ราคาเพิ่ม<span class="text-danger">*</span></label>
+                                            <div class="col-sm-4">
+                                                <div class="input-group mb-5">
+                                                    <input type="text" class="form-control" id="dynamicChangePrice" name="dynamicChangePrice" autocomplete="off" aria-describedby="basic-addon2" />
+                                                    <span class="input-group-text" id="basic-addon2">บาท</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <div class="input-group mb-5">
+                                                    <span class="input-group-text" id="basic-addon2">ต่อราคาน้ำมัน<span class="text-danger">*</span></span>
+                                                    <input type="text" class="form-control" id="dynamicpriceStape" name="dynamicpriceStape" autocomplete="off" aria-describedby="basic-addon2" />
+                                                    <span class="input-group-text" id="basic-addon2">บาท</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="container mt-5">
+                                            <B><span class="text-danger d-none" id="need-more-text">กรุณากรอกข้อมูลให้ครบถ้วน</span></B>
+                                        </div>
+                                        <div class="container mt-5">
+                                            <div id="priceTable" class="table-responsive">
+                                                <!-- ตารางราคาจะถูกแสดงที่นี่ -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="submit" class="btn btn-primary" id="btnSaveNewPrice">บันทึก</button>
+                </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
     <!--end::Main-->
 
 
@@ -204,6 +352,16 @@ include 'check_cookie.php';
     <script>
         // เมื่อ Document โหลดเสร็จแล้ว
         $(document).ready(function() {
+            // Global Var -------------------------------------
+            let MAIN_EDIT_PRICELIST_ID = '';
+            let MAIN_Oil_PRICE = 0.0;
+            let priceDetails = [];
+
+
+
+
+
+
             // Form to Object 
             function formToObject(form) {
                 var data = {};
@@ -257,6 +415,243 @@ include 'check_cookie.php';
             locationTable.on('draw', function() {
                 $('#locationTable').removeClass('d-none');
             });
+
+            // 
+            $("#createPriceForm").submit(function(e) {
+                e.preventDefault(); // ปิดการทำงานปกติของฟอร์มเมื่อถูกส่ง
+                $('#addPriceListModal').modal('hide');
+                // เก็บข้อมูลจากฟอร์มลงในตัวแปร formData
+                let data = formToObject(this);
+                data['f'] = 17;
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/06_interface/mainFunction.php',
+                        data: (data)
+                    })
+                    .done(function(data) {
+                        //console.log(data);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'บันทึกข้อมูลสำเร็จ',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+
+            });
+
+            // editPriceList
+            $('body').on('click', '.editPriceList', function() {
+                var target = ($(this).attr('value'));
+                var jobName = ($(this).attr('jobName'));
+                var description = ($(this).attr('description'));
+                var price = ($(this).attr('price'));
+                var dynamicPrice = ($(this).attr('dynamicPrice'));
+
+                // editPriceListModal
+                $('#editPriceListModal').modal('show');
+
+                MAIN_EDIT_PRICELIST_ID = target;
+                $("#edit_item_name").val(jobName);
+                $("#edit_description").val(description);
+                $("#edit_price").val(price);
+                //console.log(dynamicPrice);
+                if (dynamicPrice == '1') {
+                    $("#editDynamicPrice").prop('checked', true);
+                    $("#dynamicPricePanel").removeClass("d-none");
+                    // Load request data------------
+                    loadDynamic_Price();
+
+                } else {
+                    $("#editDynamicPrice").prop('checked', false);
+                    $("#dynamicPricePanel").addClass("d-none");
+                    priceDetails = [];
+                    $('#priceTable').html("");
+                    //#dynamicChangePrice, #dynamicpriceStape, #starter_price
+                    $('#dynamicChangePrice').val("");
+                    $('#dynamicpriceStape').val("");
+                    $('#starter_price').val("");
+                }
+            });
+
+            function loadDynamic_Price() {
+                var ajaxData = {};
+                ajaxData['f'] = '19';
+                ajaxData['MAIN_EDIT_PRICELIST_ID'] = MAIN_EDIT_PRICELIST_ID;
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/06_interface/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        //console.log(data);
+                        var data_arr = JSON.parse(data);
+                        $("#dynamicChangePrice").val(data_arr[0].priceStep);
+                        $("#dynamicpriceStape").val(data_arr[0].Step);
+                        $("#starter_price").val(data_arr[0].priceStart);
+                        calculatePriceList();
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+
+            // editDynamicPrice
+            $('body').on('change', '#editDynamicPrice', function() {
+                if ($(this).prop('checked')) {
+                    $("#dynamicPricePanel").removeClass("d-none");
+                    calculatePriceList();
+                } else {
+                    $("#dynamicPricePanel").addClass("d-none");
+                    priceDetails = [];
+                    $('#priceTable').html("");
+
+                }
+            });
+
+
+            $('body').on('change', '#dynamicChangePrice, #dynamicpriceStape, #starter_price', function() {
+                calculatePriceList();
+            });
+
+            function calculatePriceList() {
+                var dynamicChangePrice = $("#dynamicChangePrice").val();
+                var dynamicpriceStape = $("#dynamicpriceStape").val();
+                var starter_price = $("#starter_price").val();
+                var Current_Price = MAIN_Oil_PRICE;
+
+                if ($.isNumeric(dynamicChangePrice) && $.isNumeric(dynamicpriceStape) && $.isNumeric(starter_price)) {
+                    dynamicChangePrice = parseFloat(dynamicChangePrice);
+                    dynamicpriceStape = parseFloat(dynamicpriceStape);
+                    starter_price = parseFloat(starter_price);
+
+                    let tableContent = `<table  class="table table-hover table-rounded table-striped border gy-2 gs-7"><thead class="thead-dark"><tr class="fw-semibold fs-6 text-gray-800 border-bottom-2 border-gray-200" ><th><B>ราคาน้ำมัน (ปัจจุบัน ${Current_Price.toFixed(2)} บาท)</B></th><th><B>ราคา</B></th></tr></thead><tbody>`;
+                    priceDetails = [];
+                    for (let oilPrice = 20; oilPrice <= 50; oilPrice += dynamicpriceStape) {
+                        let price = starter_price + ((oilPrice - 20) / dynamicpriceStape) * dynamicChangePrice;
+                        let min = oilPrice;
+                        let max = oilPrice + dynamicpriceStape - 0.01;
+
+                        priceDetails.push({
+                            Min: min,
+                            Max: max,
+                            Price: price
+                        }); // สร้างและเพิ่ม object ใน array
+
+                        let rowClass = '';
+                        if (Current_Price >= min && Current_Price < max) {
+                            rowClass = 'table-danger';
+                            $("#edit_price").val(price);
+                        }
+                        tableContent += `<tr class="${rowClass}"><td>${min.toFixed(2)} - ${max.toFixed(2)}</td><td>${Intl.NumberFormat().format(price.toFixed(2))}</td></tr>`;
+                    }
+
+                    tableContent += '</tbody></table>';
+
+                    $('#priceTable').html(tableContent);
+                    //console.log(priceDetails); // แสดง array ของ objects ในคอนโซล
+                } else {
+                    //console.log("One or more values are not numbers.");
+                    priceDetails = [];
+                    $('#priceTable').html("");
+                }
+            }
+
+
+
+            // Load C
+            function loadOilPrice() {
+                var ajaxData = {};
+                ajaxData['f'] = '11';
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/00_systemManagement/mainFunction.php',
+                        data: (ajaxData),
+                    })
+                    .done(function(data) {
+
+                        var data_arr = JSON.parse(data);
+                        var result = {};
+
+                        data_arr.forEach(function(item) {
+                            var key = item.type + '_data';
+                            result[key] = item;
+                        });
+                        //console.log();
+                        MAIN_Oil_PRICE = parseFloat(result.OilPrice_data.value);
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+            function isNumericValue(value) {
+                return !isNaN(parseFloat(value)) && isFinite(value);
+            }
+
+
+            // editPriceForm
+            $("#editPriceForm").submit(function(e) {
+                e.preventDefault(); // ปิดการทำงานปกติของฟอร์มเมื่อถูกส่ง
+                // เก็บข้อมูลจากฟอร์มลงในตัวแปร formData
+                let ajaxData = formToObject(this);
+                ajaxData['f'] = 18;
+                ajaxData['MAIN_EDIT_PRICELIST_ID'] = MAIN_EDIT_PRICELIST_ID;
+                ajaxData['priceDetails'] = priceDetails;
+                validate_check = true;
+                $("#need-more-text").addClass("d-none");
+                if (ajaxData.editDynamicPrice == "1") {
+                    validate_check = (isNumericValue(ajaxData.starter_price) &&
+                        isNumericValue(ajaxData.dynamicChangePrice) &&
+                        isNumericValue(ajaxData.dynamicpriceStape));
+                }
+                //console.log(ajaxData);
+                if (validate_check) {
+                    $('#editPriceListModal').modal('hide');
+                    $.ajax({
+                            type: 'POST',
+                            dataType: "text",
+                            url: 'function/06_interface/mainFunction.php',
+                            data: (ajaxData)
+                        })
+                        .done(function(data) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'บันทึกข้อมูลสำเร็จ',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        })
+                        .fail(function() {
+                            // just in case posting your form failed
+                            alert("Posting failed.");
+                        });
+                } else {
+                    $("#need-more-text").removeClass("d-none");
+                }
+
+            });
+
+
+
+            // Initial Run Function =============================
+            loadOilPrice();
+
 
 
 

@@ -150,11 +150,11 @@ include 'check_cookie.php';
                                 <!--end::Breadcrumb-->
                             </div>
                             <!--end::Page title-->
-                            <!--begin::Actions-->
                             <div class="d-flex align-items-center py-1">
                                 <!--begin::Wrapper-->
                                 <!--end::Wrapper-->
                                 <!--begin::Button-->
+                                
                                 <!--end::Button-->
                             </div>
                             <!--end::Actions-->
@@ -345,6 +345,8 @@ include 'check_cookie.php';
                             ajaxData['f'] = '5';
                             ajaxData['uploadResult'] = JSON.stringify(uploadResult);
                             //console.log(ajaxData);
+                            
+                            
                             $.ajax({
                                     type: 'POST',
                                     dataType: "text",
@@ -353,7 +355,7 @@ include 'check_cookie.php';
                                 })
                                 .done(function(data) {
                                     //var data_arr = JSON.parse(data);
-                                    //console.log(data_arr);
+                                    //console.log(data);
                                     // ทำการอัพโหลดข้อมูลที่นี่
                                     Swal.fire(
                                         'สำเร็จ!',
@@ -365,7 +367,7 @@ include 'check_cookie.php';
                                     // just in case posting your form failed
                                     alert("Posting failed.");
                                 });
-
+                                
                         }
                     })
                 });
