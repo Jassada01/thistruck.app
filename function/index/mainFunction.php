@@ -462,6 +462,54 @@ function loadDJobPerMonth()
 	echo json_encode($data_Array);
 }
 
+// F=9
+function LoadJobDaily()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	$sql = "SELECT 
+	a.id AS trip_no, 
+	a.job_id, 
+	c.job_name, 
+	a.job_no, 
+	a.tripNo, 
+	a.tripSeq, 
+	a.jobStartDateTime, 
+	a.status, 
+	a.truck_licenseNo, 
+	a.driver_name, 
+	b.contact_number, 
+	b.type
+  From 
+	job_order_detail_trip_info a 
+	Inner Join truck_driver_info b ON a.driver_id = b.driver_id 
+	Inner Join job_order_header c ON a.job_id = c.id 
+  Where 
+	DATE(a.jobStartDateTime) = '$target_date'
+	AND a.status <> 'ยกเลิก'
+	AND c.status <> 'ยกเลิก'
+	Order By a.jobStartDateTime,a.job_id, a.tripSeq;
+  ";
+
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	echo json_encode($data_Array);
+}
+
+
 
 
 
@@ -497,6 +545,10 @@ switch ($f) {
 		}
 	case 8: {
 			loadDJobPerMonth();
+			break;
+		}
+	case 9: {
+			LoadJobDaily();
 			break;
 		}
 }

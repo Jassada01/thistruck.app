@@ -164,6 +164,10 @@ include 'check_cookie.php';
             max-width: 100%;
             overflow: hidden;
         }
+
+        .mouse_pointer {
+            cursor: pointer;
+        }
     </style>
 </head>
 <!--end::Head-->
@@ -230,7 +234,51 @@ include 'check_cookie.php';
                         <!--begin::Container-->
                         <div id="kt_content_container" class="container-xxl">
                             <!--begin::Row-->
-                            <div class="row gy-5 g-xl-8">
+                            <div class="row gy-5 g-xl-8 mb-5">
+                                <div class="col-md-4">
+                                    <!--begin::Timeline widget 3-->
+                                    <div class="card h-md-100">
+                                        <!--begin::Header-->
+                                        <div class="card-header border-0 pt-5">
+                                            <h3 class="card-title align-items-start flex-column">
+                                                <span class="card-label fw-bolder fs-3 mb-1" onclick="window.location.href = '100_jobOrderIndex.php';">ใบงานประจำวัน</span>
+                                            </h3>
+                                        </div>
+                                        <!--end::Header-->
+
+                                        <!--begin::Body-->
+                                        <div class="card-body pt-7 px-0">
+                                            <!--begin::Nav-->
+                                            <ul class="nav selectdateJob nav-stretch nav-pills nav-pills-custom nav-pills-active-custom d-flex justify-content-between mb-8 px-5">
+
+
+                                            </ul>
+                                            <!--end::Nav-->
+
+                                            <!--begin::Tab Content (ishlamayabdi)-->
+                                            <div class="tab-content mb-2 px-9" style="max-height: 300px; overflow-y: auto;">
+                                                <!--begin::Tap pane-->
+                                                <div class="tab-pane fade show active" id="show_DailyJob_panel">
+
+                                                </div>
+                                                <!--end::Tap pane-->
+
+                                            </div>
+                                            <!--end::Tab Content-->
+
+                                            <!--begin::Action-->
+                                            <div class="float-end d-none">
+                                                <a href="#" class="btn btn-sm btn-light me-2" data-bs-toggle="modal" data-bs-target="#kt_modal_create_project">Add Lesson</a>
+
+                                                <a href="#" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#kt_modal_create_app">Call Sick for Today</a>
+                                            </div>
+                                            <!--end::Action-->
+                                        </div>
+                                        <!--end: Card Body-->
+                                    </div>
+                                    <!--end::Timeline widget 3-->
+                                </div>
+
                                 <div class="col-sm-8">
                                     <!--begin::Tables Widget 9-->
                                     <div class="card card-xl-stretch mb-5 mb-xl-8">
@@ -273,7 +321,8 @@ include 'check_cookie.php';
                                     <!--end::Tables Widget 9-->
                                 </div>
                                 <!--end::Col-->
-
+                            </div>
+                            <div class="row gy-5 g-xl-8 d-none">
                                 <div class="col-sm-4">
                                     <!--begin::Tables Widget 9-->
                                     <div class="card card-xl-stretch mb-20 mb-xl-8">
@@ -1580,6 +1629,112 @@ include 'check_cookie.php';
                     });
             }
 
+            function Create_JobDailaPanelSeletion() {
+                // กำหนดวันปัจจุบัน
+                var currentDate = new Date();
+
+                // สร้าง HTML สำหรับ 6 วันก่อนหน้าและ 4 วันล่วงหน้า
+                var html = ""
+                var activeWord = "";
+                for (var i = -6; i <= 2; i++) {
+                    var date = new Date(currentDate);
+                    date.setDate(date.getDate() + i);
+
+                    var dayNumber = date.getDate(); // e.g., 20
+                    activeWord = "";
+                    if (i == 0) {
+                        activeWord = "active";
+                    }
+                    var day = moment(date).format('dd');
+                    var dateValue = moment(date).format('YYYY-MM-DD');
+                    // สร้าง HTML element สำหรับแต่ละวันที่
+                    html += '<li class="nav-item p-0 ms-0">' +
+                        '<a class="nav-link btn d-flex flex-column flex-center rounded-pill min-w-45px py-4 px-3 btn-active-danger selectJobdatebtn ' + activeWord + '" data-bs-toggle="tab" href="#show_DailyJob_panel" value=' + dateValue + '>' +
+                        '<span class="fs-7 fw-semibold">' + day + '</span>' +
+                        '<span class="fs-6 fw-bold">' + dayNumber + '</span>' +
+                        '</a>' +
+                        '</li>';
+
+                }
+
+                // เพิ่มลงใน UL element ใน DOM
+                $('.selectdateJob').html(html);
+                LoadJobDaily(moment().format('YYYY-MM-DD'))
+            }
+
+            // selectJobdatebtn
+            $('body').on('click', '.selectJobdatebtn', function() {
+                var target_date = $(this).attr('value');
+                LoadJobDaily(target_date);
+            });
+
+            function LoadJobDaily(target_date) {
+                var ajaxData = {};
+                ajaxData['f'] = '9';
+                ajaxData['target_date'] = target_date;
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/index/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        var data_arr = JSON.parse(data);
+                        var html = "";
+                        if (data_arr.length > 0) {
+                            data_arr.forEach(function(item) {
+                                var jobStartTime = moment(item.jobStartDateTime).format('HH:mm');
+                                var statusColor = " bg-primary";
+                                if (['คนขับยืนยันจบงานแล้ว', 'จบงาน'].includes(item.status)) {
+                                    statusColor = " bg-success";
+                                }
+                                if (['รอเจ้าหน้าที่ยืนยัน'].includes(item.status)) {
+                                    statusColor = " bg-info";
+                                }
+                                html += `
+                                    <div class="d-flex align-items-center mb-6">
+                                        <span data-kt-element="bullet" class="bullet bullet-vertical d-flex align-items-center min-h-70px mh-100 me-4 ${statusColor}"></span>
+                                        <div class="flex-grow-1 me-5">
+                                            <div class="text-gray-800 fw-semibold fs-2">
+                                                ${jobStartTime} <span class="text-gray-500 fw-semibold fs-7"> น. </span>
+                                            </div>
+                                            <div class="text-gray-700 fw-semibold fs-6">
+                                                <a href="102_confirmWorkOrder.php?job_id=${item.job_id}" class="text-gray-700 fw-bold fs-5 mouse_pointer"> ${item.job_no} </a> :
+                                                <span>${item.job_name}</span>
+                                            </div>
+                                            <div class="text-gray-500 fw-semibold fs-7">
+                                                ${item.status}
+                                                <a href="#" class="text-primary opacity-75-hover fw-semibold" data-bs-toggle="tooltip" data-bs-placement="top" title="${item.contact_number}">${item.driver_name} (${item.type})</a>
+                                            </div>
+                                        </div>
+                                        <a href="103_tripDetail.php?job_id=${item.job_id}&trip_id=${item.trip_no}" class="btn btn-sm  btn-active-primary">${item.tripNo}</a>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            html = `
+                                <div class="alert alert-primary d-flex align-items-center p-5">
+                                    <i class="ki-duotone ki-shield-tick fs-2hx text-success me-4"><span class="path1"></span><span class="path2"></span></i>
+                                    <div class="d-flex flex-column">
+                                        <span>ยังไม่มีข้อมูลใบงานบันทึกลงในวันที่เลือก</span>
+                                    </div>
+                                </div>
+                                `;
+                        }
+
+
+                        $('#show_DailyJob_panel').html(html);
+
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+
+
 
             // Initial Run When start ===============================================================
             //Initialcalendar();
@@ -1591,6 +1746,7 @@ include 'check_cookie.php';
             LoadDataforPrivotTable();
             loadDJobPerDate();
             loadDJobPerMonth();
+            Create_JobDailaPanelSeletion();
 
 
         });
