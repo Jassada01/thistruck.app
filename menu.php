@@ -38,45 +38,28 @@
                                         <span class="menu-title">สร้างใบงาน</span>
                                     </a>
                                 </div>
-                                <div class="separator my-2"></div>
-                                <div class="menu-item" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
-                                    <!--begin::Menu link-->
-                                    <a href="#" class="menu-link">
+                               
+                            </div>
+                        </div>
+                        <div data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion me-lg-1">
+                            <span class="menu-link py-3">
+                                <span class="menu-title">วางบิล</span>
+                                <span class="menu-arrow d-lg-none"></span>
+                            </span>
+                            <div class="menu-sub menu-sub-lg-down-accordion menu-sub-lg-dropdown menu-rounded-0 py-lg-4 w-lg-225px">
+                                <div class="menu-item">
+                                    <a class="menu-link py-3" href="070_InvoiceIndex.php">
                                         <span class="menu-icon">
-                                            <i class="bi bi-receipt-cutoff fs-3"></i>
+                                            <i class="fas fa-list-ul fs-3"></i>
                                         </span>
-                                        <span class="menu-title">อินวอยซ์</span>
-                                        <span class="menu-arrow"></span>
+                                        <span class="menu-title">รายการ อินวอยซ์</span>
                                     </a>
-                                    <!--end::Menu link-->
-
-                                    <!--begin::Menu sub-->
-                                    <div class="menu-sub menu-sub-dropdown w-250px py-2">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item">
-                                            <a href="070_InvoiceIndex.php" class="menu-link">
-                                                <span class="menu-icon">
-                                                    <i class="fas fa-list-ul fs-3"></i>
-                                                </span>
-                                                <span class="menu-title">รายการ อินวอยซ์</span>
-                                            </a>
-                                        </div>
-                                        <!--end::Menu item-->
-
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item">
-                                            <a href="071_createInvoice.php" class="menu-link">
-                                                <span class="menu-icon">
-                                                    <i class="fas fa-receipt  fs-3"></i>
-                                                </span>
-                                                <span class="menu-title">สร้าง อินวอยซ์</span>
-                                            </a>
-                                        </div>
-                                        <!--end::Menu item-->
-
-
-                                    </div>
-                                    <!--end::Menu sub-->
+                                    <a class="menu-link py-3" href="071_createInvoice.php">
+                                        <span class="menu-icon">
+                                            <i class="fas fa-receipt  fs-3"></i>
+                                        </span>
+                                        <span class="menu-title">สร้าง อินวอยซ์</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>

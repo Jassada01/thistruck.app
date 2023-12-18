@@ -61,6 +61,17 @@ include 'check_cookie.php';
                 if ($inactive) {
                     $checkword = "";
                 }
+                $dateStart = "";
+                $dateEnd = "";
+
+                if (isset($_GET['start'])) {
+                    $dateStart = $_GET['start'];
+                }
+                if (isset($_GET['end'])) {
+                    $dateEnd = $_GET['end'];
+                }
+
+
                 ?>
                 <!--end::Header-->
                 <!--begin::Content-->
@@ -119,9 +130,13 @@ include 'check_cookie.php';
                                             <h1><i class="bi bi-layers fs-3"></i> รายการใบงาน</h1>
                                         </div>
                                         <div class="card-toolbar">
-                                            <div class="form-check d-none">
-                                                <input type="checkbox" class="form-check-input" id="active" name="active" value="1" <?php echo $checkword; ?>>
-                                                <label class="form-check-label" for="active">เฉพาะรายการที่ยังใช้งาน</label>
+                                            <div class="input-group">
+                                                <button type="button" class="btn btn-default pull-right" id="daterange-btn">
+                                                    <span>
+                                                        <i class="fa fa-calendar"></i> <span id="calendarLabel">เลือกระยะเวลา</span>
+                                                    </span>
+                                                    <i class="fa fa-caret-down"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -189,38 +204,75 @@ include 'check_cookie.php';
                                                     a.id DESC;
                                                   ";
                                                   */
-                                                  $sql = "SELECT 
-                                                  a.*, 
-                                                  b.jobStartDateTime, 
-                                                  b.containerID, 
-                                                  CASE WHEN d.document_number IS NULL 
-                                                  AND d.id IS NOT NULL THEN 'ยังไม่กำหนด' WHEN d.id IS NULL THEN '' ELSE d.document_number END AS invoiceNo,
-                                                  d.id as INVID
-                                                FROM 
-                                                  job_order_header a 
-                                                  Left Join (
-                                                    SELECT 
-                                                      a.job_id, 
-                                                      a.jobStartDateTime, 
-                                                      REPLACE(
-                                                        GROUP_CONCAT(
-                                                          IF(
-                                                            a.containerID = '', NULL, a.containerID
-                                                          ) SEPARATOR ','
-                                                        ), 
-                                                        ',', 
-                                                        '<br>'
-                                                      ) AS containerID 
-                                                    FROM 
-                                                      job_order_detail_trip_info a 
-                                                    GROUP BY 
-                                                      a.job_id
-                                                  ) b ON a.id = b.job_id 
-                                                  LEFT JOIN invoice_job_mapping c ON a.id = c.job_id AND c.attr = 'ใช้งาน'
-                                                  LEFT JOIN invoice_header d ON c.invoice_id = d.id AND d.attr1 = 'ใช้งาน' 
-                                                Order By 
-                                                  a.id DESC;
-                                                ";
+                                                    if ($dateStart == "") {
+                                                        $sql = "SELECT 
+                                                            a.*, 
+                                                            b.jobStartDateTime, 
+                                                            b.containerID, 
+                                                            CASE WHEN d.document_number IS NULL 
+                                                            AND d.id IS NOT NULL THEN 'ยังไม่กำหนด' WHEN d.id IS NULL THEN '' ELSE d.document_number END AS invoiceNo,
+                                                            d.id as INVID
+                                                        FROM 
+                                                            job_order_header a 
+                                                            Left Join (
+                                                            SELECT 
+                                                                a.job_id, 
+                                                                a.jobStartDateTime, 
+                                                                REPLACE(
+                                                                GROUP_CONCAT(
+                                                                    IF(
+                                                                    a.containerID = '', NULL, a.containerID
+                                                                    ) SEPARATOR ','
+                                                                ), 
+                                                                ',', 
+                                                                '<br>'
+                                                                ) AS containerID 
+                                                            FROM 
+                                                                job_order_detail_trip_info a 
+                                                            GROUP BY 
+                                                                a.job_id
+                                                            ) b ON a.id = b.job_id 
+                                                            LEFT JOIN invoice_job_mapping c ON a.id = c.job_id AND c.attr = 'ใช้งาน'
+                                                            LEFT JOIN invoice_header d ON c.invoice_id = d.id AND d.attr1 = 'ใช้งาน' 
+                                                        Order By 
+                                                            a.id DESC;
+                                                        ";
+                                                    } else {
+                                                        $sql = "SELECT 
+                                                            a.*, 
+                                                            b.jobStartDateTime, 
+                                                            b.containerID, 
+                                                            CASE WHEN d.document_number IS NULL 
+                                                            AND d.id IS NOT NULL THEN 'ยังไม่กำหนด' WHEN d.id IS NULL THEN '' ELSE d.document_number END AS invoiceNo,
+                                                            d.id as INVID
+                                                        FROM 
+                                                            job_order_header a 
+                                                            Left Join (
+                                                            SELECT 
+                                                                a.job_id, 
+                                                                a.jobStartDateTime, 
+                                                                REPLACE(
+                                                                GROUP_CONCAT(
+                                                                    IF(
+                                                                    a.containerID = '', NULL, a.containerID
+                                                                    ) SEPARATOR ','
+                                                                ), 
+                                                                ',', 
+                                                                '<br>'
+                                                                ) AS containerID 
+                                                            FROM 
+                                                                job_order_detail_trip_info a 
+                                                            GROUP BY 
+                                                                a.job_id
+                                                            ) b ON a.id = b.job_id 
+                                                            LEFT JOIN invoice_job_mapping c ON a.id = c.job_id AND c.attr = 'ใช้งาน'
+                                                            LEFT JOIN invoice_header d ON c.invoice_id = d.id AND d.attr1 = 'ใช้งาน'
+                                                            WHERE a.job_date BETWEEN '$dateStart' AND '$dateEnd'
+                                                        Order By 
+                                                            a.id DESC;
+                                                        ";
+                                                    }
+
 
 
 
@@ -380,6 +432,9 @@ include 'check_cookie.php';
         $(document).ready(function() {
             // Set Moment 
             moment.locale('th');
+
+            let startDate = "<?php echo $dateStart;?>";
+            let endDate = "<?php echo $dateEnd;?>";
             // Thai date sorting plugin
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
                 "date-th-pre": function(a) {
@@ -495,6 +550,48 @@ include 'check_cookie.php';
                 //}
                 $(this).text(formattedDate);
             });
+
+
+            //Date range as a button
+            $('#daterange-btn').daterangepicker({
+                    ranges: {
+                        'วันนี้': [moment(), moment()],
+                        'เมื่อวาน': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                        'พรุ่งนี้': [moment().subtract(-1, 'days'), moment().subtract(-1, 'days')],
+                        '7 วันล่าสุด': [moment().subtract(6, 'days'), moment()],
+                        '30 วันล่าสุด': [moment().subtract(29, 'days'), moment()],
+                        'เดือนนี้': [moment().startOf('month'), moment().endOf('month')],
+                        'เดือนที่ผ่านมา': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                        '3 เดือนที่ผ่านมา': [moment().subtract(3, 'month'), moment()],
+                        'ปีนี้': [moment().startOf('year'), moment().endOf('year')]
+                    },
+                    startDate: moment().startOf('month'),
+                    endDate: moment().endOf('month'),
+                    locale: {
+                        "format": "MM/DD/YYYY",
+                        "separator": " - ",
+                        "applyLabel": "ยืนยัน",
+                        "cancelLabel": "ยกเลิก",
+                        "fromLabel": "จาก",
+                        "toLabel": "ถึง",
+                        "customRangeLabel": "เลือกเอง",
+                    }
+
+                },
+                function(start, end, ranges) {
+                    //$('#daterange-btn span').html(start.format(' D MMMM YYYY') + ' - ' + end.format('D MMMM YYYY'))
+                    //loadJobHeader(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
+                    //console.log(start.format('YYYY-MM-DD'));
+                    //console.log(end.format('YYYY-MM-DD'));
+                    window.location.href = '100_jobOrderIndex.php?start=' + start.format('YYYY-MM-DD') + '&end=' + end.format('YYYY-MM-DD');
+                    //get_page_data_from_range(start.format(' YYYY-MM-DD'), end.format(' YYYY-MM-DD'));
+                }
+            )
+
+            if (startDate != "")
+            {
+                $("#calendarLabel").html(moment(startDate).format('D MMMM YYYY') + " - " + moment(endDate).format('D MMMM YYYY'))
+            }
 
             function loadTrip_DetailforViewIndex(job_id, target_div) {
                 var ajaxData = {};
