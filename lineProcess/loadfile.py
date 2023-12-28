@@ -1,4 +1,5 @@
 import os
+import time
 import random
 import string
 import requests
@@ -61,7 +62,13 @@ def update_line_attached_file(message_id, download_date, path, file_name):
 
 def main(message_id):
     download_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
+    # สร้างค่าเวลา sleep แบบสุ่มระหว่าง 0.5 ถึง 5 วินาที
+    sleep_time = random.uniform(0.5, 5)
+    
+    # ปัดเศษให้เหลือหนึ่งตำแหน่งทศนิยม
+    sleep_time = round(sleep_time, 1)
+    
+    time.sleep(sleep_time)
     path, file_name = download_image(message_id)
     webpath = f'assets/media/uploadfile/linemedia/{file_name}'
     if path and file_name:

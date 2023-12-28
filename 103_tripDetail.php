@@ -840,6 +840,7 @@ include 'check_cookie.php';
                                                     </div>
                                                 </div>
                                                 <div class="timeline-label">
+                                                    กำลังโหลดข้อมูล...
                                                 </div>
                                             </div>
                                             <!--end: Card Body-->
@@ -1876,7 +1877,7 @@ include 'check_cookie.php';
                         document.querySelectorAll('#jobHeaderForm input').forEach(input => {
                             input.disabled = true;
                         });
-                        console.log(data_arr);
+                        //console.log(data_arr);
                         //var jobHeaderForm = document.querySelector('#jobHeaderForm');
                         //var jobHeaderMainForm = document.querySelector('#jobHeaderMainForm');
 

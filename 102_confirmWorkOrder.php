@@ -636,6 +636,9 @@ include 'check_cookie.php';
                                                 <div class="menu-item px-3">
                                                     <a class="menu-link flex-stack px-3" id="checkMapbtn">ตรวจสอบเส้นทาง</a>
                                                 </div>
+                                                <div class="menu-item px-3">
+                                                    <a class="menu-link flex-stack px-3" id="addtripBtn">เพิ่มทริปในใบงาน</a>
+                                                </div>
                                                 <!--end::Menu item-->
                                             </div>
                                         </div>
@@ -1087,6 +1090,210 @@ include 'check_cookie.php';
         </div>
     </div>
 
+    <!-- Modal เลือก Confirm ราย Trip -->
+    <div class="modal fade" id="modalAddnewTrip" tabindex="-1" aria-labelledby="modalAddnewTripLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAddnewTripLabel">เพิ่มปริปในใบงาน</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="DriverList">
+                        <!--begin::Form group-->
+                        <span class="text-danger d-none" id="showInaddTripIfalreadyProcess">ใบงานที่มีการเริ่มดำเนินการแล้วสามารถเลือกเพิ่มได้แค่ SONE888 ก่อน จากนั้นเข้าไปที่ใบงานเลือกเปลี่ยนคนขับรถอีกครั้ง</span>
+                        <div class="form-group">
+                            <div data-repeater-list="DriverList">
+                                <div data-repeater-item>
+
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h3 class="triptNo"></h3>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mb-2">
+                                        <div class="col-md-2">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <label class="form-label">รถ</label>
+                                                    <select class="form-control mb-2 mb-md-2 truckinJob" name="truckinJob">
+                                                        <?php
+                                                        // Connect to database
+                                                        include "function/connectionDb.php";
+
+                                                        // Query data from master_data where type = 'Job_Type'
+                                                        $sql = "SELECT a.truck_id, a.truck_type, a.truck_number, a.province, b.driver_name , b.driver_id, b.image_path, b.type as driver_type FROM truck_info a left join truck_driver_info b ON a.main_driver_id = b.driver_id WHERE a.active = 1";
+                                                        $result = mysqli_query($conn, $sql);
+
+                                                        // Loop through data and create dropdown options
+                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                            //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                            echo "<option value='" . $row['truck_id'] . "' driverName='" . $row['driver_name'] . "' driverImg='assets/media/uploadfile/" . $row['image_path'] . "' license='" . $row['truck_number'] . "' province='" . $row['province'] . "' driver_id='" . $row['driver_id'] . "' data-driver_id='" . $row['driver_id'] . "' data-truck_type='" . $row['truck_type'] . "'  data-driver_type='" . $row['driver_type'] . "'>" . $row['truck_number'] . " - " . $row['province'] . "</option>";
+                                                        }
+                                                        // Close database connection
+                                                        mysqli_close($conn);
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12">
+                                                    <select class="form-control mb-2 mb-md-0 truckDriver" name="truckDriver">
+                                                        <?php
+                                                        // Connect to database
+                                                        include "function/connectionDb.php";
+
+                                                        // Query data from master_data where type = 'Job_Type'
+                                                        $sql = "SELECT * From truck_driver_info WHERE active = 1";
+                                                        $result = mysqli_query($conn, $sql);
+
+                                                        // Loop through data and create dropdown options
+                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                            //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                            echo "<option value='" . $row['driver_id'] . "' driverName='" . $row['driver_name'] . "' driverImg='assets/media/uploadfile/" . $row['image_path'] . "' data-driver_type='" . $row['type'] . "' >" . $row['driver_name'] . "</option>";
+                                                        }
+                                                        // Close database connection
+                                                        mysqli_close($conn);
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">ประเภทรถ</label>
+                                                    <select class="form-control mb-2 mb-md-0 truckType" name="truckType">
+                                                        <option></option>
+                                                        <?php
+                                                        // Connect to database
+                                                        include "function/connectionDb.php";
+
+                                                        // Query data from master_data where type = 'Job_Type'
+                                                        $sql = "SELECT * FROM master_data where type = 'Truck_typeInJob' order by id;";
+                                                        $result = mysqli_query($conn, $sql);
+
+                                                        // Loop through data and create dropdown options
+                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                            //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                            echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
+                                                        }
+
+                                                        // Close database connection
+                                                        mysqli_close($conn);
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">เข้า</label>
+                                                    <input type="date" class="form-control jobStartDateTime" name="jobStartDateTime" autocomplete="off">
+                                                </div>
+
+                                                <div class="col-md-2  text-end">
+                                                    <div class="form-check form-check-custom form-check-solid mt-2 mt-md-10">
+                                                        <input class="form-check-input subcontrackCheckbox" type="checkbox" value="" name="subcontrackCheckbox" />
+                                                        <label class="form-check-label" for="subcontrackCheckbox">
+                                                            รถร่วม
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row my-5">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">หมายเลขตู้ 1</label>
+                                                    <input class="form-control mb-2 mb-md-0 containerID" name="containerID" />
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">ขนาดตู้(Type)</label>
+                                                    <select class="form-control mb-2 mb-md-0 containersize" name="containersize">
+                                                        <option></option>
+                                                        <?php
+                                                        // Connect to database
+                                                        include "function/connectionDb.php";
+
+                                                        // Query data from master_data where type = 'Job_Type'
+                                                        $sql = "SELECT * FROM master_data where type = 'container_size' order by id;";
+                                                        $result = mysqli_query($conn, $sql);
+
+                                                        // Loop through data and create dropdown options
+                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                            //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                            echo "<option value='" . $row['value'] . "'>" . $row['name'] . "</option>";
+                                                        }
+
+                                                        // Close database connection
+                                                        mysqli_close($conn);
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">หมายเลขซีล</label>
+                                                    <input class="form-control mb-2 mb-md-0 sealNo" name="sealNo" />
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">น้ำหนักตู้</label>
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control containerWeight" name="containerWeight" autocomplete="off" />
+                                                        <span class="input-group-text" id="basic-addon2">กก.</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row my-5 d-none">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">หมายเลขตู้ 2</label>
+                                                    <input class="form-control mb-2 mb-md-0 containerID2" name="containerID2" />
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">ขนาดตู้(Type)</label>
+                                                    <select class="form-control mb-2 mb-md-0 containersize2" name="containersize2">
+                                                        <option></option>
+                                                        <?php
+                                                        // Connect to database
+                                                        include "function/connectionDb.php";
+
+                                                        // Query data from master_data where type = 'Job_Type'
+                                                        $sql = "SELECT * FROM master_data where type = 'container_size' order by id;";
+                                                        $result = mysqli_query($conn, $sql);
+
+                                                        // Loop through data and create dropdown options
+                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                            //echo "<option value='" . $row['truck_id'] . "'> " . $row['truck_number']  . $row['driver_name']  . "</option>";
+                                                            echo "<option value='" . $row['value'] . "'>" . $row['name'] . "</option>";
+                                                        }
+
+                                                        // Close database connection
+                                                        mysqli_close($conn);
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">หมายเลขซีล</label>
+                                                    <input class="form-control mb-2 mb-md-0 sealNo2" name="sealNo2" />
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">น้ำหนักตู้</label>
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control containerWeight2" name="containerWeight2" autocomplete="off" />
+                                                        <span class="input-group-text" id="basic-addon2">กก.</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end::Form group-->
+                    </div>
+                    <!--end::Repeater-->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary" id="confirmAddNewTrip">ยืนยัน</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         var hostUrl = "assets/";
@@ -1287,6 +1494,8 @@ include 'check_cookie.php';
 
             let isClientConfirmed = false;
             let subContractJob = [];
+
+            let CURRENT_JOB_STATUS = "";
 
 
             // Set Initial Select 2
@@ -1562,8 +1771,8 @@ include 'check_cookie.php';
 
                         //sub_confirmed
                         //confirmsubContract
-                        
 
+                        CURRENT_JOB_STATUS = jobHeader.status;
                         if (jobHeader.status === 'ยกเลิก') {
                             // Disable cancelJob button
                             $('#cancelJob').prop('disabled', true);
@@ -1654,10 +1863,8 @@ include 'check_cookie.php';
 
                         // Sub Contract Handel
                         subContractJob = data_arr.jobforSubContract;
-                        if(jobHeader.sub_confirmed == null)
-                        {
-                            if (subContractJob.length > 0)
-                            {
+                        if (jobHeader.sub_confirmed == null) {
+                            if (subContractJob.length > 0) {
                                 $("#confirmsubContract").removeClass("d-none");
                             }
                         }
@@ -3246,14 +3453,14 @@ include 'check_cookie.php';
                     })
                     .done(function(data) {
                         Swal.fire({
-                                icon: 'success',
-                                title: 'ส่งไลน์ไปยังบริษัทซับแล้ว',
-                                showConfirmButton: false,
-                                timer: 1500
-                            }).then(() => {
-                                location.reload();
-                                //null
-                            });
+                            icon: 'success',
+                            title: 'ส่งไลน์ไปยังบริษัทซับแล้ว',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                            //null
+                        });
                     })
                     .fail(function() {
                         // just in case posting your form failed
@@ -3274,9 +3481,183 @@ include 'check_cookie.php';
                     //console.log(val);
                     sendNotificationtoSubCar(val);
                 });
+            });
+            // Format options
+            const select2OptionFormat = (item) => {
+                if (!item.id) {
+                    return item.text;
+                }
+
+                var span = document.createElement('span');
+                var template = '';
+
+                template += '<div class="d-flex align-items-center">';
+                //template += '<img src="' + item.element.getAttribute('driverImg') + '" class="rounded-circle h-30px me-3"/>';
+                template += '<div class="d-flex flex-column">'
+                template += '<span class="fs-4 fw-bold lh-1">' + item.element.getAttribute('license') + '</span>';
+                template += '<span class="text-muted fs-6">' + item.element.getAttribute('province') + '</span>';
+                template += '</div>';
+                template += '</div>';
+
+                span.innerHTML = template;
+
+                return $(span);
+            }
+
+            // Format options
+            const select2OptionFormatforDriver = (item) => {
+                if (!item.id) {
+                    return item.text;
+                }
+
+                var span = document.createElement('span');
+                var template = '';
+
+                template += '<div class="d-flex align-items-center">';
+                template += '<img src="' + item.element.getAttribute('driverImg') + '" class="rounded-circle h-30px me-3"/>';
+                template += '<div class="d-flex flex-column">'
+                template += '<span class="fs-4 fw-bold lh-1">' + item.element.getAttribute('driverName') + '</span>';
+                //template += '<span class="text-muted fs-6">' + item.element.getAttribute('province') + '</span>';
+                template += '</div>';
+                template += '</div>';
+
+                span.innerHTML = template;
+
+                return $(span);
+            }
+            let dropdownTruckAddNewTrip = $('.truckinJob').select2({
+                placeholder: 'เลือกรถบรรทุก',
+                templateResult: select2OptionFormat, // ใช้ function formatResult แสดงรูปภาพ
+                templateSelection: select2OptionFormat, // ใช้ function formatSelection เพื่อแสดงชื่อและ driver_id เมื่อเลือก
+                dropdownParent: $("#modalAddnewTrip"),
+            });
+
+            let dropdownDriverAddNewTrip = $('.truckDriver').select2({
+                placeholder: 'เลือกคนขับ',
+                templateResult: select2OptionFormatforDriver, // ใช้ function formatResult แสดงรูปภาพ
+                templateSelection: select2OptionFormatforDriver, // ใช้ function formatSelection เพื่อแสดงชื่อและ driver_id เมื่อเลือก
+                dropdownParent: $("#modalAddnewTrip"),
+            });
+            //addtripBtn
+            $('body').on('click', '#addtripBtn', function() {
+                // modalAddnewTrip
+                //console.log(CURRENT_JOB_STATUS)
+                if (CURRENT_JOB_STATUS == "กำลังดำเนินการ") {
+                    $('.truckinJob').val('61').trigger('change'); // Force to select S-One
+                    $('.truckDriver').val('60').trigger('change'); // Force to select S-One
+                    // การ Disable dropdown สำหรับรถบรรทุก
+                    $('.truckinJob').prop('disabled', true);
+                    // อัพเดท Select2 เพื่อให้แสดงการเปลี่ยนแปลง
+                    $('.truckinJob').select2();
+
+                    // การ Disable dropdown สำหรับคนขับ
+                    $('.truckDriver').prop('disabled', true);
+                    // อัพเดท Select2 เพื่อให้แสดงการเปลี่ยนแปลง
+                    $('.truckDriver').select2();
+
+                    $("#showInaddTripIfalreadyProcess").removeClass("d-none");
+
+                }
+
+                $('#modalAddnewTrip').modal('show');
+
+            });
 
 
 
+            $('body').on('change', '.truckDriver', function() {
+                var driver_type = $(this).find(':selected').data('driver_type');
+
+                if (typeof driver_type !== 'undefined') {
+                    if (driver_type === "ซับ คอนแทรค") {
+                        $('.subcontrackCheckbox').prop('checked', true);
+
+                    } else {
+                        $('.subcontrackCheckbox').prop('checked', false);
+                    }
+                }
+            });
+
+            $('body').on('change', '.truckinJob', function() {
+                var driver_id = $(this).find(':selected').data('driver_id');
+                $('.truckDriver').val(driver_id).trigger('change');
+            });
+
+            $('.jobStartDateTime').flatpickr({
+                dateFormat: "Y-m-d H:i",
+                enableTime: true,
+                time_24hr: true,
+                locale: "th",
+                altInput: true,
+                altFormat: "j M y เวลา H:i",
+                thaiBuddhist: true,
+            });
+
+            $('body').on('change', '.jobStartDateTime', function() {
+                var firstDate_time = $('#DriverList').find('.jobStartDateTime:first').val();
+                var currentDate = moment(); // ได้เวลาปัจจุบัน
+                var firstDate = moment(firstDate_time, "YYYY-MM-DD HH:mm");
+                if (currentDate.isAfter(firstDate)) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'เวลาเข้างานเลยมาแล้ว',
+                        text: 'คุณเลือกวันที่และเวลาที่เลยมาแล้ว กรุณาตรวจสอบความถูกต้อง',
+
+                    });
+                    workOrder_Jobdate.setDate(now());
+                }
+
+            });
+
+            // confirmAddNewTrip
+            $('body').on('click', '#confirmAddNewTrip', function() {
+                var ajaxData = {
+                    'truckinJob': $('.truckinJob').val(),
+                    'truck_licenseNo': $('.truckinJob').find(":selected").text(),
+                    'truckDriver': $('.truckDriver').val(),
+                    'truckDriverName': $('.truckDriver').find(":selected").text(),
+                    'truckType': $('.truckType').val(),
+                    'jobStartDateTime': $('.jobStartDateTime').val(),
+                    'subcontrackCheckbox': $('.subcontrackCheckbox').prop('checked') ? '1' : '0',
+                    'containerID': $('.containerID').val(),
+                    'containersize': $('.containersize').val(),
+                    'sealNo': $('.sealNo').val(),
+                    'containerWeight': $('.containerWeight').val(),
+                    'containerID2': $('.containerID2').val(),
+                    'containersize2': $('.containersize2').val(),
+                    'sealNo2': $('.sealNo2').val(),
+                    'containerWeight2': $('.containerWeight2').val(),
+                    // เพิ่มฟิลด์อื่นๆ ที่คุณต้องการจัดเก็บ
+                };
+
+                console.log(ajaxData);
+                ajaxData['f'] = '31';
+                ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
+                ajaxData['update_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData),
+                    })
+                    .done(function(data) {
+                        console.log(data);
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'เพิ่มทริปใหม่สำเร็จ',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                            //null
+                        });
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
             });
 
 

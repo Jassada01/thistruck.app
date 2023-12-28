@@ -463,6 +463,11 @@ function createNewInvoice()
 					} else {
 						$pay_invoice = 1;
 					}
+					if ($field == 'overtime_fee') {
+						$accounting_type = '410202';
+					} else {
+						$accounting_type = '113302';
+					}
 					$unit_price = $row[$field];
 					$sql_insert = "INSERT INTO invoice_detail_raw (invoice_id, job_id, trip_id, accounting_type, cost_type, unit_price, pay_invoice, pay_purchase, driver_id, driver_name, payto) 
 								   VALUES ($invoice_id, $job_id, $trip_id, '$accounting_type', '$field', $unit_price, $pay_invoice, $pay_purchase, $driver_id, '$driver_name', '$payto')";

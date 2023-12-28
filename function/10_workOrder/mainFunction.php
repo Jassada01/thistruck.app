@@ -991,7 +991,7 @@ function createMainMsgForCustomer($job_name, $formattedJobDate, $formattedDate, 
 	return $main_msgforCustomer;
 }
 
-function createMainMsgForSubcontract($job_name, $formattedJobDate, $formattedDate, $refDoc_Data, $totalQTYDataText, $jsonJobActionTimeLine, $fullAddress, $hdRemark,$jsonJoblist)
+function createMainMsgForSubcontract($job_name, $formattedJobDate, $formattedDate, $refDoc_Data, $totalQTYDataText, $jsonJobActionTimeLine, $fullAddress, $hdRemark, $jsonJoblist)
 {
 	$main_msgforsub =  [
 		[
@@ -5286,7 +5286,7 @@ function sendJobNoticetosub()
 		$tripCount = 0;
 		while ($row = $result->fetch_assoc()) {
 			// ค้นหา job_order_detail_trip_action_log.id ที่มีค่าน้อยที่สุดที่มี complete_flag == NULL
-			$tripCount = $tripCount+1;
+			$tripCount = $tripCount + 1;
 			$id = $row['id'];
 			$driver_name = $row['driver_name'];
 			$job_name = $row['job_name'];
@@ -5553,7 +5553,7 @@ function sendJobNoticetosub()
 			//}
 
 
-			
+
 			$jsonJoblist[] = [
 				'type' => 'box',
 				'layout' => 'baseline',
@@ -5561,7 +5561,7 @@ function sendJobNoticetosub()
 				'contents' => [
 					[
 						'type' => 'text',
-						'text' => $tripCount.". ".$driver_name,
+						'text' => $tripCount . ". " . $driver_name,
 						'weight' => 'bold',
 					],
 					[
@@ -5584,7 +5584,7 @@ function sendJobNoticetosub()
 		$totalQTYDataText = countValues($totalQTYData);
 
 		// Create MSG for Line Notification
-		$main_msgforCustomer = createMainMsgForSubcontract($job_name, $formattedJobDate, $formattedDate, $refDoc_Data, $totalQTYDataText, $jsonJobActionTimeLine, $fullAddress, $hdRemark,$jsonJoblist);
+		$main_msgforCustomer = createMainMsgForSubcontract($job_name, $formattedJobDate, $formattedDate, $refDoc_Data, $totalQTYDataText, $jsonJobActionTimeLine, $fullAddress, $hdRemark, $jsonJoblist);
 
 
 		$messagefor_lineNotification = "คอนเฟิร์มงาน
@@ -5631,14 +5631,119 @@ $hdRemark";
         */
 		SendNoticeJobConfirm($subcontractLineGroupID, $Line_Token, $main_msgforCustomer);
 	}
-	
+
 	$sql = "UPDATE job_order_header SET sub_confirmed = 1, update_by = '$update_user' WHERE id = $MAIN_JOB_ID";
 	//echo $sql;
 	if (!$conn->query($sql)) {
 		echo  $conn->errno;
 		exit();
 	}
-	
+
+	mysqli_close($conn);
+}
+
+// F=31
+function addNewtriptoJob()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+	$data_Array = array();
+
+
+	// Get max Seq 
+	$sql = "SELECT * FROM job_order_detail_trip_info WHERE job_id = $MAIN_JOB_ID AND tripSeq = (Select MAX(a.tripSeq) AS maxSEQ From job_order_detail_trip_info a Where a.job_id = $MAIN_JOB_ID)";
+	$result = $conn->query(trim($sql));
+
+	$row = $result->fetch_assoc();
+	$maxSEQ = $row['tripSeq'];
+	$job_no = $row['job_no'];
+	$LasttripNo = $row['tripNo'];
+	$LasttripID = $row['id'];
+	$maxSEQ = $maxSEQ + 1;
+
+	// Get Job Header 
+	$sql = "SELECT * From job_order_header a Where a.id = $MAIN_JOB_ID";
+	$result = $conn->query(trim($sql));
+	$jobHeader = $result->fetch_assoc();
+	$tripNo = getRunningNo('TripNo', 'T', $jobHeader['job_date']);
+
+	// #1 : Create job_order_detail_trip_info ---------------------------------------------------------------------------------------
+	$random_code = gen_rnd_str();
+	$sql = "INSERT INTO job_order_detail_trip_info (job_id, job_no, tripNo, tripSeq, truck_id, truck_licenseNo, driver_id, driver_name, subcontrackCheckbox, containersize, containerID, seal_no, containerWeight, containerID2, containersize2, seal_no2, containerWeight2, truckType, jobStartDateTime, status, random_code, create_date, create_user, update_date, update_user) 
+		VALUES ('$MAIN_JOB_ID', '$job_no', '$tripNo', '$maxSEQ', '$truckinJob', '$truck_licenseNo', '$truckDriver', '$truckDriverName', '$subcontrackCheckbox', '$containersize', '$containerID','$sealNo', '$containerWeight', '$containerID2', '$containersize2', '$sealNo2', '$containerWeight2',
+		'$truckType', '$jobStartDateTime', 'รอเจ้าหน้าที่ยืนยัน', '$random_code', NOW(), '$update_user', NOW(), '$update_user')";
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	// Get Job ID
+	$trip_id  = mysqli_insert_id($conn);
+
+	// Get 
+
+	// Insert Trip job_order_detail_trip_list 
+	$sql = "INSERT INTO job_order_detail_trip_list (job_id, job_no, trip_id, trip_no, job_order_template_header_id, location_id, plan_order, branch, showName, job_characteristic, job_characteristic_id, job_note, unique_key, cardColor, job_characteristicShow, create_datetime, location_code, location_name, customer_id, address, map_url, latitude, longitude, location_type, active, customer_name)
+	SELECT job_id, job_no, $trip_id AS trip_id, '$tripNo' AS trip_no, job_order_template_header_id, location_id, plan_order, branch, showName, job_characteristic, job_characteristic_id, job_note, unique_key, cardColor, job_characteristicShow, create_datetime, location_code, location_name, customer_id, address, map_url, latitude, longitude, location_type, active, customer_name
+	FROM job_order_detail_trip_list
+	WHERE job_id = $MAIN_JOB_ID AND trip_no = '$LasttripNo'";
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	// Insert Trip job_order_detail_trip_cost
+	$sql = "INSERT INTO job_order_detail_trip_cost 
+	(job_id, job_no, trip_id, hire_price, overtime_fee, port_charge, yard_charge, container_return, container_cleaning_repair, container_drop_lift, other_charge, deduction_note, total_expenses, wage_travel_cost, vehicle_expenses, expenses_1, expenses_2, expenses_3, insInvAdd1, insInvAdd2, insInvAdd3, remark)
+	SELECT 
+	job_id, job_no, $trip_id, hire_price, overtime_fee, port_charge, yard_charge, container_return, container_cleaning_repair, container_drop_lift, other_charge, deduction_note, total_expenses, wage_travel_cost, vehicle_expenses, expenses_1, expenses_2, expenses_3, insInvAdd1, insInvAdd2, insInvAdd3, remark
+	FROM job_order_detail_trip_cost
+	WHERE job_id = $MAIN_JOB_ID AND trip_id = $LasttripID";
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	// Process Trip Action Log==========================
+	$sql = "INSERT INTO job_order_detail_trip_action_log 
+	(id, job_id, job_no, trip_id, trip_no, trip_list_id, main_order, minor_order, plan_order, step_desc, stage, button_name, progress)
+	SELECT NULL, job_id, job_no, $trip_id as trip_id, trip_no, trip_list_id, main_order, minor_order, plan_order, step_desc, stage, button_name, progress
+	FROM job_order_detail_trip_action_log
+	WHERE job_id = $MAIN_JOB_ID AND trip_id = $LasttripID";
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	if ($jobHeader['status'] == 'กำลังดำเนินการ') {
+		// Update job_order_detail_trip_info
+		$sql = "UPDATE job_order_detail_trip_info SET status = 'เจ้าหน้าที่ยืนยันแล้ว' Where id = $trip_id";
+		
+		if (!$conn->query($sql)) {
+			echo  $conn->errno;
+			exit();
+		}
+		
+		// Update Log
+		$sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = 1, timestamp = CURRENT_TIMESTAMP, complete_user = '$update_user'
+		WHERE trip_id = $trip_id AND main_order = 1 AND minor_order = 1";
+		if (!$conn->query($sql)) {
+			echo  $conn->errno;
+			exit();
+		}
+		
+	}
+
+
 	mysqli_close($conn);
 }
 
@@ -5764,6 +5869,10 @@ switch ($f) {
 		}
 	case 30: {
 			sendJobNoticetosub();
+			break;
+		}
+	case 31: {
+			addNewtriptoJob();
 			break;
 		}
 }

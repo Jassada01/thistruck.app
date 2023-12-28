@@ -267,7 +267,7 @@ include 'check_cookie.php';
                                                             ) b ON a.id = b.job_id 
                                                             LEFT JOIN invoice_job_mapping c ON a.id = c.job_id AND c.attr = 'ใช้งาน'
                                                             LEFT JOIN invoice_header d ON c.invoice_id = d.id AND d.attr1 = 'ใช้งาน'
-                                                            WHERE a.job_date BETWEEN '$dateStart' AND '$dateEnd'
+                                                            WHERE b.jobStartDateTime BETWEEN '$dateStart 00:00' AND '$dateEnd 23:59'
                                                         Order By 
                                                             a.id DESC;
                                                         ";
