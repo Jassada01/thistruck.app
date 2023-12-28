@@ -509,6 +509,85 @@ function LoadJobDaily()
 	echo json_encode($data_Array);
 }
 
+// F=9
+function LoadJobDailyforGraph()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+	/*
+	$sql = "Select 
+	b.job_id, 
+	b.id as trip_id, 
+	b.job_no, 
+	b.tripNo, 
+	c.driver_name, 
+	a.job_name, 
+	b.jobStartDateTime,
+	c.type,
+	DATE_SUB(
+	  b.jobStartDateTime, interval 2 hour
+	) AS Job_START, 
+	DATE_ADD(
+	  b.jobStartDateTime, interval 2 hour
+	) AS Job_END 
+  From 
+	job_order_header a 
+	Inner Join job_order_detail_trip_info b ON a.id = b.job_id 
+	Inner Join truck_driver_info c ON b.truck_id = c.driver_id 
+  Where 
+	a.status <> 'ยกเลิก' 
+	AND b.status <> 'ยกเลิก' 
+	AND a.job_date = CURRENT_DATE
+	AND c.type = 'พนักงานบริษัท' 
+  Order By 
+	c.driver_id, 
+	b.jobStartDateTime ";
+		*/
+	$sql = "Select 
+	b.job_id, 
+	b.id as trip_id, 
+	b.job_no, 
+	b.tripNo, 
+	c.driver_name, 
+	a.job_name, 
+	b.jobStartDateTime,
+	c.type,
+	DATE_SUB(
+	  b.jobStartDateTime, interval 2 hour
+	) AS Job_START, 
+	DATE_ADD(
+	  b.jobStartDateTime, interval 2 hour
+	) AS Job_END 
+  From 
+	job_order_header a 
+	Inner Join job_order_detail_trip_info b ON a.id = b.job_id 
+	Inner Join truck_driver_info c ON b.truck_id = c.driver_id 
+  Where 
+	a.status <> 'ยกเลิก' 
+	AND b.status <> 'ยกเลิก' 
+	AND a.job_date = CURRENT_DATE 
+  Order By 
+  c.type,	
+  c.driver_id, 
+	b.jobStartDateTime ";
+
+	$res = $conn->query(trim($sql));
+	mysqli_close($conn);
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	echo json_encode($data_Array);
+}
+
 
 
 
@@ -549,6 +628,10 @@ switch ($f) {
 		}
 	case 9: {
 			LoadJobDaily();
+			break;
+		}
+	case 10: {
+			LoadJobDailyforGraph();
 			break;
 		}
 }

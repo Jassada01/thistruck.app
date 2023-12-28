@@ -322,7 +322,25 @@ include 'check_cookie.php';
                                 </div>
                                 <!--end::Col-->
                             </div>
-                            <div class="row gy-5 g-xl-8 d-none">
+                            <div class="row gy-5 g-xl-8">
+                                <div class="col-sm-8">
+                                    <div class="card card-xl-stretch mb-5 mb-xl-8">
+                                        <!--begin::Header-->
+                                        <div class="card-header border-0 pt-5">
+                                            <h3 class="card-title align-items-start flex-column">
+                                                <span class="card-label fw-bolder fs-3 mb-1">Workload คนขับ</span>
+                                            </h3>
+                                            <div class="card-toolbar">
+
+                                            </div>
+                                        </div>
+                                        <!--end::Header-->
+                                        <!--begin::Body-->
+                                        <div class="card-body py-3 d-flex justify-content-center"> <!-- เพิ่ม class ที่นี่ -->
+                                            <div id="chartDailyGrantt" style="width: 100%; height: 500px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-sm-4">
                                     <!--begin::Tables Widget 9-->
                                     <div class="card card-xl-stretch mb-20 mb-xl-8">
@@ -413,7 +431,6 @@ include 'check_cookie.php';
                                     <!--end::Tables Widget 9-->
                                 </div>
                                 <!--end::Col-->
-
                             </div>
                             <!--begin::Row-->
                             <div class="row gy-5 g-xl-8">
@@ -645,6 +662,8 @@ include 'check_cookie.php';
     <!--Amchart -->
     <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
     <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/plugins/timeline.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/plugins/bullets.js"></script>
     <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
 
 
@@ -1733,6 +1752,118 @@ include 'check_cookie.php';
                     });
             }
 
+            function generatePastelColorWithOpacity() {
+                // กำหนดค่าสีพื้นฐานที่มีความสว่างสูง
+                const baseLight = 170; // ค่าสีพื้นฐานที่มีความสว่างสูง
+                const range = 85; // การสุ่มค่าที่จะเพิ่มเข้ากับค่าพื้นฐาน
+
+                // สุ่มค่าสี RGB
+                const r = baseLight + Math.floor(Math.random() * range);
+                const g = baseLight + Math.floor(Math.random() * range);
+                const b = baseLight + Math.floor(Math.random() * range);
+                const opacity = 0.8; // ตั้งค่าความโปร่งแสง
+
+                // แปลงค่าเป็นรูปแบบ rgba
+                return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+            }
+
+
+            function loadJoobDialyforGraph() {
+                var ajaxData = {};
+                ajaxData['f'] = '10';
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/index/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        var data_arr = JSON.parse(data);
+                        //console.log(data_arr);
+                        //chartDailyGrantt
+
+
+                        var chart = am4core.create("chartDailyGrantt", am4charts.XYChart);
+                        chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+                        chart.paddingRight = 30;
+                        chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
+
+                        var colorSet = new am4core.ColorSet();
+                        colorSet.saturation = 0.4;
+                        // ใช้ฟังก์ชัน map ของ JavaScript เพื่อเพิ่มคุณสมบัติสีให้กับแต่ละออบเจกต์ใน array
+                        var chartData = data_arr.map((item, index) => {
+                            // สร้างสีใหม่จาก ColorSet สำหรับแต่ละออบเจกต์ โดยใช้ index
+                            var color = generatePastelColorWithOpacity();
+                            // คืนค่าออบเจกต์ใหม่ที่มีคุณสมบัติ color
+                            return {
+                                ...item, // แพร่กระจายคุณสมบัติเดิมของออบเจกต์
+                                color: color, // เพิ่มคุณสมบัติ color
+                                category: item.driver_name + " (" + item.type + ")",
+                            };
+                        });
+                        //console.log(chartData);
+
+                        chart.data = chartData;
+
+                        //chart.dateFormatter.dateFormat = "yyyy-MM-dd";
+                        //chart.dateFormatter.inputDateFormat = "yyyy-MM-dd";
+
+                        chart.dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss";
+                        chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
+
+                        var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+                        categoryAxis.dataFields.category = "category";
+                        categoryAxis.renderer.grid.template.location = 0;
+                        categoryAxis.renderer.inversed = true;
+
+                        var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+                        dateAxis.renderer.minGridDistance = 70;
+                        dateAxis.baseInterval = {
+                            count: 1,
+                            timeUnit: "hour"
+                        };
+                        // dateAxis.max = new Date(2018, 0, 1, 24, 0, 0, 0).getTime();
+                        //dateAxis.strictMinMax = true;
+                        dateAxis.renderer.tooltipLocation = 0;
+
+                        var series1 = chart.series.push(new am4charts.ColumnSeries());
+                        series1.columns.template.height = am4core.percent(70);
+                        //series1.columns.template.tooltipText = "{tripNo}: [bold]{openDateX}[/] - [bold]{dateX}[/]";
+                        series1.columns.template.tooltipText = "{tripNo} : [bold]{jobStartDateTime.formatDate('เริ่มงาน HH:mm น.')}[/]";
+
+                        series1.dataFields.openDateX = "Job_START";
+                        series1.dataFields.dateX = "Job_END";
+                        series1.dataFields.categoryY = "category";
+                        series1.columns.template.propertyFields.fill = "color"; // get color from data
+                        series1.columns.template.propertyFields.stroke = "color";
+                        series1.columns.template.strokeOpacity = 1;
+
+                        chart.scrollbarX = new am4core.Scrollbar();
+                        // เพิ่ม event listener สำหรับคลิกคอลัมน์
+                        series1.columns.template.events.on("hit", function(ev) {
+                            // ดึงข้อมูลจาก data item ที่ถูกคลิก
+                            var dataItem = ev.target.dataItem.dataContext;
+                            var jobId = dataItem.job_id;
+                            var tripId = dataItem.trip_id;
+
+                            // สร้าง URL ที่จะนำทางไป
+                            var url = `103_tripDetail.php?job_id=${jobId}&trip_id=${tripId}`;
+
+                            // ใช้ window.open เพื่อเปิด URL ในหน้าต่างใหม่ หรือคุณสามารถใช้ window.location.href = url; เพื่อเปลี่ยนหน้าปัจจุบัน
+                            window.open(url, '_blank');
+                        }, this);
+
+
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
 
 
 
@@ -1747,6 +1878,7 @@ include 'check_cookie.php';
             loadDJobPerDate();
             loadDJobPerMonth();
             Create_JobDailaPanelSeletion();
+            loadJoobDialyforGraph();
 
 
         });
