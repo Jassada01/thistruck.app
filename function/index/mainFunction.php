@@ -566,16 +566,16 @@ function LoadJobDailyforGraph()
 	) AS Job_END 
   From 
 	job_order_header a 
-	Inner Join job_order_detail_trip_info b ON a.id = b.job_id 
-	Inner Join truck_driver_info c ON b.truck_id = c.driver_id 
+	LEFT Join job_order_detail_trip_info b ON a.id = b.job_id 
+	LEFT Join truck_driver_info c ON b.driver_id = c.driver_id 
   Where 
 	a.status <> 'ยกเลิก' 
 	AND b.status <> 'ยกเลิก' 
-	AND a.job_date = CURRENT_DATE 
+	AND DATE(b.jobStartDateTime) = CURRENT_DATE 
   Order By 
   c.type,	
   c.driver_id, 
-	b.jobStartDateTime ";
+	b.jobStartDateTime;";
 
 	$res = $conn->query(trim($sql));
 	mysqli_close($conn);

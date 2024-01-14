@@ -1822,6 +1822,9 @@ include 'check_cookie.php';
                         dateAxis.renderer.minGridDistance = 70;
                         dateAxis.baseInterval = {
                             count: 1,
+
+
+                            
                             timeUnit: "hour"
                         };
                         // dateAxis.max = new Date(2018, 0, 1, 24, 0, 0, 0).getTime();

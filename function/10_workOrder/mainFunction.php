@@ -1763,7 +1763,7 @@ function loadTripDetailbyJobID()
 	$data_Array['jobHeader'] = array();
 	$data_Array['JobDetailTrip'] = array();
 	$data_Array['jobDetailCostForm'] = array();
-
+	$data_Array['trip_VGMClosing']= array();
 
 	// เชื่อมต่อฐานข้อมูล MySQL
 	include "../connectionDb.php";
@@ -1797,6 +1797,17 @@ function loadTripDetailbyJobID()
 	$res = $conn->query(trim($sql));
 	while ($row = $res->fetch_assoc()) {
 		$data_Array['jobDetailCostForm'][] = $row;
+	}
+
+	// Step 4 Load VGM/Closing Time 
+	$sql3 = "SELECT * FROM vgm_closing_notification_time a
+	Where job_id =$MAIN_JOB_ID
+	AND trip_id = $MAIN_trip_id";
+	
+	$res3 = $conn->query(trim($sql3));
+	$data_Array3 = array();
+	while ($row3 = $res3->fetch_assoc()) {
+		$data_Array['trip_VGMClosing'][] = $row3;
 	}
 
 
@@ -3095,6 +3106,20 @@ function loadTrip_DetailforViewIndex()
 
 
 		$row['trip_data'] =  $data_Array2;
+
+		// Load VGM/Closing Time 
+		$sql3 = "SELECT * FROM vgm_closing_notification_time a
+		Where job_id =$job_id
+		AND trip_id = ".$row['id'];
+
+		$res3 = $conn->query(trim($sql3));
+		$data_Array3 = array();
+		while ($row3 = $res3->fetch_assoc()) {
+			$data_Array3[] = $row3;
+		}
+
+		$row['trip_VGMClosing'] =  $data_Array3;
+
 		$data_Array[] = $row;
 	}
 	mysqli_close($conn);
@@ -5727,12 +5752,12 @@ function addNewtriptoJob()
 	if ($jobHeader['status'] == 'กำลังดำเนินการ') {
 		// Update job_order_detail_trip_info
 		$sql = "UPDATE job_order_detail_trip_info SET status = 'เจ้าหน้าที่ยืนยันแล้ว' Where id = $trip_id";
-		
+
 		if (!$conn->query($sql)) {
 			echo  $conn->errno;
 			exit();
 		}
-		
+
 		// Update Log
 		$sql = "UPDATE job_order_detail_trip_action_log SET complete_flag = 1, timestamp = CURRENT_TIMESTAMP, complete_user = '$update_user'
 		WHERE trip_id = $trip_id AND main_order = 1 AND minor_order = 1";
@@ -5740,8 +5765,77 @@ function addNewtriptoJob()
 			echo  $conn->errno;
 			exit();
 		}
-		
 	}
+
+
+	mysqli_close($conn);
+}
+
+// F=32
+function InsertNewVGMClosingTimeforAlert()
+{
+	// Load All Data from Paramitor
+	$job_id = $_POST['MAIN_JOB_ID'];
+	$trip_ids = $_POST['SelectTrip']; // This is an array
+	$DateTimeforVGM = $_POST['DateTimeforVGM']; // DateTimeforVGM
+	$DateTimeforClosing = $_POST['DateTimeforClosing']; // selectDateTimeforClosing
+
+	$three_hr_alert = $_POST['cbVGMClosingNotice3Hr'];
+	$six_hr_alert = $_POST['cbVGMClosingNotice6Hr'];
+	$create_by = $_POST['update_user'];
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// Execute query for each trip_id
+	foreach ($trip_ids as $trip_id) {
+
+		//Check if VGM is setting
+		if ($DateTimeforVGM != "") {
+			$timeThreeHoursBefore = date("Y-m-d H:i", strtotime($DateTimeforVGM . " - 3 hours"));
+			$timeSixHoursBefore = date("Y-m-d H:i", strtotime($DateTimeforVGM . " - 6 hours"));
+
+			// Delete fro Update lasted Setting
+			$deletesql = "Delete From vgm_closing_notification_time Where alert_type = 'VGM' AND job_id = $job_id AND trip_id = $trip_id";
+			if (!$conn->query($deletesql)) {
+				echo  $conn->errno;
+				exit();
+			}
+
+			// Insert New Data
+			$inssql = "INSERT INTO vgm_closing_notification_time (job_id, trip_id, alert_type, base_time, 3hr_time, 6hr_time, 3hr_alert, 6hr_alert, create_date, create_by) 
+			VALUES ($job_id, $trip_id, 'VGM', '$DateTimeforVGM', '$timeThreeHoursBefore', '$timeSixHoursBefore', $three_hr_alert, $six_hr_alert, CURRENT_TIMESTAMP, '$create_by')";
+			//echo $inssql;
+			if (!$conn->query($inssql)) {
+				echo  $conn->errno;
+				exit();
+			}
+		}
+
+		//Check if Closing is setting
+		echo $DateTimeforClosing ;
+		if ($DateTimeforClosing != "") {
+			$timeThreeHoursBefore = date("Y-m-d H:i", strtotime($DateTimeforClosing . " - 3 hours"));
+			$timeSixHoursBefore = date("Y-m-d H:i", strtotime($DateTimeforClosing . " - 6 hours"));
+
+			// Delete fro Update lasted Setting
+			$deletesql = "Delete From vgm_closing_notification_time Where alert_type = 'Closing' AND job_id = $job_id AND trip_id = $trip_id";
+			if (!$conn->query($deletesql)) {
+				echo  $conn->errno;
+				exit();
+			}
+
+			// Insert New Data
+			$inssql = "INSERT INTO vgm_closing_notification_time (job_id, trip_id, alert_type, base_time, 3hr_time, 6hr_time, 3hr_alert, 6hr_alert, create_date, create_by) 
+			VALUES ($job_id, $trip_id, 'Closing', '$DateTimeforClosing', '$timeThreeHoursBefore', '$timeSixHoursBefore', $three_hr_alert, $six_hr_alert, CURRENT_TIMESTAMP, '$create_by')";
+			//echo $inssql;
+			if (!$conn->query($inssql)) {
+				echo  $conn->errno;
+				exit();
+			}
+		}
+
+	}
+
 
 
 	mysqli_close($conn);
@@ -5873,6 +5967,10 @@ switch ($f) {
 		}
 	case 31: {
 			addNewtriptoJob();
+			break;
+		}
+	case 32: {
+			InsertNewVGMClosingTimeforAlert();
 			break;
 		}
 }

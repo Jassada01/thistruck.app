@@ -325,6 +325,10 @@ include 'check_cookie.php';
                                             <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="closeJob">
                                                 <i class="fas fa-check-circle fs-4"></i> จบงาน
                                             </button>
+                                            <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="setAlarmVGMClosing">
+                                                <i class="fas fa-bell fs-4"></i> ตั้งเวลาแจ้งเตือน
+                                            </button>
+                                            <span id="VGMandClosingPanel"></span>
 
 
                                         </div>
@@ -1478,6 +1482,52 @@ include 'check_cookie.php';
         </div>
     </div>
 
+    <!-- Modal Set VFGM Closing Clock -->
+    <div class="modal fade" id="selectTripforVGMorClosing" tabindex="-1" aria-labelledby="selectTripforVGMorClosingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="selectTripforVGMorClosingLabel">เลือกทริปและตั้งค่า VGM/Closing</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <label for="selectDateTimeforVGM" class="form-label">VGM</label>
+                            <input class="form-control form-control-solid" placeholder="เลือกวันเวลา" id="selectDateTimeforVGM" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="selectDateTimeforClosing" class="form-label">Closing</label>
+                            <input class="form-control form-control-solid" placeholder="เลือกวันเวลา" id="selectDateTimeforClosing" />
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <div class="form-check form-check-custom form-check-solid  form-check-danger">
+                                <input type="checkbox" class="form-check-input" id="cbVGMClosingNotice3Hr">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    แจ้งเตือนก่อน 3 ชั่วโมง
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-check-custom form-check-solid  form-check-danger">
+                                <input type="checkbox" class="form-check-input" id="cbVGMClosingNotice6Hr" checked>
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    แจ้งเตือนก่อน 6 ชั่วโมง
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary" id="btnConfirmsetVGMClosing">ตั้งเวลา</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
     <script>
@@ -1874,6 +1924,7 @@ include 'check_cookie.php';
                     .done(function(data) {
                         //console.log(data);
                         var data_arr = JSON.parse(data);
+                        //console.log(data_arr);
                         document.querySelectorAll('#jobHeaderForm input').forEach(input => {
                             input.disabled = true;
                         });
@@ -2043,6 +2094,14 @@ include 'check_cookie.php';
                             $("#totalCostPanel").html(formattedTotal + " บาท");
                         }
 
+                        printVGMClosing = "";
+                        $.each(data_arr.trip_VGMClosing, function(index, object) {
+                            printVGMClosing += "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='text-danger'><B>" + object.alert_type + " : </B>" + moment(object.base_time).format("Do MMM H:mm น.") + "</span>";
+                        });
+                        //VGMandClosingPanel
+                        $("#VGMandClosingPanel").html(printVGMClosing);
+
+
 
                         loadtripTimeLine();
                         $('#loading-spinner').hide();
@@ -2076,11 +2135,9 @@ include 'check_cookie.php';
             });
 
             $("#jobDetailCostForm input").on("keyup", function() {
-                if ($(this).attr("id") == "deduction_note")
-                {
+                if ($(this).attr("id") == "deduction_note") {
                     check_value = $(this).val();
-                    if ((check_value.trim() != "") && (check_value.charAt(0) != "-"))
-                    {
+                    if ((check_value.trim() != "") && (check_value.charAt(0) != "-")) {
                         $(this).val("-" + check_value);
                     }
                 }
@@ -3990,6 +4047,72 @@ include 'check_cookie.php';
                         alert("Posting failed.");
                     });
             }
+
+            $('#setAlarmVGMClosing').on('click', function() {
+                //let tableRows = allTrip_data.map(generateTableRowforVGMClosing).join("");
+                //$('#tripTableBodyVGMClosing').html(tableRows);
+                $('#selectTripforVGMorClosing').modal('show');
+            });
+            //selectDateTimeforVGMClosing
+            $("#selectDateTimeforVGM").flatpickr({
+                dateFormat: "Y-m-d H:i",
+                enableTime: true,
+                locale: "th",
+                altInput: true,
+                altFormat: "j M y เวลา H:i น.",
+                thaiBuddhist: true,
+            });
+
+            $("#selectDateTimeforClosing").flatpickr({
+                dateFormat: "Y-m-d H:i",
+                enableTime: true,
+                locale: "th",
+                altInput: true,
+                altFormat: "j M y เวลา H:i น.",
+                thaiBuddhist: true,
+            });
+
+            $('#btnConfirmsetVGMClosing').on('click', function() {
+                let selectedTrips = [];
+                selectedTrips.push(MAIN_trip_id);
+
+                var ajaxData = {
+                    'DateTimeforVGM': $('#selectDateTimeforVGM').val(),
+                    'DateTimeforClosing': $('#selectDateTimeforClosing').val(),
+                    'cbVGMClosingNotice3Hr': $('#cbVGMClosingNotice3Hr').prop('checked') ? '1' : '0',
+                    'cbVGMClosingNotice6Hr': $('#cbVGMClosingNotice6Hr').prop('checked') ? '1' : '0',
+                    'SelectTrip': selectedTrips,
+                    'MAIN_JOB_ID': MAIN_job_id,
+                    'update_user': '<?php echo $MAIN_USER_DATA->name; ?>'
+                };
+                ajaxData['f'] = '32';
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData),
+                    })
+                    .done(function(data) {
+                        //console.log(data);
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ตั้งค่าสำเร็จ',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                            //null
+                        });
+
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            });
 
 
 

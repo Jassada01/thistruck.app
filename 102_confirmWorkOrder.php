@@ -637,6 +637,9 @@ include 'check_cookie.php';
                                                     <a class="menu-link flex-stack px-3" id="checkMapbtn">ตรวจสอบเส้นทาง</a>
                                                 </div>
                                                 <div class="menu-item px-3">
+                                                    <a class="menu-link flex-stack px-3" id="setVGMClosingbtn">ตั้งแจ้งเตือน VGM/Closing</a>
+                                                </div>
+                                                <div class="menu-item px-3">
                                                     <a class="menu-link flex-stack px-3" id="addtripBtn">เพิ่มทริปในใบงาน</a>
                                                 </div>
                                                 <!--end::Menu item-->
@@ -1090,7 +1093,7 @@ include 'check_cookie.php';
         </div>
     </div>
 
-    <!-- Modal เลือก Confirm ราย Trip -->
+    <!-- Modal เลือก Add new trip -->
     <div class="modal fade" id="modalAddnewTrip" tabindex="-1" aria-labelledby="modalAddnewTripLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -1289,6 +1292,66 @@ include 'check_cookie.php';
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
                     <button type="button" class="btn btn-primary" id="confirmAddNewTrip">ยืนยัน</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Set VFGM Closing Clock -->
+    <div class="modal fade" id="selectTripforVGMorClosing" tabindex="-1" aria-labelledby="selectTripforVGMorClosingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="selectTripforVGMorClosingLabel">เลือกทริปและตั้งค่า VGM/Closing</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <label for="selectDateTimeforVGM" class="form-label">VGM</label>
+                            <input class="form-control form-control-solid" placeholder="เลือกวันเวลา" id="selectDateTimeforVGM" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="selectDateTimeforClosing" class="form-label">Closing</label>
+                            <input class="form-control form-control-solid" placeholder="เลือกวันเวลา" id="selectDateTimeforClosing" />
+                        </div>
+                    </div>
+                    <div class="row mb-10">
+                        <div class="col-md-6">
+                            <div class="form-check form-check-custom form-check-solid  form-check-danger">
+                                <input type="checkbox" class="form-check-input" id="cbVGMClosingNotice3Hr">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    แจ้งเตือนก่อน 3 ชั่วโมง
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-check-custom form-check-solid  form-check-danger">
+                                <input type="checkbox" class="form-check-input" id="cbVGMClosingNotice6Hr" checked>
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    แจ้งเตือนก่อน 6 ชั่วโมง
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-striped table-hover">
+                        <thead class="bg-success text-white">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">หมายเลขทริป</th>
+                                <th scope="col">ชื่อคนขับ</th>
+                                <th scope="col">เวลาเริ่มงาน</th>
+                                <th scope="col">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tripTableBodyVGMClosing">
+                            <!-- เราจะแทรกข้อมูลตารางตรงนี้โดยใช้ JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary" id="btnConfirmsetVGMClosing">ตั้งเวลา</button>
                 </div>
             </div>
         </div>
@@ -2928,6 +2991,7 @@ include 'check_cookie.php';
                         var data_arr = JSON.parse(data);
                         //console.log(data_arr);
                         allTrip_data = data_arr;
+                        //console.log(allTrip_data);
 
                         // สร้าง div สำหรับการแสดงผลตาราง
                         var tableContainer = $('<div class="table-responsive"></div>');
@@ -3014,7 +3078,13 @@ include 'check_cookie.php';
                             var row = $('<tr></tr>');
 
                             // เพิ่มข้อมูลลงในแถว
-                            var tripNo = $('<td></td>').html('<a href="103_tripDetail.php?job_id=' + rowData.job_id + '&trip_id=' + rowData.id + '">' + rowData.tripNo + '</a>');
+                            //Generate Closing And VGM
+                            printVGMClosing = "";
+                            $.each(rowData.trip_VGMClosing, function(index, object) {
+                                printVGMClosing += "<BR><span class='text-danger'>" + object.alert_type +" : "+ moment(object.base_time).format("Do MMM H:mm น.") + "</span>";
+                            });
+
+                            var tripNo = $('<td></td>').html('<a href="103_tripDetail.php?job_id=' + rowData.job_id + '&trip_id=' + rowData.id + '">' + rowData.tripNo + '</a>' + printVGMClosing);
                             row.append(tripNo);
 
 
@@ -3264,6 +3334,8 @@ include 'check_cookie.php';
                 }
 
             }
+
+
 
 
             //btnConfirmbyTrip
@@ -3630,7 +3702,7 @@ include 'check_cookie.php';
                     // เพิ่มฟิลด์อื่นๆ ที่คุณต้องการจัดเก็บ
                 };
 
-                console.log(ajaxData);
+                //console.log(ajaxData);
                 ajaxData['f'] = '31';
                 ajaxData['MAIN_JOB_ID'] = MAIN_job_id;
                 ajaxData['update_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
@@ -3659,6 +3731,94 @@ include 'check_cookie.php';
                         alert("Posting failed.");
                     });
             });
+
+            function generateTableRowforVGMClosing(tripData) {
+                let checkboxDisabled = "";
+                return `
+            <tr>
+                <td class="text-center"><div class="form-check form-check-custom form-check-solid ms-6 me-4"><input type="checkbox" class="form-check-input" checked value="${tripData.id}"></div></td>
+                <td>${tripData.tripNo}</td>
+                <td>${tripData.driver_name}</td>
+                <td>${moment(tripData.jobStartDateTime).format("Do MMM H:mm น.")}</td>
+                <td>${tripData.status}</td>
+            </tr>
+                `;
+            }
+
+            //setVGMClosing
+            $('#setVGMClosingbtn').on('click', function() {
+                let tableRows = allTrip_data.map(generateTableRowforVGMClosing).join("");
+                $('#tripTableBodyVGMClosing').html(tableRows);
+                $('#selectTripforVGMorClosing').modal('show');
+            });
+
+            //selectDateTimeforVGMClosing
+            $("#selectDateTimeforVGM").flatpickr({
+                dateFormat: "Y-m-d H:i",
+                enableTime: true,
+                locale: "th",
+                altInput: true,
+                altFormat: "j M y เวลา H:i น.",
+                thaiBuddhist: true,
+            });
+
+            $("#selectDateTimeforClosing").flatpickr({
+                dateFormat: "Y-m-d H:i",
+                enableTime: true,
+                locale: "th",
+                altInput: true,
+                altFormat: "j M y เวลา H:i น.",
+                thaiBuddhist: true,
+            });
+
+            //btnConfirmsetVGMClosing
+            $('#btnConfirmsetVGMClosing').on('click', function() {
+                let selectedTrips = [];
+
+                // ค้นหา checkbox ที่ถูก check ใน #tripTableBody
+                $('#tripTableBodyVGMClosing input[type="checkbox"]:checked').each(function() {
+                    selectedTrips.push($(this).val());
+                });
+                var ajaxData = {
+                    'DateTimeforVGM': $('#selectDateTimeforVGM').val(),
+                    'DateTimeforClosing': $('#selectDateTimeforClosing').val(),
+                    'cbVGMClosingNotice3Hr': $('#cbVGMClosingNotice3Hr').prop('checked') ? '1' : '0',
+                    'cbVGMClosingNotice6Hr': $('#cbVGMClosingNotice6Hr').prop('checked') ? '1' : '0',
+                    'SelectTrip': selectedTrips,
+                    'MAIN_JOB_ID': MAIN_job_id,
+                    'update_user': '<?php echo $MAIN_USER_DATA->name; ?>'
+                };
+                ajaxData['f'] = '32';
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/10_workOrder/mainFunction.php',
+                        data: (ajaxData),
+                    })
+                    .done(function(data) {
+                        //console.log(data);
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ตั้งค่าสำเร็จ',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                            //null
+                        });
+                        
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            });
+
+
+
 
 
 

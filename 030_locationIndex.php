@@ -457,35 +457,35 @@ include 'check_cookie.php';
                                     <div class="form-group mt-3 row">
                                         <label for="short_haul_fee" class="col-sm-3 col-form-label text-end-pc">ค่ารับตู้สั้น</label>
                                         <div class="col-sm-5">
-                                            <input type="number" class="form-control" id="short_haul_fee" name="short_haul_fee">
+                                            <input type="number" class="form-control" id="short_haul_fee" name="short_haul_fee" step="0.01">
                                         </div>
                                     </div>
 
                                     <div class="form-group mt-3 row">
                                         <label for="long_haul_fee" class="col-sm-3 col-form-label text-end-pc">ค่ารับตู้ยาว</label>
                                         <div class="col-sm-5">
-                                            <input type="number" class="form-control" id="long_haul_fee" name="long_haul_fee">
+                                            <input type="number" class="form-control" id="long_haul_fee" name="long_haul_fee" step="0.01">
                                         </div>
                                     </div>
 
                                     <div class="form-group mt-3 row">
                                         <label for="short_haul_return_fee" class="col-sm-3 col-form-label text-end-pc">ค่าคืนตู้สั้น</label>
                                         <div class="col-sm-5">
-                                            <input type="number" class="form-control" id="short_haul_return_fee" name="short_haul_return_fee">
+                                            <input type="number" class="form-control" id="short_haul_return_fee" name="short_haul_return_fee"  step="0.01">
                                         </div>
                                     </div>
 
                                     <div class="form-group mt-3 row">
                                         <label for="long_haul_return_fee" class="col-sm-3 col-form-label text-end-pc">ค่าคืนตู้ยาว</label>
                                         <div class="col-sm-5">
-                                            <input type="number" class="form-control" id="long_haul_return_fee" name="long_haul_return_fee">
+                                            <input type="number" class="form-control" id="long_haul_return_fee" name="long_haul_return_fee"  step="0.01">
                                         </div>
                                     </div>
 
                                     <div class="form-group mt-3 row">
                                         <label for="yard_fee" class="col-sm-3 col-form-label text-end-pc">ค่าผ่านลาน</label>
                                         <div class="col-sm-5">
-                                            <input type="number" class="form-control" id="yard_fee" name="yard_fee">
+                                            <input type="number" class="form-control" id="yard_fee" name="yard_fee"  step="0.01">
                                         </div>
                                     </div>
 
@@ -622,35 +622,35 @@ include 'check_cookie.php';
                                         <div class="form-group mt-3 row">
                                             <label for="edit_short_haul_fee" class="col-sm-3 col-form-label text-end-pc">ค่ารับตู้สั้น</label>
                                             <div class="col-sm-5">
-                                                <input type="number" class="form-control" id="edit_short_haul_fee" name="short_haul_fee">
+                                                <input type="number" class="form-control" id="edit_short_haul_fee" name="short_haul_fee"  step="0.01">
                                             </div>
                                         </div>
 
                                         <div class="form-group mt-3 row">
                                             <label for="edit_long_haul_fee" class="col-sm-3 col-form-label text-end-pc">ค่ารับตู้ยาว</label>
                                             <div class="col-sm-5">
-                                                <input type="number" class="form-control" id="edit_long_haul_fee" name="long_haul_fee">
+                                                <input type="number" class="form-control" id="edit_long_haul_fee" name="long_haul_fee"  step="0.01">
                                             </div>
                                         </div>
 
                                         <div class="form-group mt-3 row">
                                             <label for="edit_short_haul_return_fee" class="col-sm-3 col-form-label text-end-pc">ค่าคืนตู้สั้น</label>
                                             <div class="col-sm-5">
-                                                <input type="number" class="form-control" id="edit_short_haul_return_fee" name="short_haul_return_fee">
+                                                <input type="number" class="form-control" id="edit_short_haul_return_fee" name="short_haul_return_fee"  step="0.01">
                                             </div>
                                         </div>
 
                                         <div class="form-group mt-3 row">
                                             <label for="edit_long_haul_return_fee" class="col-sm-3 col-form-label text-end-pc">ค่าคืนตู้ยาว</label>
                                             <div class="col-sm-5">
-                                                <input type="number" class="form-control" id="edit_long_haul_return_fee" name="long_haul_return_fee">
+                                                <input type="number" class="form-control" id="edit_long_haul_return_fee" name="long_haul_return_fee"  step="0.01">
                                             </div>
                                         </div>
 
                                         <div class="form-group mt-3 row">
                                             <label for="edit_yard_fee" class="col-sm-3 col-form-label text-end-pc">ค่าผ่านลาน</label>
                                             <div class="col-sm-5">
-                                                <input type="number" class="form-control" id="edit_yard_fee" name="yard_fee">
+                                                <input type="number" class="form-control" id="edit_yard_fee" name="yard_fee"  step="0.01">
                                             </div>
                                         </div>
 

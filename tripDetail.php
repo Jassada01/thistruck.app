@@ -435,8 +435,9 @@ License: For each use you must have a valid license purchased only from above li
                                             <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary" id="printJob"><i class="fas fa-file-pdf fs-3"></i>ใบงาน</button>
                                         </div>
                                         <button type="button" class="btn btn-sm btn-color-primary btn-active-light-primary d-none" id="closeJob">
-                                                <i class="fas fa-check-circle fs-4"></i> จบงาน
+                                            <i class="fas fa-check-circle fs-4"></i> จบงาน
                                         </button>
+                                        <span id="VGMandClosingPanel"></span>
                                     </div>
                                     <div class="card-body">
                                         <div class="row mt-5">
@@ -560,7 +561,7 @@ License: For each use you must have a valid license purchased only from above li
 
                                         <div class="row mt-3 mh-5">
                                             <div class="col-md-4">
-                                            <h5>หมายเหตุ</h5>
+                                                <h5>หมายเหตุ</h5>
                                                 <p id="HD_remark"></p>
                                             </div>
                                         </div>
@@ -2014,7 +2015,7 @@ License: For each use you must have a valid license purchased only from above li
                         // ใช้ Date.now() ในการเข้าถึงเวลาปัจจุบัน (เป็นมิลลิวินาที)
                         let currentTime = Date.now();
 
-                        if(currentTime - jobStartDate > 6 * 3600000) {
+                        if (currentTime - jobStartDate > 6 * 3600000) {
                             $("#closeJob").removeClass('d-none');
                         }
 
@@ -2115,6 +2116,13 @@ License: For each use you must have a valid license purchased only from above li
                             $("#totalCostPanel").html(formattedTotal + " บาท");
                         }
 
+                        printVGMClosing = "";
+                        $.each(data_arr.trip_VGMClosing, function(index, object) {
+                            printVGMClosing += "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='text-danger'><B>" + object.alert_type + " : </B>" + moment(object.base_time).format("Do MMM H:mm น.") + "</span>";
+                        });
+                        //VGMandClosingPanel
+                        $("#VGMandClosingPanel").html(printVGMClosing);
+
 
                         $('#loading-spinner').hide();
                     })
@@ -2147,11 +2155,9 @@ License: For each use you must have a valid license purchased only from above li
             });
 
             $("#jobDetailCostForm input").on("keyup", function() {
-                if ($(this).attr("id") == "deduction_note")
-                {
+                if ($(this).attr("id") == "deduction_note") {
                     check_value = $(this).val();
-                    if ((check_value.trim() != "") && (check_value.charAt(0) != "-"))
-                    {
+                    if ((check_value.trim() != "") && (check_value.charAt(0) != "-")) {
                         $(this).val("-" + check_value);
                     }
                 }

@@ -314,7 +314,7 @@ include 'check_cookie.php';
                         .done(function(data) {
                             //console.log(data)
                             let data_arr = JSON.parse(data);
-                            console.log(data_arr);
+                            //console.log(data_arr);
                             let tableContent = '';
                             data_arr.forEach(item => {
                                 tableContent += '<tr>';
