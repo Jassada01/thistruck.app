@@ -1882,8 +1882,13 @@ include 'check_cookie.php';
                             }
 
                             if (containerWeight !== "" && containerWeight !== undefined && containerWeight !== "0.00") {
-                                tripText += "น้ำหนักตู้ " + containerWeight + "\n";
+                                let formattedWeight = parseFloat(containerWeight).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
+                                tripText += "น้ำหนักตู้ " + formattedWeight + "\n";
                             }
+
 
                             if (trip.CURRENT_MAIN_ORDER == '3') {
                                 switch (trip.CURRENT_MINOR_ORDER) {
@@ -1916,7 +1921,7 @@ include 'check_cookie.php';
                             // หรือสามารถนำข้อความไปแสดงในส่วนอื่นของเว็บไซต์ได้ตามต้องการ
                         });
                         MAIN_LINE_MSG = "";
-                        MAIN_LINE_MSG += "วันที่ " + jobHeaderForm.job_date;
+                        MAIN_LINE_MSG += "วันที่ " + moment(jobHeaderForm.job_date).format("Do MMM YYYY (dddd)");
                         MAIN_LINE_MSG += "\nชื่องาน " + jobHeaderForm.job_name;
                         MAIN_LINE_MSG += "\nเลขที่อ้างอิง:\n" + jobHeaderForm.refDoc_Data;
                         MAIN_LINE_MSG += data_arr.jobActionLog;
@@ -3081,7 +3086,7 @@ include 'check_cookie.php';
                             //Generate Closing And VGM
                             printVGMClosing = "";
                             $.each(rowData.trip_VGMClosing, function(index, object) {
-                                printVGMClosing += "<BR><span class='text-danger'>" + object.alert_type +" : "+ moment(object.base_time).format("Do MMM H:mm น.") + "</span>";
+                                printVGMClosing += "<BR><span class='text-danger'>" + object.alert_type + " : " + moment(object.base_time).format("Do MMM H:mm น.") + "</span>";
                             });
 
                             var tripNo = $('<td></td>').html('<a href="103_tripDetail.php?job_id=' + rowData.job_id + '&trip_id=' + rowData.id + '">' + rowData.tripNo + '</a>' + printVGMClosing);
@@ -3798,7 +3803,7 @@ include 'check_cookie.php';
                     })
                     .done(function(data) {
                         //console.log(data);
-                        
+
                         Swal.fire({
                             icon: 'success',
                             title: 'ตั้งค่าสำเร็จ',
@@ -3808,7 +3813,7 @@ include 'check_cookie.php';
                             location.reload();
                             //null
                         });
-                        
+
 
                     })
                     .fail(function() {
