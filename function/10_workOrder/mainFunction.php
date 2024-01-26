@@ -1763,7 +1763,7 @@ function loadTripDetailbyJobID()
 	$data_Array['jobHeader'] = array();
 	$data_Array['JobDetailTrip'] = array();
 	$data_Array['jobDetailCostForm'] = array();
-	$data_Array['trip_VGMClosing']= array();
+	$data_Array['trip_VGMClosing'] = array();
 
 	// เชื่อมต่อฐานข้อมูล MySQL
 	include "../connectionDb.php";
@@ -1803,7 +1803,7 @@ function loadTripDetailbyJobID()
 	$sql3 = "SELECT * FROM vgm_closing_notification_time a
 	Where job_id =$MAIN_JOB_ID
 	AND trip_id = $MAIN_trip_id";
-	
+
 	$res3 = $conn->query(trim($sql3));
 	$data_Array3 = array();
 	while ($row3 = $res3->fetch_assoc()) {
@@ -3110,7 +3110,7 @@ function loadTrip_DetailforViewIndex()
 		// Load VGM/Closing Time 
 		$sql3 = "SELECT * FROM vgm_closing_notification_time a
 		Where job_id =$job_id
-		AND trip_id = ".$row['id'];
+		AND trip_id = " . $row['id'];
 
 		$res3 = $conn->query(trim($sql3));
 		$data_Array3 = array();
@@ -5812,7 +5812,7 @@ function InsertNewVGMClosingTimeforAlert()
 		}
 
 		//Check if Closing is setting
-		echo $DateTimeforClosing ;
+		echo $DateTimeforClosing;
 		if ($DateTimeforClosing != "") {
 			$timeThreeHoursBefore = date("Y-m-d H:i", strtotime($DateTimeforClosing . " - 3 hours"));
 			$timeSixHoursBefore = date("Y-m-d H:i", strtotime($DateTimeforClosing . " - 6 hours"));
@@ -5833,13 +5833,35 @@ function InsertNewVGMClosingTimeforAlert()
 				exit();
 			}
 		}
-
 	}
 
 
 
 	mysqli_close($conn);
 }
+
+// F=33
+function saveLocationbHistory()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+	$sql = "Insert into trip_gps_record(trip_id, lat, lon) Values ($trip_id,$lat,$lon)";
+	//echo  $sql;
+
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+	mysqli_close($conn);
+}
+
 
 
 
@@ -5971,6 +5993,10 @@ switch ($f) {
 		}
 	case 32: {
 			InsertNewVGMClosingTimeforAlert();
+			break;
+		}
+	case 33: {
+			saveLocationbHistory();
 			break;
 		}
 }
