@@ -65,7 +65,6 @@ try:
                 WHERE 
                   line_job_notification_log.trip_id IS NULL 
                   AND job_order_detail_trip_info.jobStartDateTime <= NOW() + INTERVAL 6 HOUR 
-                  AND job_order_detail_trip_info.jobStartDateTime > NOW() 
                   AND job_order_detail_trip_info.status != 'ยกเลิก' 
                   AND job_order_detail_trip_info.complete_flag IS NULL
               )
@@ -328,7 +327,6 @@ try:
                 WHERE 
                   line_job_notification_log.trip_id IS NULL 
                   AND job_order_detail_trip_info.jobStartDateTime <= NOW() + INTERVAL 6 HOUR 
-                  AND job_order_detail_trip_info.jobStartDateTime > NOW() 
                   AND job_order_detail_trip_info.status != 'ยกเลิก' 
                   AND job_order_detail_trip_info.complete_flag IS NULL
               )

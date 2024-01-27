@@ -65,11 +65,10 @@ try:
                 WHERE 
                   line_job_notification_log.trip_id IS NULL 
                   AND job_order_detail_trip_info.jobStartDateTime <= NOW() + INTERVAL 6 HOUR 
-                  AND job_order_detail_trip_info.jobStartDateTime > NOW() 
-                  AND job_order_detail_trip_info.status != 'ยกเลิก' 
                   AND job_order_detail_trip_info.complete_flag IS NULL
               )
         """
+        print(sql_select_data)
         cursor.execute(sql_select_data)
 
         # ดึงข้อมูลทั้งหมดที่ได้จากการ Select
@@ -78,6 +77,7 @@ try:
             # สร้าง flex message ตามข้อมูลที่ได้รับ
             flex_contents = []
             for row in results:
+                
                 job_no = row[0]
                 tripNo = row[1]
                 job_name = row[2]
@@ -328,7 +328,6 @@ try:
                 WHERE 
                   line_job_notification_log.trip_id IS NULL 
                   AND job_order_detail_trip_info.jobStartDateTime <= NOW() + INTERVAL 6 HOUR 
-                  AND job_order_detail_trip_info.jobStartDateTime > NOW() 
                   AND job_order_detail_trip_info.status != 'ยกเลิก' 
                   AND job_order_detail_trip_info.complete_flag IS NULL
               )
