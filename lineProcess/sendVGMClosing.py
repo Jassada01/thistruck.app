@@ -145,7 +145,8 @@ try:
                     INNER JOIN job_order_detail_trip_info c ON a.job_id = c.job_id AND a.trip_id = c.id
                     WHERE a.6hr_time <= NOW()
                     AND alert_type = 'VGM'
-                    AND a.6hr_alert = 1;
+                    AND a.6hr_alert = 1
+                    AND c.status NOT IN ('จบงาน', 'ยกเลิก');
                 """,
                 "Notifyname": "แจ้งเตือน 6 ชั่วโมงก่อน VGM",
                 "Notifytype": "VGM",
@@ -175,7 +176,8 @@ try:
                     INNER JOIN job_order_detail_trip_info c ON a.job_id = c.job_id AND a.trip_id = c.id
                     WHERE a.3hr_time <= NOW()
                     AND alert_type = 'VGM'
-                    AND a.3hr_alert = 1;
+                    AND a.3hr_alert = 1
+                    AND c.status NOT IN ('จบงาน', 'ยกเลิก');
                 """,
                 "Notifyname": "แจ้งเตือน 3 ชั่วโมงก่อน VGM",
                 "Notifytype": "VGM",
@@ -206,7 +208,8 @@ try:
                     INNER JOIN job_order_detail_trip_info c ON a.job_id = c.job_id AND a.trip_id = c.id
                     WHERE a.6hr_time <= NOW()
                     AND alert_type = 'Closing'
-                    AND a.6hr_alert = 1;
+                    AND a.6hr_alert = 1
+                    AND c.status NOT IN ('จบงาน', 'ยกเลิก');
                 """,
                 "Notifyname": "แจ้งเตือน 6 ชั่วโมงก่อน Closing",
                 "Notifytype": "Closing",
@@ -236,7 +239,8 @@ try:
                     INNER JOIN job_order_detail_trip_info c ON a.job_id = c.job_id AND a.trip_id = c.id
                     WHERE a.3hr_time <= NOW()
                     AND alert_type = 'Closing'
-                    AND a.3hr_alert = 1;
+                    AND a.3hr_alert = 1
+                    AND c.status NOT IN ('จบงาน', 'ยกเลิก');
                 """,
                 "Notifyname": "แจ้งเตือน 3 ชั่วโมงก่อน Closing",
                 "Notifytype": "Closing",
