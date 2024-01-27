@@ -1432,7 +1432,7 @@
     </div>
     <!--begin::FloatingAction Button-->
     <div class="fab-wrapper">
-        
+
     </div>
     <!--End ::FloatingAction Button-->
 
@@ -1663,8 +1663,8 @@
             let initialWordforAttached = "";
             let availableGPSModule = null;
 
-            setInterval(checkcurrentLocation, 300000);
             
+
 
             function checkcurrentLocation() {
                 if (availableGPSModule == null) {
@@ -1675,9 +1675,7 @@
                         availableGPSModule = false;
                         console.log("Geolocation is not supported by this browser.");
                     }
-                }
-                else if (availableGPSModule == true)
-                {
+                } else if (availableGPSModule == true) {
                     navigator.geolocation.getCurrentPosition(savelocation);
                 }
 
@@ -1691,6 +1689,7 @@
                 ajaxData['trip_id'] = MAIN_trip_id; // Convert the object to a JSON string
                 ajaxData['lat'] = position.coords.latitude; // Convert the object to a JSON string
                 ajaxData['lon'] = position.coords.longitude; // Convert the object to a JSON string
+                ajaxData['MAIN_TRIP_STATUS'] = MAIN_TRIP_STATUS; // Convert the object to a JSON string
                 $.ajax({
                         type: 'POST',
                         dataType: "text",
@@ -1735,7 +1734,7 @@
                         get_status_and_button();
                         loadAttachedData();
                         loadTripTimeLineOverAll(MAIN_trip_id);
-                        checkcurrentLocation();
+                        
 
                     })
                     .fail(function() {
@@ -2184,6 +2183,20 @@
                         });
                         //VGMandClosingPanel
                         $("#VGMandClosingPanel").html(printVGMClosing);
+
+                        // Validate Job status for check Current Location
+                        //console.log(MAIN_TRIP_STATUS);
+                        if (MAIN_TRIP_STATUS === 'ยกเลิก' ||
+                            MAIN_TRIP_STATUS === 'จบงาน' ||
+                            MAIN_TRIP_STATUS === 'คนขับยืนยันจบงานแล้ว' ||
+                            MAIN_TRIP_STATUS === 'รอเจ้าหน้าที่ยืนยัน') {
+                            console.log('MAIN_TRIP_STATUS มีค่าตามที่กำหนด');
+                            // ทำงานที่ต้องการตามค่า MAIN_TRIP_STATUS ที่นี่
+                        } else
+                        {
+                            setInterval(checkcurrentLocation, 300000);
+                            checkcurrentLocation();
+                        }
 
 
                         $('#loading-spinner').hide();

@@ -3102,9 +3102,6 @@ function loadTrip_DetailforViewIndex()
 		while ($row2 = $res2->fetch_assoc()) {
 			$data_Array2[] = $row2;
 		}
-
-
-
 		$row['trip_data'] =  $data_Array2;
 
 		// Load VGM/Closing Time 
@@ -3120,7 +3117,21 @@ function loadTrip_DetailforViewIndex()
 
 		$row['trip_VGMClosing'] =  $data_Array3;
 
+		// Load trip gps timestampLog
+		$sql4 = "SELECT a.lat, a.lon, a.timestamp, a.attr1 AS Description FROM trip_gps_record a Where a.trip_id = " . $row['id'] . " Order by a.timestamp;";
+
+		$res4 = $conn->query(trim($sql4));
+		$data_Array4 = array();
+		while ($row4 = $res4->fetch_assoc()) {
+			$data_Array4[] = $row4;
+		}
+		$row['tripGPS'] =  $data_Array4;
+
+
+		// Add all data to return data
 		$data_Array[] = $row;
+
+
 	}
 	mysqli_close($conn);
 	echo json_encode($data_Array);
@@ -5852,7 +5863,7 @@ function saveLocationbHistory()
 
 	// เชื่อมต่อฐานข้อมูล MySQL
 	include "../connectionDb.php";
-	$sql = "Insert into trip_gps_record(trip_id, lat, lon) Values ($trip_id,$lat,$lon)";
+	$sql = "Insert into trip_gps_record(trip_id, lat, lon, attr1) Values ($trip_id,$lat,$lon, '$MAIN_TRIP_STATUS')";
 	//echo  $sql;
 
 	if (!$conn->query($sql)) {

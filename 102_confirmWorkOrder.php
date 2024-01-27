@@ -106,6 +106,12 @@ include 'check_cookie.php';
             text-decoration: underline;
         }
 
+        .mapOpenModal {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+
 
         /* ----------timelineAttachedFile------------ */
         .timelineAttachedFile {
@@ -1357,6 +1363,21 @@ include 'check_cookie.php';
         </div>
     </div>
 
+    <!-- Modal เลือก Confirm ราย Trip -->
+    <div class="modal fade" id="modalMapeachTrip" tabindex="-1" aria-labelledby="modalMapeachTripLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalMapeachTripLabel">คอนเฟิร์มงานไปยังรถร่วม</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="mapeachTrip" style="height: 800px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         var hostUrl = "assets/";
@@ -1512,6 +1533,81 @@ include 'check_cookie.php';
                 }
             );
         }
+
+
+        function initMapeachMap(tripGPS) {
+            var map = new google.maps.Map(document.getElementById('mapeachTrip'), {
+                zoom: 8,
+                center: {
+                    lat: parseFloat(tripGPS[0].lat),
+                    lng: parseFloat(tripGPS[0].lon)
+                }
+            });
+
+            var directionsService = new google.maps.DirectionsService();
+            var directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                suppressMarkers: true // ปิดการแสดงหมุดอัตโนมัติ
+            });
+
+            var origin = tripGPS[0];
+            var destination = tripGPS[tripGPS.length - 1];
+
+            // เพิ่มจุดทางผ่าน (waypoints) และ InfoWindow สำหรับ timestamp
+            var waypoints = tripGPS.slice(1, -1).map(function(gpsPoint) {
+                var waypointMarker = new google.maps.Marker({
+                    position: new google.maps.LatLng(parseFloat(gpsPoint.lat), parseFloat(gpsPoint.lon)),
+                    map: map,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 3 // ขนาดของจุดเล็กๆ
+                    }
+                });
+
+                var waypointInfowindow = new google.maps.InfoWindow({
+                    content: moment(gpsPoint.timestamp).fromNow()
+                });
+
+                waypointMarker.addListener('click', function() {
+                    waypointInfowindow.open(map, waypointMarker);
+                });
+
+                return {
+                    location: waypointMarker.position,
+                    stopover: true
+                };
+            });
+
+            // คำนวณเส้นทาง
+            directionsService.route({
+                origin: new google.maps.LatLng(parseFloat(origin.lat), parseFloat(origin.lon)),
+                destination: new google.maps.LatLng(parseFloat(destination.lat), parseFloat(destination.lon)),
+                waypoints: waypoints,
+                travelMode: 'DRIVING',
+                optimizeWaypoints: true // เพื่อการเรียงลำดับจุดทางผ่านที่เหมาะสมที่สุด
+            }, function(response, status) {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(response);
+
+                    // สร้างหมุดและ InfoWindow สำหรับจุดปลายทาง
+                    var destinationMarker = new google.maps.Marker({
+                        position: new google.maps.LatLng(parseFloat(destination.lat), parseFloat(destination.lon)),
+                        map: map,
+                        title: 'Destination'
+                    });
+
+                    var destinationInfowindow = new google.maps.InfoWindow({
+                        content: moment(destination.timestamp).fromNow()
+                    });
+
+                    destinationMarker.addListener('click', function() {
+                        destinationInfowindow.open(map, destinationMarker);
+                    });
+                } else {
+                    window.alert('Directions request failed due to ' + status);
+                }
+            });
+        }
     </script>
 
 
@@ -1559,6 +1655,8 @@ include 'check_cookie.php';
             let subContractJob = [];
 
             let CURRENT_JOB_STATUS = "";
+
+            let gps_allTripArray = [];
 
 
             // Set Initial Select 2
@@ -3089,7 +3187,13 @@ include 'check_cookie.php';
                                 printVGMClosing += "<BR><span class='text-danger'>" + object.alert_type + " : " + moment(object.base_time).format("Do MMM H:mm น.") + "</span>";
                             });
 
-                            var tripNo = $('<td></td>').html('<a href="103_tripDetail.php?job_id=' + rowData.job_id + '&trip_id=' + rowData.id + '">' + rowData.tripNo + '</a>' + printVGMClosing);
+                            printGPSButton = "";
+                            if (rowData.tripGPS.length > 0) {
+                                printGPSButton = "<span class='mapOpenModal' value='" + j + "'><i class='fas fa-map'></i></span>"
+                            }
+
+
+                            var tripNo = $('<td></td>').html('<a href="103_tripDetail.php?job_id=' + rowData.job_id + '&trip_id=' + rowData.id + '">' + rowData.tripNo + '</a>  ' + printGPSButton + printVGMClosing);
                             row.append(tripNo);
 
 
@@ -3150,6 +3254,8 @@ include 'check_cookie.php';
                             // เพิ่มแถวลงใน tbody
                             tbody.append(row2);
 
+                            // Add tripGPS
+                            gps_allTripArray.push(rowData.tripGPS);
 
                         }
 
@@ -3163,6 +3269,10 @@ include 'check_cookie.php';
                         // เพิ่ม div ที่มีตารางลงในหน้าเอกสาร
                         //$("#" + target_div).html(tableContainer);
                         $("#tripTable").html(tableContainer);
+
+                        //console.log(gps_allTripArray);
+
+
 
                     })
                     .fail(function() {
@@ -3820,6 +3930,15 @@ include 'check_cookie.php';
                         // just in case posting your form failed
                         alert("Posting failed.");
                     });
+            });
+
+            //mapOpenModal
+            $('body').on('click', '.mapOpenModal', function() {
+                let target = $(this).attr('value');
+                //console.log(gps_allTripArray[target]);
+                //modalMapeachTrip
+                initMapeachMap(gps_allTripArray[target]);
+                $('#modalMapeachTrip').modal('show');
             });
 
 
