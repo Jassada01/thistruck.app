@@ -1810,6 +1810,14 @@ function loadTripDetailbyJobID()
 		$data_Array['trip_VGMClosing'][] = $row3;
 	}
 
+	// Load trip gps timestampLog
+	$sql4 = "SELECT a.lat, a.lon, a.timestamp, a.attr1 AS Description FROM trip_gps_record a Where a.trip_id = $MAIN_trip_id Order by a.timestamp;";
+	$data_Array['tripGPS'] = array();
+	$res4 = $conn->query(trim($sql4));
+	while ($row4 = $res4->fetch_assoc()) {
+		$data_Array['tripGPS'][] = $row4;
+	}
+
 
 
 	mysqli_close($conn);

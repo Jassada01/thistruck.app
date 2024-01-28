@@ -1039,15 +1039,16 @@ function loadInvoiceIndex()
 			a.id, 
 			a.document_date, 
 			a.document_number, 
-			b.ContactID, 
-			b.ContactName, 
+			a.customer_code AS ContactID, 
+			e.ClientName AS ContactName, 
 			a.reference, 
 			GROUP_CONCAT(d.job_no) AS job_no 
 		FROM 
 			invoice_header a 
 			LEFT JOIN contacts b ON a.customer_code = b.ContactID 
 			LEFT JOIN invoice_job_mapping c ON a.id = c.invoice_id 
-			LEFT JOIN job_order_header d ON c.job_id = d.id 
+			LEFT JOIN job_order_header d ON c.job_id = d.id
+			LEFT JOIN client_info e ON a.customer_code = e.ClientCode
 		WHERE 
 			a.attr1 = 'ใช้งาน' 
 		GROUP BY 
@@ -1059,7 +1060,7 @@ function loadInvoiceIndex()
 			a.reference 
 		ORDER BY 
 			a.id DESC;  
-  ";
+		";
 	$res = $conn->query(trim($sql));
 
 

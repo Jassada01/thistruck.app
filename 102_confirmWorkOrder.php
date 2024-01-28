@@ -1368,7 +1368,7 @@ include 'check_cookie.php';
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalMapeachTripLabel">คอนเฟิร์มงานไปยังรถร่วม</h5>
+                    <h5 class="modal-title" id="modalMapeachTripLabel">ทริปการเดินทางจริง</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -1587,6 +1587,7 @@ include 'check_cookie.php';
                 optimizeWaypoints: true // เพื่อการเรียงลำดับจุดทางผ่านที่เหมาะสมที่สุด
             }, function(response, status) {
                 if (status === 'OK') {
+                    console.log(destination);
                     directionsRenderer.setDirections(response);
 
                     // สร้างหมุดและ InfoWindow สำหรับจุดปลายทาง
@@ -1597,7 +1598,7 @@ include 'check_cookie.php';
                     });
 
                     var destinationInfowindow = new google.maps.InfoWindow({
-                        content: moment(destination.timestamp).fromNow()
+                        content: moment(destination.timestamp).fromNow()  + "<BR>" +destination.Description
                     });
 
                     destinationMarker.addListener('click', function() {
