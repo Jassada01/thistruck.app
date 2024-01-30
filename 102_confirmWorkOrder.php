@@ -2019,10 +2019,11 @@ include 'check_cookie.php';
                             //console.log(tripText); // แสดงข้อความในคอนโซล
                             // หรือสามารถนำข้อความไปแสดงในส่วนอื่นของเว็บไซต์ได้ตามต้องการ
                         });
-                        MAIN_LINE_MSG = "";
+                        MAIN_LINE_MSG += "====================\n ";
+                        MAIN_LINE_MSG += jobHeaderForm.job_name;
+                        MAIN_LINE_MSG += "\n====================\n"
                         MAIN_LINE_MSG += "วันที่ " + moment(jobHeaderForm.job_date).format("Do MMM YYYY (dddd)");
-                        MAIN_LINE_MSG += "\nชื่องาน " + jobHeaderForm.job_name;
-                        MAIN_LINE_MSG += "\nเลขที่อ้างอิง:\n" + jobHeaderForm.refDoc_Data;
+                        MAIN_LINE_MSG += "\n" + jobHeaderForm.refDoc_Data;
                         MAIN_LINE_MSG += data_arr.jobActionLog;
                         MAIN_LINE_MSG += tripText;
 
