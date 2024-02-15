@@ -18,6 +18,7 @@ if (isset($_GET['p2'])) {
 if (isset($_GET['p3'])) {
 	$p3 = $_GET['p3'];
 }
+
 // ================ Global Function =============================
 $thai_day_arr = array("อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์");
 $thai_month_arr = array(
@@ -123,6 +124,12 @@ function getRunningNo($running_type, $running_prefix, $date)
 // สร้างฟังก์ชันเพื่อสร้างส่วนของ JSON
 function createActionBox($action, $color, $code, $link)
 {
+	$main_text_color = "#000000";
+	$main_text_bold = "regular";
+	if (strpos($action, 'ส่งสินค้า') !== false || strpos($action, 'รับสินค้า') !== false) {
+		$main_text_color = "#C80027";
+		$main_text_bold = "bold";
+	}
 	return array(
 		"type" => "box",
 		"layout" => "horizontal",
@@ -133,6 +140,8 @@ function createActionBox($action, $color, $code, $link)
 				"size" => "sm",
 				"gravity" => "center",
 				"wrap" => true,
+				"color" => $main_text_color,
+				'weight' => $main_text_bold,
 				"flex" => 2,
 				"align" => "end"
 			),
@@ -165,7 +174,9 @@ function createActionBox($action, $color, $code, $link)
 				"text" => $code,
 				"flex" => 4,
 				"size" => "sm",
+				"color" => $main_text_color,
 				"gravity" => "center",
+				'weight' => $main_text_bold,
 				"action" => array(
 					"type" => "uri",
 					"label" => "action",
@@ -465,7 +476,7 @@ function generateMainMsgNoticeNewJob(
 											'flex' => 5,
 											'size' => 'sm',
 											'wrap' => true,
-											'color' => '#666666',
+											'color' => '#C80027',
 										],
 									],
 								],
@@ -568,7 +579,7 @@ function generateMainMsgNoticeNewJob(
 									'contents' => [
 										0 => [
 											'type' => 'text',
-											'color' => '#666666',
+											'color' => '#C80027',
 											'size' => 'sm',
 											'wrap' => true,
 											'text' => !empty($hdRemark) ? $hdRemark : '-',
@@ -830,7 +841,7 @@ function createMainMsgForCustomer($job_name, $formattedJobDate, $formattedDate, 
 									'contents' => [
 										0 => [
 											'type' => 'text',
-											'text' => 'เริ่มงาน',
+											'text' => 'เริ่ม:',
 											'color' => '#000000',
 											'flex' => 1,
 											'size' => 'sm',
@@ -843,7 +854,8 @@ function createMainMsgForCustomer($job_name, $formattedJobDate, $formattedDate, 
 											'flex' => 5,
 											'size' => 'sm',
 											'wrap' => true,
-											'color' => '#666666',
+											'color' => '#C80027',
+											'weight' => 'bold',
 										],
 									],
 								],
@@ -880,7 +892,8 @@ function createMainMsgForCustomer($job_name, $formattedJobDate, $formattedDate, 
 											'flex' => 5,
 											'size' => 'sm',
 											'wrap' => true,
-											'color' => '#666666',
+											'color' => '#C80027',
+											'weight' => 'bold',
 										],
 									],
 								],
@@ -970,7 +983,7 @@ function createMainMsgForCustomer($job_name, $formattedJobDate, $formattedDate, 
 									'contents' => [
 										0 => [
 											'type' => 'text',
-											'color' => '#666666',
+											'color' => '#C80027',
 											'size' => 'sm',
 											'wrap' => true,
 											'text' => !empty($hdRemark) ? $hdRemark : '-',
@@ -1113,7 +1126,8 @@ function createMainMsgForSubcontract($job_name, $formattedJobDate, $formattedDat
 											'flex' => 5,
 											'size' => 'md',
 											'wrap' => true,
-											'color' => '#000000',
+											'weight' => 'bold',
+											'color' => '#C80027',
 										],
 									],
 								],
@@ -1203,9 +1217,9 @@ function createMainMsgForSubcontract($job_name, $formattedJobDate, $formattedDat
 									'contents' => [
 										0 => [
 											'type' => 'text',
-											'color' => '#666666',
 											'size' => 'sm',
 											'wrap' => true,
+											'color' => '#C80027',
 											'text' => !empty($hdRemark) ? $hdRemark : '-',
 										],
 									],
@@ -3138,8 +3152,6 @@ function loadTrip_DetailforViewIndex()
 
 		// Add all data to return data
 		$data_Array[] = $row;
-
-
 	}
 	mysqli_close($conn);
 	echo json_encode($data_Array);

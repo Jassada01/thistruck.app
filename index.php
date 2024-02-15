@@ -285,6 +285,46 @@ include 'check_cookie.php';
                                         <!--begin::Header-->
                                         <div class="card-header border-0 pt-5">
                                             <h3 class="card-title align-items-start flex-column">
+                                                <span class="card-label fw-bolder fs-3 mb-1" onclick="window.location.href = '100_jobOrderIndex.php';">รายการใบงานวันนี้</span>
+                                                <span class="text-muted mt-1 fw-bold fs-7">เฉพาะงานที่กำลังดำเนินการ</span>
+                                            </h3>
+                                        </div>
+                                        <!--end::Header-->
+                                        <!--begin::Body-->
+                                        <div class="card-body py-3" style="max-height: 400px; overflow-y: auto;">
+                                            <!--begin::Table container-->
+                                            <div class="table-responsive">
+                                                <!--begin::Table-->
+                                                <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                                                    <!--begin::Table head-->
+                                                    <thead>
+                                                        <tr class="fw-bolder text-muted">
+                                                            <th class="min-w-140px">ชื่องาน</th>
+                                                            <th class="min-w-140px">ขนาด</th>
+                                                            <th class="min-w-140px">น้ำหนัก</th>
+                                                            <th class="min-w-60px">Progress</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <!--end::Table head-->
+                                                    <!--begin::Table body-->
+                                                    <tbody id="่JobDailyProgressTable">
+                                                    </tbody>
+                                                    <!--end::Table body-->
+                                                </table>
+                                                <!--end::Table-->
+                                            </div>
+                                            <!--end::Table container-->
+                                        </div>
+                                        <!--begin::Body-->
+                                    </div>
+                                    <!--end::Tables Widget 9-->
+                                </div>
+                                <div class="col-sm-8 d-none">
+                                    <!--begin::Tables Widget 9-->
+                                    <div class="card card-xl-stretch mb-5 mb-xl-8">
+                                        <!--begin::Header-->
+                                        <div class="card-header border-0 pt-5">
+                                            <h3 class="card-title align-items-start flex-column">
                                                 <span class="card-label fw-bolder fs-3 mb-1" onclick="window.location.href = '100_jobOrderIndex.php';">รายการใบงาน</span>
                                                 <span class="text-muted mt-1 fw-bold fs-7">เฉพาะงานที่กำลังดำเนินการ</span>
                                             </h3>
@@ -1824,7 +1864,7 @@ include 'check_cookie.php';
                             count: 1,
 
 
-                            
+
                             timeUnit: "hour"
                         };
                         // dateAxis.max = new Date(2018, 0, 1, 24, 0, 0, 0).getTime();
@@ -1867,6 +1907,97 @@ include 'check_cookie.php';
                     });
             }
 
+            function summarizeContainerSizes(tripData) {
+                var containerSummary = {};
+
+                tripData.forEach(function(trip) {
+                    var containerSize = trip.containersize;
+                    if (!containerSummary[containerSize]) {
+                        containerSummary[containerSize] = 0;
+                    }
+                    containerSummary[containerSize] += 1;
+                });
+
+                var summaryText = Object.keys(containerSummary).map(function(size) {
+                    return containerSummary[size] + 'x' + size;
+                }).join(', ');
+
+                return summaryText;
+            }
+
+            function sumContainerWeight(trip_data) {
+                const totalWeight = trip_data.reduce((sum, trip) => {
+                    const weight = parseFloat(trip.containerWeight);
+                    return sum + (isNaN(weight) ? 0 : weight);
+                }, 0);
+
+                // Format number to not have decimals and include comma as thousand separator
+                return totalWeight.toLocaleString('en-US', {
+                    maximumFractionDigits: 0
+                });
+            }
+
+
+            function loadDailyBoard() {
+                var ajaxData = {};
+                ajaxData['f'] = '11';
+                //console.log(ajaxData);
+                $.ajax({
+                        type: 'POST',
+                        dataType: "text",
+                        url: 'function/index/mainFunction.php',
+                        data: (ajaxData)
+                    })
+                    .done(function(data) {
+                        var data_arr = JSON.parse(data);
+                        //console.log(data_arr);
+                        print_text = "";
+                        data_arr.forEach(function(item) {
+                            let sizeOfJob = summarizeContainerSizes(item.trip_data);
+                            let weightOfJob = sumContainerWeight(item.trip_data);
+                            print_text += "<TR>";
+                            print_text += "<TD><a href='102_confirmWorkOrder.php?job_id=" + item.id + "'>" + item.job_name + "</a></TD>";
+                            print_text += "<TD>" + sizeOfJob + "</TD>";
+                            print_text += '<TD> <div class="text-danger fw-semibold fs-7">'+ weightOfJob +'</div></TD>';
+
+                            // Generate Trip Text
+                            let tripText = "";
+                            item.trip_data.forEach(function(tripData) {
+                                let driver_name = tripData.driver_name;
+                                if (tripData.driver_name.length > 8) {
+                                    driver_name = tripData.driver_name.substring(0, 8) + "..";
+                                }
+
+                                let badge_color = " badge-light-primary";
+                                if (tripData.PCT == 0) {
+                                    badge_color = " badge-light-danger";
+                                } else if (tripData.PCT == 100) {
+                                    badge_color = " badge-light-success";
+                                } else {
+                                    driver_name += "" + Intl.NumberFormat().format(tripData.PCT) + "%"
+                                }
+                                tripText += '<span class="badgeTrip_Daily mouse_pointer badge ' + badge_color + ' badge me-2" job_id="' + tripData.job_id + '" trip_id="' + tripData.trip_id + '">' + driver_name + '</span>';
+                            });
+                            print_text += "<TD>" + tripText + "</TD>";
+                            print_text += "</TR>";
+                        });
+                        //่JobDailyProgressTable
+                        $("#่JobDailyProgressTable").html(print_text);
+
+                    })
+                    .fail(function() {
+                        // just in case posting your form failed
+                        alert("Posting failed.");
+                    });
+            }
+
+            // badgeTrip_Daily
+            $('body').on('click', '.badgeTrip_Daily', function() {
+                var job_id = $(this).attr('job_id');
+                var trip_id = $(this).attr('trip_id');
+                window.open("103_tripDetail.php?job_id=" + job_id + "&trip_id=" + trip_id + "", "_blank");
+            });
+
 
 
 
@@ -1882,6 +2013,7 @@ include 'check_cookie.php';
             loadDJobPerMonth();
             Create_JobDailaPanelSeletion();
             loadJoobDialyforGraph();
+            loadDailyBoard();
 
 
         });

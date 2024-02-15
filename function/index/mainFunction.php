@@ -376,7 +376,7 @@ function LoadDataforPrivotTable()
 		Where 
 			a.status <> 'ยกเลิก' 
 			AND b.status <> 'ยกเลิก' 
-			AND DATE_FORMAT(a.job_date, '%m%Y') = DATE_FORMAT(current_timestamp, '%m%Y') 
+			AND DATE_FORMAT(b.jobStartDateTime, '%m%Y') = DATE_FORMAT(current_timestamp, '%m%Y') 
 		GROUP By 
 			a.job_name, 
 			a.job_type, 
@@ -509,7 +509,7 @@ function LoadJobDaily()
 	echo json_encode($data_Array);
 }
 
-// F=9
+// F=10
 function LoadJobDailyforGraph()
 {
 	// Load All Data from Paramitor
@@ -588,6 +588,90 @@ function LoadJobDailyforGraph()
 	echo json_encode($data_Array);
 }
 
+// F=11
+function loadDailyBoard()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	$sql = "SELECT 
+	a.id, 
+	a.job_name, 
+	a.client_name 
+  FROM 
+	job_order_header a 
+  Where 
+	a.id IN (
+	  Select 
+		DISTINCT(a.job_id) 
+	  From 
+		job_order_detail_trip_info a 
+	  Where 
+		DATE(a.jobStartDateTime) = CURRENT_DATE
+	) 
+  Order By 
+	a.ClientID;
+  
+  ";
+
+	$res = $conn->query(trim($sql));
+	
+	$data_Array = array();
+
+	while ($row = $res->fetch_assoc()) {
+		$jobID = $row['id'];
+
+		$sql2 = "SELECT
+			b.job_id,
+			b.id AS trip_id,
+			b.tripSeq, 
+			b.driver_name, 
+			b.containersize,
+			b.containerWeight,
+			c.SUCCESS, 
+			c.TOTAL, 
+			(c.SUCCESS / c.TOTAL) * 100 AS PCT 
+			FROM 
+			job_order_header a 
+			Inner jOin job_order_detail_trip_info b ON a.id = b.job_id 
+			LEFT JOIN (
+				SELECT 
+				a.job_id, 
+				a.trip_id, 
+				SUM(
+					IF(a.complete_flag = 1, 1, 0)
+				) AS SUCCESS, 
+				COUNT(*) AS TOTAL 
+				FROM 
+				job_order_detail_trip_action_log a 
+				Where 
+				a.main_order = 3 
+				AND a.job_id = $jobID 
+				Group By 
+				a.trip_id
+				Order By a.trip_id
+			) c ON b.job_id = c.job_id 
+			AND b.id = c.trip_id 
+			Where  a.id = $jobID
+			";
+		$res2 = $conn->query(trim($sql2));
+		$data_Array2 = array();
+		while ($row2 = $res2->fetch_assoc()) {
+			$data_Array2[] = $row2;
+		}
+		$row['trip_data'] =  $data_Array2;
+		$data_Array[] = $row;
+	}
+	mysqli_close($conn);
+	echo json_encode($data_Array);
+}
+
 
 
 
@@ -632,6 +716,10 @@ switch ($f) {
 		}
 	case 10: {
 			LoadJobDailyforGraph();
+			break;
+		}
+	case 11: {
+			loadDailyBoard();
 			break;
 		}
 }

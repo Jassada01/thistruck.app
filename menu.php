@@ -38,7 +38,7 @@
                                         <span class="menu-title">สร้างใบงาน</span>
                                     </a>
                                 </div>
-                               
+
                             </div>
                         </div>
                         <div data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion me-lg-1">
@@ -290,6 +290,83 @@
             <div class="d-flex align-items-stretch flex-shrink-0">
                 <!--begin::Toolbar wrapper-->
                 <div class="topbar d-flex align-items-stretch flex-shrink-0">
+                    <!--begin::User-->
+                    <div class="d-flex align-items-center ms-1 ms-lg-3" id="kt_header_user_menu_toggle">
+                        <!--begin::Menu wrapper-->
+                        <div class="topbar-item cursor-pointer symbol px-3 px-lg-5 me-n3 me-lg-n5 symbol-30px symbol-md-35px" data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end" data-kt-menu-flip="bottom">
+
+                            <div class="menu-content d-flex align-items-center px-3">
+                                <div class="app-navbar-item ms-1 ms-md-4">
+                                    <!--begin::Drawer toggle-->
+                                    <div class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px" id="kt_activities_toggle">
+                                        <i class="fas fa-map-marked-alt fs-2x"></i>
+                                    </div>
+                                    <!--end::Drawer toggle-->
+                                </div>
+                            </div>
+
+                        </div>
+                        <!--begin::Menu-->
+                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px" data-kt-menu="true">
+                            <!--begin::Menu item-->
+                            <div class="menu-item px-3">
+                                <div class="menu-content d-flex align-items-center px-3">
+                                    <!--begin::Username-->
+                                    <div class="d-flex flex-column">
+                                        <div class="fw-bolder d-flex align-items-center fs-5">งานที่อัพเดทล่าสุด
+                                        </div>
+                                    </div>
+                                    <!--end::Username-->
+                                </div>
+                            </div>
+                            <!--end::Menu item-->
+                            <!--begin::Menu separator-->
+                            <div class="separator my-2"></div>
+                            <!--end::Menu separator-->
+
+                            <!--begin::Menu item-->
+                            <div class="menu-item px-5 my-1">
+                                <a href="004_userProfile.php" class="menu-link px-5">จัดการบัญชีผู้ใช้</a>
+                            </div>
+                            <!--end::Menu item-->
+                            <!--begin::Menu item-->
+                            <div class="menu-item px-5">
+                                <a href="signout.php" class="menu-link px-5">ออกจากระบบ</a>
+                            </div>
+                            <!--end::Menu item-->
+                        </div>
+                        <!--end::Menu-->
+                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                     <!--begin::User-->
                     <div class="d-flex align-items-center ms-1 ms-lg-3" id="kt_header_user_menu_toggle">
