@@ -1779,7 +1779,7 @@ include 'check_cookie.php';
                 optimizeWaypoints: true // เพื่อการเรียงลำดับจุดทางผ่านที่เหมาะสมที่สุด
             }, function(response, status) {
                 if (status === 'OK') {
-                    console.log(destination);
+                    //console.log(destination);
                     directionsRenderer.setDirections(response);
 
                     // สร้างหมุดและ InfoWindow สำหรับจุดปลายทาง
@@ -1817,6 +1817,7 @@ include 'check_cookie.php';
             const urlParams = new URLSearchParams(window.location.search);
             const MAIN_job_id = urlParams.get('job_id');
             const MAIN_trip_id = urlParams.get('trip_id');
+            const OPEN_GPS_MODAL = urlParams.get('opengpsmodal');
             let MAIN_trip_no = "";
             let MAIN_job_no = "";
             let updatePlan_no = "";
@@ -2208,6 +2209,15 @@ include 'check_cookie.php';
 
                         loadtripTimeLine();
                         $('#loading-spinner').hide();
+                        // 1 second delay
+                        setTimeout(function() {
+                            if (OPEN_GPS_MODAL == 'true') {
+                                initMapeachMap(gps_allTripArray);
+                                $('#modalMapeachTrip').modal('show');
+                            }
+                        }, 1300);
+
+
                     })
                     .fail(function() {
                         // just in case posting your form failed
@@ -4224,6 +4234,8 @@ include 'check_cookie.php';
                 initMapeachMap(gps_allTripArray);
                 $('#modalMapeachTrip').modal('show');
             });
+
+
 
 
 

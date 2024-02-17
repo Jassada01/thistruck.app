@@ -854,6 +854,13 @@ include 'check_cookie.php';
                 $(this).text(formattedDate);
             });
 
+            /*
+            $('.gpsTimestamp').each(function() {
+                var dateString = $(this).text();
+                var formattedDate = moment(dateString).fromNow();
+                $(this).text(formattedDate);
+            });
+            */
 
             function loadProgress() {
                 var ajaxData = {};

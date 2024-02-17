@@ -307,13 +307,13 @@
 
                         </div>
                         <!--begin::Menu-->
-                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px" data-kt-menu="true">
+                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-450px" data-kt-menu="true">
                             <!--begin::Menu item-->
                             <div class="menu-item px-3">
                                 <div class="menu-content d-flex align-items-center px-3">
                                     <!--begin::Username-->
                                     <div class="d-flex flex-column">
-                                        <div class="fw-bolder d-flex align-items-center fs-5">งานที่อัพเดทล่าสุด
+                                        <div class="fw-bolder d-flex align-items-center fs-5">งานที่อัพเดท Location ล่าสุด
                                         </div>
                                     </div>
                                     <!--end::Username-->
@@ -326,12 +326,50 @@
 
                             <!--begin::Menu item-->
                             <div class="menu-item px-5 my-1">
-                                <a href="004_userProfile.php" class="menu-link px-5">จัดการบัญชีผู้ใช้</a>
-                            </div>
-                            <!--end::Menu item-->
-                            <!--begin::Menu item-->
-                            <div class="menu-item px-5">
-                                <a href="signout.php" class="menu-link px-5">ออกจากระบบ</a>
+                                <!--begin::Section-->
+                                <?php
+                                // เชื่อมต่อฐานข้อมูล
+                                include "function/connectionDb.php";
+                                // สร้างคำสั่ง SQL สำหรับดึงข้อมูลลูกค้าทั้งหมด
+
+
+                                $sql = "Select b.job_id, a.trip_id, c.job_name, b.driver_name, a.timestamp From trip_gps_record a
+                                                    Inner Join job_order_detail_trip_info b ON a.trip_id = b.id
+                                                    Inner Join job_order_header c ON b.job_id = c.id
+                                                    Order By a.timestamp DESC LIMIT 100";
+                                // ส่งคำสั่ง SQL ไปยังฐานข้อมูล
+                                $result = mysqli_query($conn, $sql);
+                                // ปิดการเชื่อมต่อฐานข้อมูล
+                                mysqli_close($conn);
+
+                                // สร้าง array เพื่อเก็บ trip_id
+                                $unique_trip_ids = [];
+                                // วนลูปเพื่อดึงข้อมูลและแสดงผลในตาราง
+                                if ($result->num_rows > 0) {
+                                    while ($row = $result->fetch_assoc()) {
+                                        // ตรวจสอบว่า trip_id นี้ถูกเพิ่มใน array แล้วหรือยัง
+                                        if (!in_array($row["trip_id"], $unique_trip_ids)) {
+                                            // เพิ่ม trip_id ใน array เพื่อทำการตรวจสอบในภายหลัง
+                                            $unique_trip_ids[] = $row["trip_id"];
+                                            $date=date_create($row["timestamp"]);
+                                            $dateformatted =  date_format($date,"j M H:i น.");
+                                            // ทำการ echo หรือแสดงผลลัพธ์ที่ต้องการ
+                                            echo "<div class='d-flex menu-link align-items-center flex-row-fluid flex-wrap'>";
+                                            echo "<div class='flex-grow-1 me-2'>";
+                                            echo "<a href='103_tripDetail.php?job_id=" . $row["job_id"] . "&trip_id=" . $row["trip_id"] . "&opengpsmodal=true' class='text-gray-800 text-hover-primary fs-6 fw-bold'>" . $row["job_name"] . "</a>";
+                                            echo "<span class='text-muted fw-semibold d-block fs-7'>" . $row["driver_name"] . "</span>";
+                                            echo "</div>";
+                                            echo "<span class='badge badge-light-primary fw-bold my-2 gpsTimestamp'>" . $dateformatted . "</span>";
+                                            echo "</div>";
+                                        }
+
+                                        if (count($unique_trip_ids) >= 10)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+                                ?>
                             </div>
                             <!--end::Menu item-->
                         </div>
