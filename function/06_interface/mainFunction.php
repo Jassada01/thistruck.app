@@ -1405,6 +1405,72 @@ function loadDynamicPrice()
 	echo json_encode($data_Array);
 }
 
+// F = 20
+function loadInvoiceHeaderForSelect()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+
+	$data_Array = array();
+
+
+	$sql = "SELECT 
+			a.id, 
+			a.document_number, 
+			a.document_date, 
+			b.Attr1 AS paymentterm, 
+			CASE WHEN b.Attr1 IS NULL THEN NULL WHEN b.Attr1 = '' THEN NULL ELSE DATE_ADD(
+			a.document_date, INTERVAL b.Attr1 DAY
+			) END AS due_date, 
+			a.reference, 
+			a.customer_code AS ClientCode, 
+			b.ClientName, 
+			c.total_price, 
+			c.wht 
+		FROM 
+			invoice_header a 
+			LEFT JOIN client_info b ON a.customer_code = b.ClientCode 
+			LEFT JOIN (
+			SELECT 
+				a.invoice_id, 
+				SUM(a.unit_price) AS total_price, 
+				SUM(a.withHoldingtax) AS wht 
+			FROM 
+				(
+				SELECT 
+					a.invoice_id, 
+					a.unit_price, 
+					CASE WHEN a.accounting_type = '410202' THEN a.unit_price * 0.01 ELSE '0' END AS withHoldingtax 
+				FROM 
+					invoice_detail_raw a 
+				Where 
+					a.pay_invoice = 1 
+					AND a.unit_price <> 0
+				) a 
+			Group By 
+				a.invoice_id
+			) c ON a.id = c.invoice_id 
+		WHERE 
+			a.attr1 <> 'ยกเลิก'
+			AND a.document_date BETWEEN '$startDate' AND '$endDate'
+		";
+	$res = $conn->query(trim($sql));
+
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	mysqli_close($conn);
+	echo json_encode($data_Array);
+}
 
 
 
@@ -1485,6 +1551,10 @@ switch ($f) {
 		}
 	case 19: {
 			loadDynamicPrice();
+			break;
+		}
+	case 20: {
+			loadInvoiceHeaderForSelect();
 			break;
 		}
 }

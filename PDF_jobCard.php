@@ -385,17 +385,36 @@ if ($result->num_rows > 0) {
 		//$pdf->Cell(0, 10, $refDoc, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 		$pdf->MultiCell(0, 10, $refDoc2, 0, 'L', false, 1, '', '', true);
 
-		// job_type
-		$pdf->SetXY(44, 55.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
-		$pdf->SetFont('thsarabunb', 'B', 16);
-		$pdf->Cell(0, 10, $job_type, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+
+		switch ($job_type) {
+			case "EXPORT":
+				$pdf->SetFont('zapfdingbats', '', 22);
+				$pdf->writeHTMLCell(10, 10, 29.5, 54.5, '3', $border = 0, $ln = 0, $fill = 0, $reseth = true, $align = '', $autopadding = true);
+				break;
+			case "IMPORT":
+				$pdf->SetFont('zapfdingbats', '', 22);
+				$pdf->writeHTMLCell(10, 10, 56.5, 54.5, '3', $border = 0, $ln = 0, $fill = 0, $reseth = true, $align = '', $autopadding = true);
+				break;
+			case "DOMESTIC":
+				$pdf->SetFont('zapfdingbats', '', 22);
+				$pdf->writeHTMLCell(10, 10, 81.5, 54.5, '3', $border = 0, $ln = 0, $fill = 0, $reseth = true, $align = '', $autopadding = true);
+				break;
+			default:
+				$pdf->SetFont('zapfdingbats', '', 22);
+				$pdf->writeHTMLCell(10, 10, 116, 54.5, '3', $border = 0, $ln = 0, $fill = 0, $reseth = true, $align = '', $autopadding = true);
+				$pdf->SetXY(120, 58.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
+				$pdf->SetFont('thsarabunb', 'B', 16);
+				$pdf->Cell(0, 10, $job_type, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+		}
+
+
 
 
 		// trip_tripSeq
 		$pdf->SetXY(191, 2); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
 		$pdf->SetFont('thsarabunb', 'B', 16);
 		//$pdf->Cell(0, 10, $trip_tripSeq, 0, 1, 'L', false, '', 0, false, 'T', 'C');
-		$pdf->Cell(0, 10, $trip_tripSeq."/".$AllTripinJob, 0, 1, 'L', false, '', 0, false, 'T', 'C');
+		$pdf->Cell(0, 10, $trip_tripSeq . "/" . $AllTripinJob, 0, 1, 'L', false, '', 0, false, 'T', 'C');
 
 		// trip_truckType
 		$pdf->SetXY(164, 59.5); // กำหนดตำแหน่ง x = 50, y = 100 (หน่วยเป็น mm)
