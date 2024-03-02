@@ -1955,7 +1955,8 @@ include 'check_cookie.php';
                         // Generate Line Msg to customer/Client ====================================
 
                         var tripDetails = data_arr.JobDetailTrip; // ดึงข้อมูล JobDetailTrip จาก Object
-                        var tripText = "\n";
+                        var tripText = "\n★★★★★★★★★★";
+                        let tripcountTotal = tripDetails.length;
                         $.each(tripDetails, function(index, trip) {
                             var tripNumber = trip.tripSeq;
                             var driverName = trip.driver_name;
@@ -1966,7 +1967,7 @@ include 'check_cookie.php';
                             var containerWeight = trip.containerWeight;
                             var status = trip.status;
 
-                            tripText += "\nทริปที่ " + tripNumber + " ";
+                            tripText += "\nทริปที่ " + tripNumber + "/"+tripcountTotal + "\n";
                             tripText += "พขร. " + driverName + "\n";
                             tripText += "เบอร์โทร " + driverPhone + "\n";
                             tripText += "ทะเบียน " + licenseNo + "\n";
@@ -1982,10 +1983,10 @@ include 'check_cookie.php';
 
                             if (containerWeight !== "" && containerWeight !== undefined && containerWeight !== "0.00") {
                                 let formattedWeight = parseFloat(containerWeight).toLocaleString('en-US', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
                                 });
-                                tripText += "น้ำหนักตู้ " + formattedWeight + "\n";
+                                tripText += "น้ำหนักตู้ " + formattedWeight + " kg. \n";
                             }
 
 
@@ -2019,9 +2020,9 @@ include 'check_cookie.php';
                             //console.log(tripText); // แสดงข้อความในคอนโซล
                             // หรือสามารถนำข้อความไปแสดงในส่วนอื่นของเว็บไซต์ได้ตามต้องการ
                         });
-                        MAIN_LINE_MSG += "====================\n ";
+                        //MAIN_LINE_MSG += "====================\n ";
                         MAIN_LINE_MSG += jobHeaderForm.job_name;
-                        MAIN_LINE_MSG += "\n====================\n"
+                        MAIN_LINE_MSG += "\n\n"
                         MAIN_LINE_MSG += "วันที่ " + moment(jobHeaderForm.job_date).format("Do MMM YYYY (dddd)");
                         MAIN_LINE_MSG += "\n" + jobHeaderForm.refDoc_Data;
                         MAIN_LINE_MSG += data_arr.jobActionLog;

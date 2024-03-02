@@ -47,19 +47,83 @@
                                 <span class="menu-arrow d-lg-none"></span>
                             </span>
                             <div class="menu-sub menu-sub-lg-down-accordion menu-sub-lg-dropdown menu-rounded-0 py-lg-4 w-lg-225px">
-                                <div class="menu-item">
-                                    <a class="menu-link py-3" href="070_InvoiceIndex.php">
+                                <div class="menu-item" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+                                    <!--begin::Menu link-->
+                                    <a href="#" class="menu-link">
                                         <span class="menu-icon">
-                                            <i class="fas fa-list-ul fs-3"></i>
+                                            <i class="bi bi-truck fs-3"></i>
                                         </span>
-                                        <span class="menu-title">รายการ อินวอยซ์</span>
+                                        <span class="menu-title">อินวอยซ์</span>
+                                        <span class="menu-arrow"></span>
                                     </a>
-                                    <a class="menu-link py-3" href="071_createInvoice.php">
+                                    <!--end::Menu link-->
+
+                                    <!--begin::Menu sub-->
+                                    <div class="menu-sub menu-sub-dropdown w-175px py-2">
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item">
+                                            <a href="070_InvoiceIndex.php" class="menu-link">
+                                                <span class="menu-icon">
+                                                    <i class="fas fa-list-ul fs-3"></i>
+                                                </span>
+                                                <span class="menu-title">รายการ อินวอยซ์</span>
+                                            </a>
+                                        </div>
+                                        <!--end::Menu item-->
+
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item">
+                                            <a href="071_createInvoice.php" class="menu-link">
+                                                <span class="menu-icon">
+                                                    <i class="fas fa-receipt fs-3"></i>
+                                                </span>
+                                                <span class="menu-title">สร้าง อินวอยซ์</span>
+                                            </a>
+                                        </div>
+                                        <!--end::Menu item-->
+
+
+                                    </div>
+                                    <!--end::Menu sub-->
+                                </div>
+                                <div class="menu-item" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+                                    <!--begin::Menu link-->
+                                    <a href="#" class="menu-link">
                                         <span class="menu-icon">
-                                            <i class="fas fa-receipt  fs-3"></i>
+                                            <i class="bi bi-truck fs-3"></i>
                                         </span>
-                                        <span class="menu-title">สร้าง อินวอยซ์</span>
+                                        <span class="menu-title">วางบิล</span>
+                                        <span class="menu-arrow"></span>
                                     </a>
+                                    <!--end::Menu link-->
+
+                                    <!--begin::Menu sub-->
+                                    <div class="menu-sub menu-sub-dropdown w-175px py-2">
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item">
+                                            <a href="#" class="menu-link">
+                                                <span class="menu-icon">
+                                                    <i class="fas fa-list-ul fs-3"></i>
+                                                </span>
+                                                <span class="menu-title">รายการ วางบิล</span>
+                                            </a>
+                                        </div>
+                                        <!--end::Menu item-->
+
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item">
+                                            <a href="076_createBilling.php" class="menu-link">
+                                                <span class="menu-icon">
+                                                    <i class="fas fa-receipt fs-3"></i>
+                                                </span>
+                                                <span class="menu-title">สร้าง วางบิล</span>
+                                            </a>
+                                        </div>
+                                        <!--end::Menu item-->
+
+
+                                    </div>
+                                    <!--end::Menu sub-->
                                 </div>
                             </div>
                         </div>
@@ -351,8 +415,8 @@
                                         if (!in_array($row["trip_id"], $unique_trip_ids)) {
                                             // เพิ่ม trip_id ใน array เพื่อทำการตรวจสอบในภายหลัง
                                             $unique_trip_ids[] = $row["trip_id"];
-                                            $date=date_create($row["timestamp"]);
-                                            $dateformatted =  date_format($date,"j M H:i น.");
+                                            $date = date_create($row["timestamp"]);
+                                            $dateformatted =  date_format($date, "j M H:i น.");
                                             // ทำการ echo หรือแสดงผลลัพธ์ที่ต้องการ
                                             echo "<div class='d-flex menu-link align-items-center flex-row-fluid flex-wrap'>";
                                             echo "<div class='flex-grow-1 me-2'>";
@@ -363,8 +427,7 @@
                                             echo "</div>";
                                         }
 
-                                        if (count($unique_trip_ids) >= 10)
-                                        {
+                                        if (count($unique_trip_ids) >= 10) {
                                             break;
                                         }
                                     }

@@ -1471,7 +1471,100 @@ function loadInvoiceHeaderForSelect()
 	mysqli_close($conn);
 	echo json_encode($data_Array);
 }
+// F = 21
+function loadCustomerInfobyClientCode()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
 
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+
+	$data_Array = array();
+
+
+	$sql = "SELECT * FROM client_info a Where a.ClientCode = '$ClientCode'";
+	$res = $conn->query(trim($sql));
+
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	mysqli_close($conn);
+	echo json_encode($data_Array);
+}
+
+// F= 22
+function createnewBilling()
+{
+	// ดึงข้อมูลส่วน Header
+	$header = $_POST['header'];
+
+	// สร้างตัวแปรสำหรับข้อมูลที่จะ insert
+	$clientID = $header['ClientID'];
+	$clientCode = $header['ClientCode'];
+	$clientName = $header['ClientName'];
+	$branch = $header['Branch'];
+	$billingAddress = $header['BillingAddress'];
+	$taxID = $header['TaxID'];
+	$billingDate = $header['billing_date'];
+	$dueDate = $header['due_date'];
+	$remark = $header['billing_remark'];
+	$new_billing_running_no = getRunningNo('BillNo', 'BL', $billingDate);;
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+	// สร้าง SQL script สำหรับ insert
+	$sql = "INSERT INTO billing_header (billing_no, clientID, client_code, client_name, branch, billing_address, tax_id, billing_date, due_date, remark) VALUES ('$new_billing_running_no', '$clientID', '$clientCode', '$clientName', '$branch', '$billingAddress', '$taxID', '$billingDate', '$dueDate', '$remark')";
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	// Get invoice_id
+	$billing_id  = mysqli_insert_id($conn);
+
+	$details  = $_POST['detail'];
+	foreach ($details as $detail) {
+		// สร้าง SQL script
+		$sql = "INSERT INTO billing_detail (invoice_id, invoice_no, document_date, due_date, total_amount, wht_amount, reference_doc, billing_header_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+		$stmt = $conn->prepare($sql);
+		if (!$stmt) {
+			echo "Error preparing statement: " . $conn->error;
+			continue;
+		}
+
+		// คำสั่งนี้สมมติว่าคุณมี billing_header_id ที่เกี่ยวข้องแล้ว
+		// คุณอาจต้องปรับแก้ตามข้อมูลจริงของคุณ
+		$stmt->bind_param(
+			"issdddsi",
+			$detail['id'],
+			$detail['document_number'],
+			$detail['document_date'],
+			$detail['due_date'],
+			$detail['total_price'],
+			$detail['wht'],
+			$detail['reference'],
+			$billing_id
+		);
+
+		if ($stmt->execute()) {
+			echo "Record inserted successfully.\n";
+		} else {
+			echo "Error inserting record: " . $stmt->error . "\n";
+		}
+
+		$stmt->close();
+	}
+	echo $billing_id;
+	mysqli_close($conn);
+}
 
 
 //============================ MAIN =========================================================
@@ -1555,6 +1648,14 @@ switch ($f) {
 		}
 	case 20: {
 			loadInvoiceHeaderForSelect();
+			break;
+		}
+	case 21: {
+			loadCustomerInfobyClientCode();
+			break;
+		}
+	case 22: {
+			createnewBilling();
 			break;
 		}
 }

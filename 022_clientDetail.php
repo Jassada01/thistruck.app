@@ -716,10 +716,6 @@ include 'check_cookie.php';
                     // Start process upload 
                     validateFile();
                 }
-
-                // ทำงานอื่นๆ เมื่อ input field มีข้อมูล
-
-
             });
 
 

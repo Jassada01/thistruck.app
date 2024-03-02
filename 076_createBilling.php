@@ -193,7 +193,7 @@ include 'check_cookie.php';
                                     <div class="card-body">
                                         <div class="row mb-5">
                                             <div class="col-md-12 text-end">
-                                                <button type="button" class="btn btn-primary" id="createNewInvoice"><i class="fas fa-plus fs-3"></i>สร้างอินวอยซ์</button>
+                                                <button type="button" class="btn btn-primary" id="createNewBilling"><i class="fas fa-plus fs-3"></i>สร้างใบวางบิลใหม่</button>
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-12">
@@ -243,21 +243,86 @@ include 'check_cookie.php';
 
         <!--end::Main-->
 
-        <div class="modal fade" id="conFirmCreateInvoiceModal" tabindex="-1" aria-labelledby="conFirmCreateInvoiceModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+        <div class="modal fade" id="conFirmCreateBillingModal" tabindex="-1" aria-labelledby="conFirmCreateBillingModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="conFirmCreateInvoiceModalLabel">ใบงานที่เลือก</h5>
+                        <h5 class="modal-title" id="conFirmCreateBillingModalLabel">สร้างใบวางบิลใหม่</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="container" id="Selected_Job_Panal">
+                        <div id="selected_billing_header">
+                            <div class="row  mb-50">
+                                <div class="col-md-4">
+                                    <span class="fw-bolder text-gray-700 text-xxl-end">ชื่อลูกค้า</span><BR>
+                                    <span class="text-gray-800" id="billing_customer_name"></span><BR>
+                                    <span class="fw-bolder text-gray-700 text-xxl-end">สาขา : </span><span class="text-gray-800" id="billing_customer_branch"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="fw-bolder text-gray-700 text-xxl-end">ที่อยู่</span><BR>
+                                    <span class="text-gray-800" id="billing_customer_address"></span><BR>
+                                    <span class="fw-bolder text-gray-700 text-xxl-end">Tax ID : </span><span class="text-gray-800" id="billing_customer_taxID"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="row  mb-50">
+                                        <div class="col-md-6">
+                                            <span class="fw-bolder text-gray-700 text-xxl-end">วันที่ออกเอกสาร</span><BR>
+                                            <span class="text-gray-800"><input class="form-control form-control-solid" placeholder="เลือก" id="new_billing_date" /></span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <span class="fw-bolder text-gray-700 text-xxl-end">วันที่ครบกำหนด</span><BR>
+                                            <span class="text-gray-800"><input class="form-control form-control-solid" placeholder="เลือก" id="new_billing_duedate" /></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr class="fw-bold fs-6 text-gray-800">
+                                        <th>No.</th>
+                                        <th>เลขอินวอยซ์</th>
+                                        <th>วันที่เอกสาร</th>
+                                        <th>Due Date</th>
+                                        <th class="text-end">ราคารวม</th>
+                                        <th class="text-end">หักภาษี ณ. ที่จ่าย</th>
+                                        <th>เอกสารอ้างอิง</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoiceTableBody">
+                                    <!-- Rows will be added here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="container mt-10" id="Selected_Job_summary_Panal">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <textarea class="form-control form-control-solid" placeholder="หมายเหตุ" id="new_billing_remark" ></textarea>
+                                </div>
+                                <div class="col-md-5">
+                                    <table class="no-border" style="width: 100%;">
+                                        <tr style="vertical-align: top;" class="py-5 fw-bold  border-bottom  border-gray-300 fs-4">
+                                            <th class="text-end">ยอดรวมทุกรายการ:</th>
+                                            <td class="text-end" id="Selected_Job_summary_Total"></td>
+                                        </tr>
+                                        <tr style="vertical-align: top;">
+                                            <th class="text-end">หัก ณ ที่จ่าย</th>
+                                            <td class="text-end" id="Selected_Job_summary_WHT_Total"></td>
+                                        </tr>
+
+                                    </table>
+                                </div>
+                            </div>
+
+
                         </div>
 
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-                        <button type="button" class="btn btn-primary" id="confirmCreateNewInvoice"><i class="bi bi-receipt-cutoff fs-3"></i>สร้างอินวอยซ์</button>
+                        <button type="button" class="btn btn-primary" id="confirmCreateNewBilling"><i class="bi bi-receipt-cutoff fs-3"></i>สร้างใบวางบิล</button>
                     </div>
                 </div>
             </div>
@@ -300,8 +365,11 @@ include 'check_cookie.php';
 
                 // Global Value ========================================================
                 var _selected_InvoiceID = [];
+                var _main_Invoice_List = [];
                 var _select_Client = "";
                 var _select_yearMonth = "";
+                var _selected_client_data = {};
+                var _selected_invoice_data = [];
 
 
 
@@ -369,7 +437,7 @@ include 'check_cookie.php';
                     ajaxData['f'] = '20';
                     ajaxData['startDate'] = startDate;
                     ajaxData['endDate'] = endDate;
-                    console.log(ajaxData);
+                    //console.log(ajaxData);
                     $.ajax({
                             type: 'POST',
                             dataType: "text",
@@ -378,7 +446,8 @@ include 'check_cookie.php';
                         })
                         .done(function(data) {
                             var data_arr = JSON.parse(data);
-                            console.log(data_arr);
+                            //console.log(data_arr);
+                            _main_Invoice_List = data_arr;
                             $("#count_selected").html("-")
                             _select_Client = "";
                             _select_yearMonth = "";
@@ -441,7 +510,7 @@ include 'check_cookie.php';
 
                                         }
                                     }, {
-                                        targets: [7,8],
+                                        targets: [7, 8],
                                         render: function(data, type, row) {
 
                                             // ตรวจสอบว่า data เป็นตัวเลขหรือไม่
@@ -526,98 +595,126 @@ include 'check_cookie.php';
                         _select_yearMonth = "";
                     }
 
-                    console.log(_selected_InvoiceID);
+                    //console.log(_selected_InvoiceID);
                 });
 
 
                 // createNewInvoice
-                $('#createNewInvoice').click(function() {
+                $('#createNewBilling').click(function() {
                     // Validate is selected 
                     if (_selected_InvoiceID.length == 0) {
                         Swal.fire({
-                            title: 'กรุณาเลือกใบงาน',
-                            text: 'กรุณาเลือกใบงานที่ต้องการสร้างอินวอยซ์',
+                            title: 'กรุณาเลือกอินวอยซ์',
+                            text: 'กรุณาเลือกอินวอยซ์ที่ต้องการวางบิล',
                             icon: 'warning',
                             confirmButtonText: 'ตกลง'
                         });
                     } else {
-                        // conFirmCreateInvoiceModal
-                        $('#conFirmCreateInvoiceModal').modal('show');
-                        loadJobHeaderOnlySelected();
+                        $("#new_billing_date").flatpickr({
+                            dateFormat: "Y-m-d",
+                            enableTime: false,
+                            locale: "th",
+                            altInput: true,
+                            altFormat: "j M y",
+                            thaiBuddhist: true,
+                            defaultDate: "today" // ใส่ค่า "today" เพื่อให้เป็นวันนี้เป็นค่าเริ่มต้น
+                        });
+
+                        $("#new_billing_duedate").flatpickr({
+                            dateFormat: "Y-m-d",
+                            enableTime: false,
+                            locale: "th",
+                            altInput: true,
+                            altFormat: "j M y",
+                            thaiBuddhist: true,
+                            defaultDate: "today" // ใส่ค่า "today" เพื่อให้เป็นวันนี้เป็นค่าเริ่มต้น
+                        });
+                        $('#conFirmCreateBillingModal').modal('show');
+                        loadInvoiceHeaderOnlySelected();
                     }
                 });
 
-                function loadJobHeaderOnlySelected() {
-                    var ajaxData = {};
-                    ajaxData['f'] = '2';
-                    ajaxData['selected_id'] = _selected_InvoiceID.join();
-                    //console.log(ajaxData);
+                function loadInvoiceHeaderOnlySelected() {
+                    const selectedInvoices = _main_Invoice_List.filter(invoice => _selected_InvoiceID.includes(invoice.id));
+                    _selected_invoice_data = selectedInvoices;
+                    let total_amt = 0;
+                    let total_wht_amt = 0;
+                    let tableBody = document.getElementById('invoiceTableBody');
+                    loadCustomerInfobyClientCode(selectedInvoices[0].ClientCode);
+                    // Reset Inner HTML
+                    tableBody.innerHTML = "";
+                    let tableNo = 0;
+                    selectedInvoices.forEach(function(invoice) {
+                        total_amt += parseFloat(invoice.total_price);
+                        total_wht_amt += parseFloat(invoice.wht);
+
+                        let invoice_date_print = moment(invoice.document_date).format('D MMM YY');
+                        let duedate_print = "-";
+
+                        if (invoice.due_date != null) {
+                            duedate_print = moment(invoice.duedate_print).format('D MMM YY');
+                        }
+                        tableNo += 1;
+                        var row = `<tr>
+                            <td>${tableNo}.</td>
+                            <td>${invoice.document_number}</td>
+                            <td>${invoice_date_print}</td>
+                            <td>${duedate_print || '-'}</td>
+                            <td class="text-end">${parseFloat(invoice.total_price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            <td class="text-end">${parseFloat(invoice.wht).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            <td>${invoice.reference}</td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+
+                    $("#Selected_Job_summary_Total").html(parseFloat(total_amt).toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }))
+                    $("#Selected_Job_summary_WHT_Total").html(parseFloat(total_wht_amt).toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }))
+                }
+
+                function loadCustomerInfobyClientCode(ClientCode) {
+                    let ajaxData = {};
+                    ajaxData['f'] = '21';
+                    ajaxData['ClientCode'] = ClientCode;
                     $.ajax({
                             type: 'POST',
                             dataType: "text",
                             url: 'function/06_interface/mainFunction.php',
-                            data: (ajaxData)
+                            data: (ajaxData),
                         })
                         .done(function(data) {
-                            var data_arr = JSON.parse(data);
-                            //console.log(data_arr);
-                            let selectedJobPanes = document.getElementById("Selected_Job_Panal");
-
-                            let cardHTML = data_arr.map(data => {
-                                return `
-                                                <!--begin::Card-->
-                                                <div class="card card-bordered mb-5">
-                                                    <div class="card-header justify-content-end ribbon ribbon-start">
-                                                        <div class="ribbon-label bg-primary">${data.job_no}</div>
-                                                        <div class="card-title">Ribbon ${data.job_name}</div>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <table class="no-border">
-                                                            <tr style="vertical-align: top;">
-                                                                <th  class="text-end">Client Name:</th>
-                                                                <td>${data.client_name}</td>
-                                                            </tr>
-                                                            <tr style="vertical-align: top;">
-                                                                <th  class="text-end">Customer Name:</th>
-                                                                <td>${data.customer_name}</td>
-                                                            </tr>
-                                                            <tr style="vertical-align: top;">
-                                                                <th  class="text-end">Ref. Doc. Data:</th>
-                                                                <td>${data.refDoc_Data}</td>
-                                                            </tr>
-                                                            <tr style="vertical-align: top;">
-                                                                <th  class="text-end">Job Type:</th>
-                                                                <td>${data.job_type}</td>
-                                                            </tr>
-                                                            <tr style="vertical-align: top;">
-                                                                <th  class="text-end">Container ID:</th>
-                                                                <td>${data.containerID}</td>
-                                                            </tr>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <!--end::Card-->
-                                                `;
-                            }).join("");
-
-                            selectedJobPanes.innerHTML = cardHTML;
+                            const data_arr = JSON.parse(data);
+                            const customerInfo = data_arr[0];
+                            _selected_client_data = customerInfo;
+                            $("#billing_customer_name").html(customerInfo.ClientName);
+                            $("#billing_customer_branch").html(customerInfo.Branch);
+                            $("#billing_customer_address").html(customerInfo.BillingAddress);
+                            $("#billing_customer_taxID").html(customerInfo.TaxID);
                         })
-                        .fail(function() {
+                        .fail(function(data) {
+                            console.log(data);
                             // just in case posting your form failed
                             alert("Posting failed.");
                         });
                 }
 
-                $('#confirmCreateNewInvoice').click(function() {
-                    $('#confirmCreateNewInvoice').prop('disabled', true);
-                    // Create New Invoice ======================
-                    //console.log(_select_Client);
+                $('#confirmCreateNewBilling').click(function() {
+                    $('#confirmCreateNewBilling').prop('disabled', true);
+                    // Create New Billing ======================
+                    _selected_client_data["billing_date"] = $('#new_billing_date').val();
+                    _selected_client_data["due_date"] = $('#new_billing_duedate').val();
+                    _selected_client_data["billing_remark"] = $('#new_billing_remark').val();
+
                     var ajaxData = {};
-                    ajaxData['f'] = '3';
-                    ajaxData['selectClient'] = _select_Client;
-                    ajaxData['selected_id'] = _selected_InvoiceID.join();
+                    ajaxData['f'] = '22';
+                    ajaxData['header'] = _selected_client_data;
+                    ajaxData['detail'] = _selected_invoice_data;
                     ajaxData['create_user'] = '<?php echo $MAIN_USER_DATA->name; ?>';
-                    //console.log(ajaxData);
                     $.ajax({
                             type: 'POST',
                             dataType: "text",
@@ -627,19 +724,18 @@ include 'check_cookie.php';
                                 // แสดง loading spinner หรือเป็นตัวอื่นๆที่เหมาะสม
 
                                 $('#loading-spinner').show();
-                                $('#conFirmCreateInvoiceModal').modal('hide');
+                                $('#conFirmCreateBillingModal').modal('hide');
                             },
                         })
                         .done(function(data) {
                             //console.log(data);
-                            window.location.href = '072_preformInvoice.php?invoice_id=' + data.match(/\d+/g).join("");;
+                            //window.location.href = '072_preformInvoice.php?invoice_id=' + data.match(/\d+/g).join("");;
                         })
                         .fail(function(data) {
                             console.log(data);
                             // just in case posting your form failed
                             alert("Posting failed.");
                         });
-
                 });
 
 
