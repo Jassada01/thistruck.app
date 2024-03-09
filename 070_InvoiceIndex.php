@@ -118,9 +118,9 @@ include 'check_cookie.php';
                 $checkword = " checked";
                 $inactive = isset($_GET['inactive']) && $_GET['inactive'] == 'true';
                 if ($inactive) {
-                    $checkword = "";
+                    $checkword = ""; 
                 }
-                ?>
+                ?> 
 
                 <!--end::Header-->
                 <!--begin::Content-->
