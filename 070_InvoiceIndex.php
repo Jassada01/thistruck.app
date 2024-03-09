@@ -198,7 +198,7 @@ include 'check_cookie.php';
                                                     <th><B>เลข Job</B></th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="tableBody">
+                                            <tbody id="tableBody">  
                                                 <!-- Data will be inserted here -->
                                             </tbody>
                                         </table>
