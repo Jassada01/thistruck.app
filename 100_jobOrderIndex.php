@@ -237,6 +237,7 @@ include 'check_cookie.php';
                                                             LEFT JOIN invoice_job_mapping c ON a.id = c.job_id AND c.attr = 'ใช้งาน'
                                                             LEFT JOIN invoice_header d ON c.invoice_id = d.id AND d.attr1 = 'ใช้งาน'
                                                             LEFT Join job_order_summary_view  e ON a.id = e.id
+                                                            WHERE b.jobStartDateTime >= DATE_SUB(NOW(),INTERVAL 30 DAY)
                                                         Order By 
                                                             a.id DESC;
                                                         ";

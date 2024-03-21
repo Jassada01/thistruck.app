@@ -8,7 +8,7 @@ include 'check_cookie.php';
 ?>
 
 <head>
-    <title>อินวอยซ์ > รายการ อินวอยซ์</title>
+    <title>วางบิล > รายการ วางบิล</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta property="og:locale" content="en_US" />
@@ -115,12 +115,12 @@ include 'check_cookie.php';
                 <?php
                 $fn = basename($_SERVER['PHP_SELF']);
                 include 'menu.php';
-                $checkword = " checked";
-                $inactive = isset($_GET['inactive']) && $_GET['inactive'] == 'true';
-                if ($inactive) {
-                    $checkword = ""; 
+                $checkword = "checked";
+                $canceled = isset($_GET['canceled']) && $_GET['canceled'] == 'true';
+                if ($canceled) {
+                    $checkword = "";
                 }
-                ?> 
+                ?>
 
                 <!--end::Header-->
                 <!--begin::Content-->
@@ -132,7 +132,7 @@ include 'check_cookie.php';
                             <!--begin::Page title-->
                             <div data-kt-swapper="true" data-kt-swapper-mode="prepend" data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}" class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
                                 <!--begin::Title-->
-                                <h1 class="d-flex align-items-center text-dark fw-bolder fs-3 my-1">รายการอินวอยซ์</h1>
+                                <h1 class="d-flex align-items-center text-dark fw-bolder fs-3 my-1">รายการวางบิล</h1>
                                 <!--end::Title-->
                                 <!--begin::Separator-->
                                 <span class="h-20px border-gray-200 border-start mx-4"></span>
@@ -149,7 +149,7 @@ include 'check_cookie.php';
                                         <span class="bullet bg-gray-200 w-5px h-2px"> </span>
                                     </li>
                                     <!--begin::Item-->
-                                    <li class="breadcrumb-item text-dark">อินวอยซ์</li>
+                                    <li class="breadcrumb-item text-dark">วางบิล</li>
                                 </ul>
                                 <!--end::Breadcrumb-->
                                 <!--end::Breadcrumb-->
@@ -160,7 +160,7 @@ include 'check_cookie.php';
                                 <!--begin::Wrapper-->
                                 <!--end::Wrapper-->
                                 <!--begin::Button-->
-                                <a href="071_createInvoice.php" class="btn btn-sm btn-primary"> <i class="fa fa-plus"></i> สร้างอินวอยซ์</a>
+                                <a href="076_createBilling.php" class="btn btn-sm btn-primary"> <i class="fa fa-plus"></i> สร้างใบวางบิล</a>
                                 <!--end::Button-->
                             </div>
                             <!--end::Actions-->
@@ -178,9 +178,13 @@ include 'check_cookie.php';
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="col-sm-9 mt-3 d-flex align-items-center px-3">
-                                            <h1><i class="bi bi-receipt-cutoff fs-3"></i> รายการอินวอยซ์</h1>
+                                            <h1><i class="bi bi-receipt-cutoff fs-3"></i> รายการวางบิล</h1>
                                         </div>
                                         <div class="card-toolbar">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="active" name="active" value="1" <?php echo $checkword; ?>>
+                                                <label class="form-check-label" for="active">เฉพาะรายการที่ยังใช้งาน</label>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -189,17 +193,17 @@ include 'check_cookie.php';
                                             <thead>
                                                 <tr class="fw-semibold fs-6 border-bottom border-gray-200 bg-opacity-50 bg-primary">
                                                     <th></th>
-                                                    <th></th>
                                                     <th><B>วันที่</B></th>
-                                                    <th><B>เลขอินวอยซ์</B></th>
-                                                    <th><B>รหัสลูกค้า</B></th>
-                                                    <th><B>ชื่อลูกค้า</B></th>
-                                                    <th><B>เอกสารอ้างอิง</B></th>
-                                                    <th><B>เลข Job</B></th>
                                                     <th><B>เลขที่วางบิล</B></th>
+                                                    <th><B>ชื่อลูกค้า</B></th>
+                                                    <th class="text-end"><B>จำนวนเงินทั้งสิ้น</B></th>
+                                                    <th class="text-end"><B>จำนวนเงินวางบิล</B></th>
+                                                    <th class="text-end"><B>หัก ณ.ที่จ่าย</B></th>
+                                                    <th><B>วันครบกำหนด</B></th>
+                                                    <th><B>สถานะ</B></th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="tableBody">  
+                                            <tbody id="tableBody">
                                                 <!-- Data will be inserted here -->
                                             </tbody>
                                         </table>
@@ -301,10 +305,11 @@ include 'check_cookie.php';
                 }
 
 
-                function loadInvoiceHeader() {
+                function loadBillingHeader() {
                     var ajaxData = {};
                     // Onlyhavevalue
-                    ajaxData['f'] = '12';
+                    ajaxData['f'] = '26';
+                    ajaxData['active'] = '<?php echo $checkword;?>';
                     //console.log(ajaxData);
                     $.ajax({
                             type: 'POST',
@@ -315,33 +320,34 @@ include 'check_cookie.php';
                         .done(function(data) {
                             //console.log(data)
                             let data_arr = JSON.parse(data);
-                            //console.log(data_arr);
                             let tableContent = '';
                             data_arr.forEach(item => {
+                                var formattedBilling_date = moment(item.billing_date).format('D MMM');
+                                var formattedDuedate = moment(item.due_date).format('D MMM');
                                 tableContent += '<tr>';
-                                tableContent += '<td><i class="bi bi-pencil-fill text-danger badge_pointer editInvoice" k-value="'+item.id+'"></i></td>';
-                                tableContent += '<td><i class="bi bi-bookmark-check-fill text-info badge_pointer summaryInvoice" k-value="'+item.id+'"></i></td>';
-                                tableContent += '<td>' + (item.document_date || '-') + '</td>';
-                                tableContent += '<td>' + (item.document_number || '-') + '</td>';
-                                tableContent += '<td>' + (item.ContactID || '-') + '</td>';
-                                tableContent += '<td>' + (item.ContactName || '-') + '</td>';
-                                tableContent += '<td>' + (item.reference || '-') + '</td>';
-                                tableContent += '<td>' + (item.job_no || '-') + '</td>';
-
-                                if (item.billing_id !== "")
-                                {
-                                    tableContent += '<td><a href="077_billingDetail.php?billingID='+item.billing_id+'">'+item.billing_no+'</a></td>';
-                                }
-                                else
-                                {
-                                    tableContent += '<td></td>';
-                                }
-                                
+                                tableContent += '<td><i class="bi bi-bookmark-check-fill text-info badge_pointer summaryฺBilling" k-value="' + item.id + '"></i></td>';
+                                tableContent += '<td>' + (formattedBilling_date || '-') + '</td>';
+                                tableContent += '<td>' + (item.billing_no || '-') + '</td>';
+                                tableContent += '<td>' + (item.client_name || '-') + '</td>';
+                                tableContent += '<td class="text-end">' + (parseFloat(item.total_amount).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) || '-') + '</td>';
+                                tableContent += '<td class="text-end">' + (parseFloat(item.total_amount).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) || '-') + '</td>';
+                                tableContent += '<td class="text-end">' + (parseFloat(item.wht_amt).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) || '-') + '</td>';
+                                tableContent += '<td>' + (formattedDuedate || '-') + '</td>';
+                                tableContent += '<td>' + (item.status_thai || '-') + '</td>';
                                 tableContent += '</tr>';
                             });
                             $('#tableBody').html(tableContent);
 
-                            
+
                             $('#dataTable').DataTable({
                                 search: {
                                     return: true,
@@ -365,19 +371,23 @@ include 'check_cookie.php';
                         });
                 }
 
-                $('body').on('click', '.editInvoice', function() {
-                    let targetInvoiceID = $(this).attr("k-value");
-                    window.open('072_preformInvoice.php?invoice_id='+targetInvoiceID, '_blank');
+
+                $('body').on('click', '.summaryฺBilling', function() {
+                    let targetID = $(this).attr("k-value");
+                    window.open('077_billingDetail.php?billingID=' + targetID, '_blank');
                 });
-                
-                $('body').on('click', '.summaryInvoice', function() {
-                    let targetInvoiceID = $(this).attr("k-value");
-                    window.open('073_InvoiceResult.php?invoice_id='+targetInvoiceID, '_blank');
-                });
+
+                $('#active').change(function() {
+                if ($(this).is(":checked")) { // ถ้าถูกติ๊ก
+                    window.location.href = '075_billingIndex.php'; // รีโหลดหน้าเว็บพร้อมกับส่งพารามิเตอร์ ?inactive=true
+                } else { // ถ้าไม่ถูกติ๊ก
+                    window.location.href = '075_billingIndex.php?canceled=true'; // รีโหลดหน้าเว็บพร้อมกับส่งพารามิเตอร์ ?inactive=true
+                }
+            });
 
 
                 // Initial Run ===================================================================
-                loadInvoiceHeader();
+                loadBillingHeader();
             });
         </script>
         <!--end::Javascript-->

@@ -288,6 +288,17 @@ include 'check_cookie.php';
                                                 <span class="card-label fw-bolder fs-3 mb-1" onclick="window.location.href = '100_jobOrderIndex.php';">รายการใบงานวันนี้</span>
                                                 <span class="text-muted mt-1 fw-bold fs-7">เฉพาะงานที่กำลังดำเนินการ</span>
                                             </h3>
+
+                                            <div class="card-toolbar">
+                                                <div class="input-group">
+                                                    <button type="button" class="btn btn-default pull-right" id="daterange-btn">
+                                                        <span>
+                                                            <i class="fa fa-calendar"></i> <span id="calendarLabel">เลือกระยะเวลา</span>
+                                                        </span>
+                                                        <i class="fa fa-caret-down"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                         <!--end::Header-->
                                         <!--begin::Body-->
@@ -792,6 +803,31 @@ include 'check_cookie.php';
 
                 // ทำสิ่งอื่น ๆ ที่ต้องการกับข้อมูล name และ type ที่ได้
             });
+
+            $('#daterange-btn').daterangepicker({
+                    ranges: {
+                        'วันนี้': [moment(), moment()],
+                        'เมื่อวาน': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                        'พรุ่งนี้': [moment().subtract(-1, 'days'), moment().subtract(-1, 'days')],
+                    },
+                    startDate: moment(),
+                    endDate: moment(),
+                    locale: {
+                        "format": "MM/DD/YYYY",
+                        "separator": " - ",
+                        "applyLabel": "ยืนยัน",
+                        "cancelLabel": "ยกเลิก",
+                        "fromLabel": "จาก",
+                        "toLabel": "ถึง",
+                        "customRangeLabel": "เลือกเอง",
+                    }
+
+                },
+                function(start, end, ranges) {
+                    loadDailyBoard(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'))
+                    //window.location.href = '100_jobOrderIndex.php?start=' + start.format('YYYY-MM-DD') + '&end=' + end.format('YYYY-MM-DD');
+                }
+            )
 
 
 
@@ -1945,10 +1981,11 @@ include 'check_cookie.php';
             }
 
 
-            function loadDailyBoard() {
+            function loadDailyBoard(startDate, endDate) {
                 var ajaxData = {};
                 ajaxData['f'] = '11';
-                //console.log(ajaxData);
+                ajaxData['startDate'] = startDate;
+                ajaxData['endDate'] = endDate;
                 $.ajax({
                         type: 'POST',
                         dataType: "text",
@@ -1965,7 +2002,7 @@ include 'check_cookie.php';
                             print_text += "<TR>";
                             print_text += "<TD><a href='102_confirmWorkOrder.php?job_id=" + item.id + "'>" + item.job_name + "</a></TD>";
                             print_text += "<TD>" + sizeOfJob + "</TD>";
-                            print_text += '<TD> <div class="text-danger fw-semibold fs-7">'+ weightOfJob +'</div></TD>';
+                            print_text += '<TD> <div class="text-danger fw-semibold fs-7">' + weightOfJob + '</div></TD>';
 
                             // Generate Trip Text
                             let tripText = "";
@@ -2020,7 +2057,7 @@ include 'check_cookie.php';
             loadDJobPerMonth();
             Create_JobDailaPanelSeletion();
             loadJoobDialyforGraph();
-            loadDailyBoard();
+            loadDailyBoard(moment().format("YYYY-MM-DD"), moment().format("YYYY-MM-DD"));
 
 
         });

@@ -142,7 +142,7 @@ include 'check_cookie.php';
                                     </li>
                                     <!--begin::Item-->
                                     <li class="breadcrumb-item text-muted">
-                                        <a href="070_InvoiceIndex.php" class="text-muted text-hover-primary">วางบิล</a>
+                                        <a href="075_billingIndex.php" class="text-muted text-hover-primary">วางบิล</a>
                                     </li>
                                     <!--end::Item-->
                                     <li class="breadcrumb-item">
@@ -729,7 +729,7 @@ include 'check_cookie.php';
                         })
                         .done(function(data) {
                             //console.log(data);
-                            //window.location.href = '072_preformInvoice.php?invoice_id=' + data.match(/\d+/g).join("");;
+                            window.location.href = '077_billingDetail.php?billingID=' + data.match(/\d+/g).join("");;
                         })
                         .fail(function(data) {
                             console.log(data);

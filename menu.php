@@ -51,7 +51,7 @@
                                     <!--begin::Menu link-->
                                     <a href="#" class="menu-link">
                                         <span class="menu-icon">
-                                            <i class="bi bi-truck fs-3"></i>
+                                            <i class="fas fa-file-invoice"></i>
                                         </span>
                                         <span class="menu-title">อินวอยซ์</span>
                                         <span class="menu-arrow"></span>
@@ -75,7 +75,7 @@
                                         <div class="menu-item">
                                             <a href="071_createInvoice.php" class="menu-link">
                                                 <span class="menu-icon">
-                                                    <i class="fas fa-receipt fs-3"></i>
+                                                    <i class="fas fa-file-invoice"></i>
                                                 </span>
                                                 <span class="menu-title">สร้าง อินวอยซ์</span>
                                             </a>
@@ -90,7 +90,7 @@
                                     <!--begin::Menu link-->
                                     <a href="#" class="menu-link">
                                         <span class="menu-icon">
-                                            <i class="bi bi-truck fs-3"></i>
+                                            <i class="fas fa-file-invoice-dollar"></i>
                                         </span>
                                         <span class="menu-title">วางบิล</span>
                                         <span class="menu-arrow"></span>
@@ -101,7 +101,7 @@
                                     <div class="menu-sub menu-sub-dropdown w-175px py-2">
                                         <!--begin::Menu item-->
                                         <div class="menu-item">
-                                            <a href="#" class="menu-link">
+                                            <a href="075_billingIndex.php" class="menu-link">
                                                 <span class="menu-icon">
                                                     <i class="fas fa-list-ul fs-3"></i>
                                                 </span>
@@ -114,7 +114,7 @@
                                         <div class="menu-item">
                                             <a href="076_createBilling.php" class="menu-link">
                                                 <span class="menu-icon">
-                                                    <i class="fas fa-receipt fs-3"></i>
+                                                    <i class="fas fa-file-invoice-dollar"></i>
                                                 </span>
                                                 <span class="menu-title">สร้าง วางบิล</span>
                                             </a>

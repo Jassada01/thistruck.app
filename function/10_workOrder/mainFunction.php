@@ -3800,6 +3800,14 @@ function update_trip_status_CloseJob()
 	} else {
 		echo "0 results";
 	}
+
+	// Reupdate Again 
+	//$sql = "UPDATE job_order_detail_trip_info SET status = 'จบงาน', complete_flag = 1, update_user = '$update_user' WHERE id = $MAIN_trip_id";
+	// ทำการ Update ข้อมูล 
+	//if (!$conn->query($sql)) {
+	//	echo $conn->errno;
+	//	exit();
+	//}
 	mysqli_close($conn);
 }
 

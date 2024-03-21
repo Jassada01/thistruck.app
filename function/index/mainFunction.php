@@ -613,13 +613,12 @@ function loadDailyBoard()
 	  From 
 		job_order_detail_trip_info a 
 	  Where 
-		DATE(a.jobStartDateTime) = CURRENT_DATE
+		DATE(a.jobStartDateTime) BETWEEN '$startDate' AND '$endDate'
 	) 
   Order By 
 	a.ClientID;
   
   ";
-
 	$res = $conn->query(trim($sql));
 	
 	$data_Array = array();

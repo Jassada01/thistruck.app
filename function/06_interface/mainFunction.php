@@ -1036,30 +1036,37 @@ function loadInvoiceIndex()
 
 
 	$sql = "SELECT 
-			a.id, 
-			a.document_date, 
-			a.document_number, 
-			a.customer_code AS ContactID, 
-			e.ClientName AS ContactName, 
-			a.reference, 
-			GROUP_CONCAT(d.job_no) AS job_no 
-		FROM 
-			invoice_header a 
-			LEFT JOIN contacts b ON a.customer_code = b.ContactID 
-			LEFT JOIN invoice_job_mapping c ON a.id = c.invoice_id 
-			LEFT JOIN job_order_header d ON c.job_id = d.id
-			LEFT JOIN client_info e ON a.customer_code = e.ClientCode
-		WHERE 
-			a.attr1 = 'ใช้งาน' 
-		GROUP BY 
-			a.id, 
-			a.document_date, 
-			a.document_number, 
-			b.ContactID, 
-			b.ContactName, 
-			a.reference 
-		ORDER BY 
-			a.id DESC;  
+				a.id, 
+				a.document_date, 
+				a.document_number, 
+				a.customer_code AS ContactID, 
+				e.ClientName AS ContactName, 
+				a.reference, 
+				GROUP_CONCAT(d.job_no) AS job_no, 
+				IFNULL(g.id, '') as billing_id, 
+				IFNULL(g.billing_no, '') AS billing_no 
+			FROM 
+				invoice_header a 
+				LEFT JOIN contacts b ON a.customer_code = b.ContactID 
+				LEFT JOIN invoice_job_mapping c ON a.id = c.invoice_id 
+				LEFT JOIN job_order_header d ON c.job_id = d.id 
+				LEFT JOIN client_info e ON a.customer_code = e.ClientCode 
+				LEFT JOIN billing_detail f ON f.invoice_id = a.id 
+				AND f.active = 1 
+				LEFT JOIN billing_header g ON f.billing_header_id = g.id 
+				AND g.status <> 4 
+			WHERE 
+				a.attr1 = 'ใช้งาน' 
+			GROUP BY 
+				a.id, 
+				a.document_date, 
+				a.document_number, 
+				b.ContactID, 
+				b.ContactName, 
+				a.reference 
+			ORDER BY 
+				a.id DESC;
+	
 		";
 	$res = $conn->query(trim($sql));
 
@@ -1460,6 +1467,7 @@ function loadInvoiceHeaderForSelect()
 		WHERE 
 			a.attr1 <> 'ยกเลิก'
 			AND a.document_date BETWEEN '$startDate' AND '$endDate'
+			AND a.id NOT IN (SELECT a.invoice_id FROM billing_detail a Where a.active = 1)
 		";
 	$res = $conn->query(trim($sql));
 
@@ -1506,6 +1514,7 @@ function createnewBilling()
 	$header = $_POST['header'];
 
 	// สร้างตัวแปรสำหรับข้อมูลที่จะ insert
+	$create_user = $_POST['create_user'];
 	$clientID = $header['ClientID'];
 	$clientCode = $header['ClientCode'];
 	$clientName = $header['ClientName'];
@@ -1520,7 +1529,20 @@ function createnewBilling()
 	include "../connectionDb.php";
 
 	// สร้าง SQL script สำหรับ insert
-	$sql = "INSERT INTO billing_header (billing_no, clientID, client_code, client_name, branch, billing_address, tax_id, billing_date, due_date, remark) VALUES ('$new_billing_running_no', '$clientID', '$clientCode', '$clientName', '$branch', '$billingAddress', '$taxID', '$billingDate', '$dueDate', '$remark')";
+	$sql = "Insert Into billing_header (
+		billing_no, clientID, client_code, 
+		client_name, branch, billing_address, 
+		tax_id, billing_date, due_date, remark,
+		create_datetime, create_user, update_datetime, update_user
+	  ) 
+	  VALUES 
+		(
+		  '$new_billing_running_no', '$clientID', 
+		  '$clientCode', '$clientName', '$branch', 
+		  '$billingAddress', '$taxID', '$billingDate', 
+		  '$dueDate', '$remark', CURRENT_TIMESTAMP, '$create_user', CURRENT_TIMESTAMP, '$create_user'
+		)
+	  ";
 	if (!$conn->query($sql)) {
 		echo  $conn->errno;
 		exit();
@@ -1554,17 +1576,236 @@ function createnewBilling()
 			$billing_id
 		);
 
-		if ($stmt->execute()) {
-			echo "Record inserted successfully.\n";
-		} else {
+		if (!$stmt->execute()) {
 			echo "Error inserting record: " . $stmt->error . "\n";
 		}
 
 		$stmt->close();
 	}
+
+	// Update Amount 
+	$sql = "UPDATE billing_header bh
+		SET bh.total_amount = (SELECT SUM(bd.total_amount) FROM billing_detail bd WHERE bd.billing_header_id = $billing_id),
+			bh.vat_amount = (SELECT SUM(bd.vat_amount) FROM billing_detail bd WHERE bd.billing_header_id = $billing_id),
+			bh.wht_amt = (SELECT SUM(bd.wht_amount) FROM billing_detail bd WHERE bd.billing_header_id = $billing_id),
+			bh.grand_total = (SELECT SUM(bd.grand_total_amount) FROM billing_detail bd WHERE bd.billing_header_id = $billing_id)
+		WHERE bh.id = $billing_id;
+";
+	if (!$conn->query($sql)) {
+		echo  $conn->errno;
+		exit();
+	}
 	echo $billing_id;
 	mysqli_close($conn);
 }
+
+// F = 23
+function loadBillingData()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+
+	$data_Array = array();
+	$data_Array['detail'] = array();
+
+
+	// สร้างคำสั่ง SQL สำหรับข้อมูล Header
+	//$sql = "SELECT * FROM invoice_header WHERE id = $invoice_id";
+	$sql = "SELECT 
+		a.*, 
+		b.status_thai, 
+		b.status_eng 
+	FROM 
+		billing_header a 
+		Inner JOIN system_status_master b ON a.status = b.status_code 
+		AND b.status_type = 'BL' 
+	where 
+		a.id = $billingID";
+
+
+	$res = $conn->query(trim($sql));
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array['header'] = $row;
+	}
+
+	// สร้างคำสั่ง SQL สำหรับข้อมูล Detail
+	//$sql = "SELECT * FROM invoice_detail_raw WHERE invoice_id = $invoice_id order by job_id, trip_id, id LIMIT 20";
+	$sql = "SELECT * FROM billing_detail a 
+		Where a.billing_header_id = $billingID
+		Order By a.detail_id;";
+
+
+	$res = $conn->query(trim($sql));
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array['detail'][] = $row;
+	}
+
+	mysqli_close($conn);
+	echo json_encode($data_Array);
+}
+
+// F = 24
+function updateBillingData()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+
+	$data_Array = array();
+	$data_Array['detail'] = array();
+
+
+	// Cancel In Header
+	$updateSQL = "UPDATE billing_header SET 
+		ref = '$ref'
+		, due_date = '$due_date'
+		, remark = '$remark'
+		, update_user = '$update_user'
+		, update_datetime = CURRENT_TIMESTAMP
+	WHERE id = $billing_id";
+	echo $updateSQL;
+	if (!$conn->query($updateSQL)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	mysqli_close($conn);
+}
+
+// F = 25
+function cancelBilling()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+
+	$data_Array = array();
+	$data_Array['detail'] = array();
+
+
+	// Cancel In Header
+	$updateSQL = "UPDATE billing_header SET 
+		status = 4
+		, update_user = '$update_user'
+		, update_datetime = CURRENT_TIMESTAMP
+	WHERE id = $billing_id";
+	echo $updateSQL;
+	if (!$conn->query($updateSQL)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	// Cancel In Detail
+	$updateSQL = "UPDATE billing_detail SET 
+		active = 0
+	WHERE billing_header_id  = $billing_id";
+	echo $updateSQL;
+	if (!$conn->query($updateSQL)) {
+		echo  $conn->errno;
+		exit();
+	}
+
+	mysqli_close($conn);
+}
+
+// F = 26
+function loadBillingIndex()
+{
+	// Load All Data from Paramitor
+	foreach ($_POST as $key => $value) {
+		$a = htmlspecialchars($key);
+		$$a = preg_replace('~[^a-z0-9_ก-๙\s/,//.//://;//?//_//^//>//<//=//%//#//@//!//{///}//[//]/-//&//+//*///]~ui ', '', trim(str_replace("'", "", htmlspecialchars($value))));
+	}
+
+	// เชื่อมต่อฐานข้อมูล MySQL
+	include "../connectionDb.php";
+
+
+	$data_Array = array();
+
+	if ($active == "checked") {
+		$sql = "SELECT 
+		a.id, 
+		a.billing_no,
+		a.billing_date, 
+		a.due_date, 
+		a.clientID, 
+		a.client_name, 
+		a.total_amount, 
+		a.wht_amt, 
+		a.status, 
+		c.status_thai, 
+		c.status_eng, 
+		GROUP_CONCAT(b.invoice_no) AS invoice 
+	FROM 
+		billing_header a 
+		Inner Join billing_detail b ON a.id = b.billing_header_id 
+		Left Join system_status_master c ON a.status = c.status_code 
+		AND c.status_type = 'BL' 
+	WHERE a.status <> 4
+	Group By 
+		a.id 
+	Order By 
+		a.id DESC;
+	";
+	} else {
+		$sql = "SELECT 
+		a.id, 
+		a.billing_no,
+		a.billing_date, 
+		a.due_date, 
+		a.clientID, 
+		a.client_name, 
+		a.total_amount, 
+		a.wht_amt, 
+		a.status, 
+		c.status_thai, 
+		c.status_eng, 
+		GROUP_CONCAT(b.invoice_no) AS invoice 
+	FROM 
+		billing_header a 
+		Inner Join billing_detail b ON a.id = b.billing_header_id 
+		Left Join system_status_master c ON a.status = c.status_code 
+		AND c.status_type = 'BL' 
+	Group By 
+		a.id 
+	Order By 
+		a.id DESC;
+	";
+	}
+
+	$res = $conn->query(trim($sql));
+
+
+	while ($row = $res->fetch_assoc()) {
+		$data_Array[] = $row;
+	}
+
+	mysqli_close($conn);
+	echo json_encode($data_Array);
+}
+
 
 
 //============================ MAIN =========================================================
@@ -1656,6 +1897,22 @@ switch ($f) {
 		}
 	case 22: {
 			createnewBilling();
+			break;
+		}
+	case 23: {
+			loadBillingData();
+			break;
+		}
+	case 24: {
+			updateBillingData();
+			break;
+		}
+	case 25: {
+			cancelBilling();
+			break;
+		}
+	case 26: {
+			loadBillingIndex();
 			break;
 		}
 }
