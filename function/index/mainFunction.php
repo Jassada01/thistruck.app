@@ -376,7 +376,7 @@ function LoadDataforPrivotTable()
 		Where 
 			a.status <> 'ยกเลิก' 
 			AND b.status <> 'ยกเลิก' 
-			AND DATE_FORMAT(b.jobStartDateTime, '%m%Y') = DATE_FORMAT(current_timestamp, '%m%Y') 
+			AND DATE(b.jobStartDateTime) BETWEEN '$startDate' AND '$endDate'
 		GROUP By 
 			a.job_name, 
 			a.job_type, 

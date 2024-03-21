@@ -605,6 +605,13 @@ include 'check_cookie.php';
                                                 <span class="text-muted mt-1 fw-bold fs-7"></span>
                                             </h3>
                                             <div class="card-toolbar">
+                                                
+                                                <button type="button" class="btn btn-default pull-right" id="daterange-btn2">
+                                                    <span>
+                                                        <i class="fa fa-calendar"></i> <span id="calendarLabel2">เลือกระยะเวลา</span>
+                                                    </span>
+                                                    <i class="fa fa-caret-down"></i>
+                                                </button>
                                                 <!--begin::Menu-->
                                                 <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary" id="btnOpenPivotTablePanel">
                                                     <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
@@ -824,7 +831,39 @@ include 'check_cookie.php';
 
                 },
                 function(start, end, ranges) {
+                    $('#daterange-btn span').html(start.format('DD MMM YYYY') + ' - ' + end.format('DD MMM YYYY'));
+
                     loadDailyBoard(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'))
+                    //window.location.href = '100_jobOrderIndex.php?start=' + start.format('YYYY-MM-DD') + '&end=' + end.format('YYYY-MM-DD');
+                }
+            )
+
+            $('#daterange-btn2').daterangepicker({
+                    ranges: {
+                        '30 วันล่าสุด': [moment().subtract(29, 'days'), moment()],
+                        'เดือนนี้': [moment().startOf('month'), moment().endOf('month')],
+                        'เดือนหน้า': [moment().add(1, 'month').startOf('month'), moment().add(1, 'month').endOf('month')],
+                        'เดือนที่ผ่านมา': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                        '3 เดือนที่ผ่านมา': [moment().subtract(3, 'month'), moment()],
+                        'ปีนี้': [moment().startOf('year'), moment().endOf('year')]
+                    },
+                    startDate: moment().startOf('month'),
+                    endDate: moment().endOf('month'),
+                    locale: {
+                        "format": "MM/DD/YYYY",
+                        "separator": " - ",
+                        "applyLabel": "ยืนยัน",
+                        "cancelLabel": "ยกเลิก",
+                        "fromLabel": "จาก",
+                        "toLabel": "ถึง",
+                        "customRangeLabel": "เลือกเอง",
+                    }
+
+                },
+                function(start, end, ranges) {
+                    //loadDailyBoard(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
+                    $('#daterange-btn2 span').html(start.format('DD MMM YYYY') + ' - ' + end.format('DD MMM YYYY'));
+                    LoadDataforPrivotTable(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
                     //window.location.href = '100_jobOrderIndex.php?start=' + start.format('YYYY-MM-DD') + '&end=' + end.format('YYYY-MM-DD');
                 }
             )
@@ -1504,9 +1543,11 @@ include 'check_cookie.php';
                     });
             }
 
-            function LoadDataforPrivotTable() {
+            function LoadDataforPrivotTable(startDate, endDate) {
                 var ajaxData = {};
                 ajaxData['f'] = '6';
+                ajaxData['startDate'] = startDate;
+                ajaxData['endDate'] = endDate;
                 $.ajax({
                         type: 'POST',
                         dataType: "text",
@@ -1514,8 +1555,8 @@ include 'check_cookie.php';
                         data: (ajaxData)
                     })
                     .done(function(data) {
+                        
                         var data_arr = JSON.parse(data);
-                        //console.log(data_arr);
 
                         for (let i = 0; i < data_arr.length; i++) {
                             const oldDate = data_arr[i]['วันที่'];
@@ -2052,7 +2093,7 @@ include 'check_cookie.php';
             LoadMonthlyByClient();
             LoadJobWorkLoad();
             getThisMonthPaymenteachDriver();
-            LoadDataforPrivotTable();
+            LoadDataforPrivotTable(moment().startOf('month').format("YYYY-MM-DD"),moment().endOf('month').format("YYYY-MM-DD"));
             loadDJobPerDate();
             loadDJobPerMonth();
             Create_JobDailaPanelSeletion();

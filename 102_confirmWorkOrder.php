@@ -3878,6 +3878,7 @@ include 'check_cookie.php';
                 altInput: true,
                 altFormat: "j M y เวลา H:i น.",
                 thaiBuddhist: true,
+                minuteIncrement: 1, // ตั้งค่านี้เพื่อให้เวลาเพิ่มขึ้นทีละ 1 นาที
             });
 
             $("#selectDateTimeforClosing").flatpickr({
@@ -3887,6 +3888,7 @@ include 'check_cookie.php';
                 altInput: true,
                 altFormat: "j M y เวลา H:i น.",
                 thaiBuddhist: true,
+                minuteIncrement: 1, // ตั้งค่านี้เพื่อให้เวลาเพิ่มขึ้นทีละ 1 นาที
             });
 
             //btnConfirmsetVGMClosing
